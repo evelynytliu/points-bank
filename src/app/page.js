@@ -82,74 +82,113 @@ export default function Home() {
     setFamilyMembers([]);
   };
 
-  return (
-    <main className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#050508] p-4">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cyan-500/10 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px]" />
+  const [theme, setTheme] = useState('cyber');
 
-      <div className="glass-panel w-full max-w-[480px] p-8 md:p-12 text-center z-10 border-white/[0.05]">
-        <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30 shadow-inner">
-          <Sparkles className="w-8 h-8 text-cyan-400" />
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('family_theme') || 'doodle';
+    setTheme(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    if (theme === 'doodle') {
+      document.body.classList.add('theme-doodle');
+    } else {
+      document.body.classList.remove('theme-doodle');
+    }
+    localStorage.setItem('family_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'cyber' ? 'doodle' : 'cyber');
+
+  return (
+    <main className={`min-h-screen flex items-center justify-center relative overflow-hidden p-4 transition-colors duration-500`}>
+      {/* Background Decor */}
+      {theme === 'cyber' ? (
+        <>
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cyan-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px]" />
+        </>
+      ) : (
+        <svg className="absolute inset-0 w-full h-full opacity-[0.03] pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path d="M0,20 Q50,0 100,20 T200,20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+          <path d="M0,80 Q50,100 100,80 T200,80" fill="none" stroke="currentColor" strokeWidth="0.5" />
+        </svg>
+      )}
+
+      <div className="glass-panel w-full max-w-[480px] p-8 md:p-12 text-center z-10">
+        <div className={`inline-flex items-center justify-center w-16 h-16 mb-6 transition-all duration-500 ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
+          <Sparkles className={`w-8 h-8 ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`} />
         </div>
 
         <h1 className="text-4xl font-black mb-6 tracking-tight">
-          <span className="bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent italic tracking-tighter uppercase">POINTS</span>
-          <span className="text-cyan-400 italic"> V3</span>
+          <span className={`${theme === 'cyber' ? 'bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent italic' : 'text-[#4a4a4a]'} uppercase`}>POINTS</span>
+          <span className={theme === 'cyber' ? 'text-cyan-400 italic' : 'text-[#ff8a80]'}> V3</span>
         </h1>
 
         {/* Tab Switcher */}
-        <div className="flex bg-black/40 p-1 rounded-xl mb-8 border border-white/5">
+        <div className={`flex p-1 rounded-xl mb-8 border ${theme === 'cyber' ? 'bg-black/40 border-white/5' : 'bg-[#eee] border-[#4a4a4a] border-2 shadow-[2px_2px_0px_#d8c4b6]'}`}>
           <button
             onClick={() => setActiveTab('parent')}
-            className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'parent' ? 'bg-white/10 text-white shadow-lg' : 'text-slate-500'}`}
+            className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'parent'
+              ? (theme === 'cyber' ? 'bg-white/10 text-white shadow-lg' : 'bg-[#4a4a4a] text-white')
+              : (theme === 'cyber' ? 'text-slate-500' : 'text-[#888]')
+              }`}
           >
             <Shield className="w-4 h-4" /> 家長管理
           </button>
           <button
             onClick={() => { setActiveTab('kid'); resetKidFlow(); }}
-            className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'kid' ? 'bg-white/10 text-white shadow-lg' : 'text-slate-500'}`}
+            className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'kid'
+              ? (theme === 'cyber' ? 'bg-white/10 text-white shadow-lg' : 'bg-[#4a4a4a] text-white')
+              : (theme === 'cyber' ? 'text-slate-500' : 'text-[#888]')
+              }`}
           >
             <UserCheck className="w-4 h-4" /> 小孩專區
           </button>
         </div>
 
         {activeTab === 'parent' ? (
-          <div className="space-y-6">
-            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed font-medium">使用 Google 帳號登入後即可管理您家庭的點數規則與進度。</p>
-              <button onClick={handleParentLogin} className="btn btn-primary w-full group py-4 font-black shadow-xl shadow-cyan-500/10">
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className={`p-6 border rounded-2xl ${theme === 'cyber' ? 'bg-white/[0.02] border-white/5' : 'bg-[#fcfbf9] border-[#4a4a4a] border-dashed border-2'}`}>
+              <p className={`text-sm mb-6 leading-relaxed font-medium ${theme === 'cyber' ? 'text-slate-400' : 'text-[#777]'}`}>
+                {theme === 'cyber' ? '使用 Google 帳號登入後即可管理規則與進度。' : '登入家長帳號，開始這段溫馨的管教旅程。'}
+              </p>
+              <button onClick={handleParentLogin} className="btn btn-primary w-full group py-4 font-black shadow-xl">
                 <LogIn className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 GOOGLE 帳號登入
               </button>
             </div>
-            <button onClick={() => setShowJoinModal(true)} className="text-cyan-400/60 hover:text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] transition-all">
+            <button onClick={() => setShowJoinModal(true)} className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-110 ${theme === 'cyber' ? 'text-cyan-400/60 hover:text-cyan-400' : 'text-[#ff8a80]'}`}>
               我有家庭邀請碼
             </button>
           </div>
         ) : (
-          <div className="space-y-6 min-h-[300px] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4">
+          <div className="space-y-6 min-h-[300px] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             {kidStep === 'family' ? (
               <div className="space-y-6">
                 <div className="text-left space-y-1">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">第一步：輸入家庭訪問碼</label>
+                  <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#888]'}`}>第一步：輸入家庭訪問碼</label>
                   <input
                     type="text"
                     placeholder="例如: 6b5a7c8d"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-white focus:ring-2 focus:ring-cyan-500 outline-none text-center font-bold tracking-[0.2em] text-xl placeholder:text-slate-700 placeholder:text-xs uppercase"
+                    className={`w-full rounded-2xl p-5 focus:ring-2 outline-none text-center font-bold tracking-[0.2em] text-xl transition-all ${theme === 'cyber'
+                      ? 'bg-black/40 border border-white/10 text-white focus:ring-cyan-500 placeholder:text-slate-700'
+                      : 'bg-[#fff] border-2 border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80] placeholder:text-[#ccc] shadow-[4px_4px_0px_#d8c4b6]'
+                      } placeholder:text-xs uppercase`}
                     value={inviteCode}
                     onChange={e => setInviteCode(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && findFamily()}
                   />
                 </div>
-                <button onClick={findFamily} className="btn btn-primary w-full py-5 uppercase font-black tracking-widest shadow-xl shadow-cyan-500/10">
+                <button onClick={findFamily} className="btn btn-primary w-full py-5 uppercase font-black tracking-widest shadow-xl">
                   進入家庭 🚀
                 </button>
               </div>
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={resetKidFlow} className="text-slate-500 hover:text-white flex items-center gap-1 text-xs font-bold"><ArrowLeft className="w-3 h-3" /> 返回</button>
-                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">第二步：選你的名字</span>
+                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#888] hover:text-[#2d2d2d]'} flex items-center gap-1 text-xs font-bold transition-colors`}><ArrowLeft className="w-3 h-3" /> 返回</button>
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>第二步：選你的名字</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {familyMembers.map(m => (
@@ -159,35 +198,51 @@ export default function Home() {
                         localStorage.setItem('kid_session', JSON.stringify(m));
                         router.push('/dashboard');
                       }}
-                      className="p-6 bg-white/5 border border-white/10 rounded-3xl text-white font-black hover:bg-cyan-500 hover:text-black hover:border-cyan-400 transition-all text-xl italic uppercase group overflow-hidden relative text-left pl-10"
+                      className={`p-6 border rounded-3xl font-black transition-all text-xl italic uppercase group overflow-hidden relative text-left pl-10 shadow-lg ${theme === 'cyber'
+                        ? 'bg-white/5 border-white/10 text-white hover:bg-cyan-500 hover:text-black hover:border-cyan-400'
+                        : 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#fff5f4] hover:border-[#ff8a80] shadow-[4px_4px_0px_#d8c4b6]'
+                        }`}
                     >
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-cyan-400 rounded-full group-hover:scale-150 transition-transform" />
+                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full group-hover:scale-150 transition-transform ${theme === 'cyber' ? 'bg-cyan-400' : 'bg-[#ff8a80]'}`} />
                       {m.name}
                     </button>
                   ))}
                 </div>
-                <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest text-center mt-4">提示：家長密碼請在進去後再輸入</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest text-center mt-4 ${theme === 'cyber' ? 'text-slate-600' : 'text-[#aaa]'}`}>提示：家長密碼請在進去後再輸入</p>
               </div>
             )}
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-2 text-slate-500 text-[10px] mt-12 uppercase tracking-[0.3em] font-black opacity-40">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Encrypted Family Storage</span>
+        <div className="flex flex-col items-center gap-4 mt-12">
+          <div className={`flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.3em] font-black opacity-40 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#888]'}`}>
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Encrypted Family Storage</span>
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full transition-all hover:rotate-45 ${theme === 'cyber' ? 'text-cyan-400/40 hover:text-cyan-400' : 'text-[#ff8a80]/40 hover:text-[#ff8a80]'}`}
+            title="切換風格"
+          >
+            {theme === 'cyber' ? <Sparkles className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+          </button>
         </div>
       </div>
 
       {/* Join Family Modal */}
       {showJoinModal && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
-          <div className="glass-panel p-10 max-w-sm w-full border-cyan-500/30">
-            <h3 className="text-xl font-black mb-6 italic text-white tracking-tight uppercase">加入現有家庭</h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
+          <div className={`glass-panel p-10 max-w-sm w-full border ${theme === 'cyber' ? 'border-cyan-500/30' : 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]'}`}>
+            <h3 className={`text-xl font-black mb-6 italic tracking-tight uppercase ${theme === 'cyber' ? 'text-white' : 'text-[#4a4a4a]'}`}>加入現有家庭</h3>
             <div className="space-y-6">
               <input
                 type="text"
                 placeholder="貼上邀請碼"
-                className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:ring-2 focus:ring-cyan-500 outline-none font-mono text-xs text-center"
+                className={`w-full rounded-xl p-4 focus:ring-2 outline-none font-mono text-xs text-center ${theme === 'cyber'
+                  ? 'bg-black/40 border border-white/10 text-white focus:ring-cyan-500'
+                  : 'bg-[#fff] border-2 border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]'
+                  }`}
                 value={parentInviteCode}
                 onChange={e => setParentInviteCode(e.target.value)}
               />
