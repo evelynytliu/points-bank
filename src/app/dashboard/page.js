@@ -36,15 +36,61 @@ export default function Dashboard() {
         point_to_cash: 5,
         parent_pin: '0000',
         use_parent_pin: false,
-        short_id: ''
+        short_id: '',
+        theme: 'cyber'
     });
 
+    const [modal, setModal] = useState({
+        isOpen: false,
+        type: 'alert', // alert, confirm, prompt
+        title: '',
+        message: '',
+        value: '',
+        onConfirm: () => { }
+    });
+
+    // Apply theme class to body
+    useEffect(() => {
+        const theme = family?.theme || 'cyber';
+        document.body.className = theme === 'doodle' ? 'theme-doodle' : '';
+    }, [family?.theme]);
+
+    const showModal = (config) => {
+        setModal({
+            isOpen: true,
+            type: config.type || 'alert',
+            title: config.title || '',
+            message: config.message || '',
+            value: config.defaultValue || '',
+            onConfirm: (val) => {
+                if (config.onConfirm) config.onConfirm(val);
+                setModal(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
     const checkParentPin = () => {
-        if (!family?.use_parent_pin || userRole === 'parent') return true;
-        const input = prompt('此操作需要家長管理密碼:');
-        if (input === family.parent_pin) return true;
-        alert('密碼錯誤！');
-        return false;
+        return new Promise((resolve) => {
+            if (!family?.use_parent_pin || userRole === 'parent') {
+                resolve(true);
+                return;
+            }
+
+            showModal({
+                type: 'prompt',
+                title: '安全驗證',
+                message: '此操作需要家長管理密碼：',
+                onConfirm: (val) => {
+                    if (val === family.parent_pin) {
+                        resolve(true);
+                    } else {
+                        showModal({ title: '驗證失敗', message: '密碼錯誤！' });
+                        resolve(false);
+                    }
+                },
+                onCancel: () => resolve(false)
+            });
+        });
     };
 
     const fetchData = async () => {
@@ -61,7 +107,6 @@ export default function Dashboard() {
                 let profileData = profileCheck;
 
                 if (!profileData) {
-                    // 如果 profile 真的不在（可能 trigger 延遲或失敗），主動建立一個
                     const { data: newProfile } = await supabase.from('profiles').insert({
                         id: authUser.id,
                         full_name: authUser.user_metadata?.full_name || authUser.email.split('@')[0]
@@ -69,11 +114,11 @@ export default function Dashboard() {
                     profileData = newProfile;
                 }
 
-                // 如果還沒有家庭，建立一個
                 if (!profileData?.family_id) {
                     const { data: familyData } = await supabase.from('families').insert({
                         family_name: `${authUser.email.split('@')[0]} 的家`,
-                        admin_id: authUser.id
+                        admin_id: authUser.id,
+                        theme: 'cyber'
                     }).select().single();
 
                     if (familyData) {
@@ -119,7 +164,8 @@ export default function Dashboard() {
                     point_to_cash: familyData.point_to_cash || 5,
                     parent_pin: familyData.parent_pin || '0000',
                     use_parent_pin: familyData.use_parent_pin || false,
-                    short_id: familyData.short_id || ''
+                    short_id: familyData.short_id || '',
+                    theme: familyData.theme || 'cyber'
                 });
             }
 
@@ -267,16 +313,21 @@ export default function Dashboard() {
     };
 
     const deleteKid = async (kid) => {
-        if (!checkParentPin()) return;
-        if (!confirm(`確定要刪除「${kid.name}」嗎？此路徑無法重來。`)) return;
-
-        const { error } = await supabase.from('kids').delete().eq('id', kid.id);
-        if (error) {
-            alert('刪除失敗: ' + error.message);
-        } else {
-            alert('成員已移除');
-            fetchData();
-        }
+        if (!await checkParentPin()) return;
+        showModal({
+            type: 'confirm',
+            title: '刪除成員',
+            message: `確定要刪除「${kid.name}」嗎？此操作無法復原。`,
+            onConfirm: async () => {
+                const { error } = await supabase.from('kids').delete().eq('id', kid.id);
+                if (error) {
+                    showModal({ title: '刪除失敗', message: error.message });
+                } else {
+                    showModal({ title: '操作成功', message: '成員已移除' });
+                    fetchData();
+                }
+            }
+        });
     };
 
     const updateKidAction = async (kid, pChange, mChange, reason, actor, shouldFetch = true) => {
@@ -305,16 +356,23 @@ export default function Dashboard() {
     };
 
     const batchAllocate = async () => {
-        if (!checkParentPin()) return;
+        if (!await checkParentPin()) return;
         const minutes = allocPlan === 'weekday' ? family.weekday_limit : family.holiday_limit;
         const reason = `${allocPlan === 'weekday' ? '平日' : '假日'}分配`;
-        if (!confirm(`確定要為所有小孩分配 ${minutes} 分鐘嗎？`)) return;
-        const actor = getActorName();
-        for (const kid of kids) {
-            await updateKidAction(kid, 0, minutes, reason, actor, false);
-        }
-        alert('分配完成！');
-        fetchData();
+
+        showModal({
+            type: 'confirm',
+            title: '批量分配',
+            message: `確定要為所有小孩分配 ${minutes} 分鐘嗎？`,
+            onConfirm: async () => {
+                const actor = getActorName();
+                for (const kid of kids) {
+                    await updateKidAction(kid, 0, minutes, reason, actor, false);
+                }
+                showModal({ title: '完成', message: '分配完成！' });
+                fetchData();
+            }
+        });
     };
 
     if (loading) return (
@@ -409,6 +467,7 @@ export default function Dashboard() {
                                 familySettings={family}
                                 actorName={getActorName()}
                                 hideSensitive={userRole === 'kid'}
+                                showModal={showModal}
                             />
                         ))}
                     </div>
@@ -520,6 +579,27 @@ export default function Dashboard() {
                                 </div>
                             </section>
 
+                            {/* Theme Selection */}
+                            <section className="p-6 bg-cyan-500/5 rounded-3xl border border-cyan-500/10">
+                                <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">介面風格選擇 (Theme)</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button
+                                        onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })}
+                                        className={`p-4 rounded-2xl border-2 transition-all text-center ${tempSettings.theme === 'cyber' ? 'border-cyan-500 bg-cyan-500/10' : 'border-white/5 bg-white/5 text-slate-500'}`}
+                                    >
+                                        <div className="text-sm font-bold mb-1">Cyber Neon</div>
+                                        <div className="text-[9px] uppercase tracking-widest opacity-60">科幻電子風</div>
+                                    </button>
+                                    <button
+                                        onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })}
+                                        className={`p-4 rounded-2xl border-2 transition-all text-center ${tempSettings.theme === 'doodle' ? 'border-orange-400 bg-orange-400/10' : 'border-white/5 bg-white/5 text-slate-500'}`}
+                                    >
+                                        <div className="text-sm font-bold mb-1">Warm Doodle</div>
+                                        <div className="text-[9px] uppercase tracking-widest opacity-60">手繪生活風</div>
+                                    </button>
+                                </div>
+                            </section>
+
                             {/* Conversion Rules */}
                             <section>
                                 <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">點數與時間規則</h4>
@@ -549,6 +629,8 @@ export default function Dashboard() {
                 </div>
             )}
 
+            <CustomModal config={modal} onClose={() => setModal(prev => ({ ...prev, isOpen: false }))} />
+
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
                     <div className="glass-panel p-10 max-w-sm w-full border-cyan-500/30">
@@ -565,7 +647,7 @@ export default function Dashboard() {
     );
 }
 
-function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive }) {
+function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal }) {
     const timeLimit = currentLimit || 60;
     const timePercent = Math.min(100, (kid.total_minutes / timeLimit) * 100);
     const isWarning = timePercent > 0 && timePercent <= 30;
@@ -606,8 +688,15 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     <button onClick={() => onUpdate(kid, 0, -20, '快速扣除', actorName)} className="bg-white/5 border border-white/10 p-3 rounded-xl text-slate-400 text-sm font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center">−20m</button>
                     <button onClick={() => onUpdate(kid, 0, -30, '快速扣除', actorName)} className="bg-white/5 border border-white/10 p-3 rounded-xl text-slate-400 text-sm font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center">−30m</button>
                     <button onClick={() => {
-                        const m = parseInt(prompt('輸入扣除分鐘:'));
-                        if (m) onUpdate(kid, 0, -m, '手動扣除', actorName);
+                        showModal({
+                            type: 'prompt',
+                            title: '自訂扣除',
+                            message: '請輸入要扣除的分鐘數：',
+                            onConfirm: (val) => {
+                                const m = parseInt(val);
+                                if (m) onUpdate(kid, 0, -m, '手動扣除', actorName);
+                            }
+                        });
                     }} className="bg-white/5 border border-white/10 p-3 rounded-xl text-red-500/60 text-sm font-black hover:bg-red-500/20 hover:text-red-400 transition-all uppercase tracking-widest flex items-center justify-center">自訂</button>
                 </div>
 
@@ -617,9 +706,17 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             const kidMins = kid.total_minutes;
                             const rate = familySettings?.point_to_minutes || 2;
                             const maxPts = Math.floor(kidMins / rate);
-                            if (maxPts < 1) return alert('分鐘不足！');
-                            const want = prompt(`將時間換成點數 (匯率 ${rate}:1)\n目前時間：${kidMins}m (最多換 ${maxPts}點)\n請輸入要換成的點數：`);
-                            if (want && parseInt(want) <= maxPts) onUpdate(kid, parseInt(want), -(parseInt(want) * rate), '時間兌換點數', actorName);
+                            if (maxPts < 1) return showModal({ title: '提醒', message: '分鐘不足！' });
+                            showModal({
+                                type: 'prompt',
+                                title: '兌換點數',
+                                message: `匯率 ${rate}:1，目前最多可換 ${maxPts} 點：`,
+                                defaultValue: maxPts.toString(),
+                                onConfirm: (val) => {
+                                    const want = parseInt(val);
+                                    if (want && want <= maxPts) onUpdate(kid, want, -(want * rate), '時間兌換點數', actorName);
+                                }
+                            });
                         }}
                         className="bg-white/5 border border-white/10 p-4 rounded-2xl text-slate-400 text-xs font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center gap-2"
                     >
@@ -629,13 +726,67 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         onClick={() => {
                             const kidPts = kid.total_points;
                             const rate = familySettings?.point_to_minutes || 2;
-                            if (kidPts < 1) return alert('點數不足！');
-                            const want = prompt(`將點數換成時間 (匯率 1:${rate})\n目前點數：${kidPts} (1點=${rate}分鐘)\n請輸入要使用的點數：`);
-                            if (want && parseInt(want) <= kidPts) onUpdate(kid, -parseInt(want), parseInt(want) * rate, '點數兌換時間', actorName);
+                            if (kidPts < 1) return showModal({ title: '提醒', message: '點數不足！' });
+                            showModal({
+                                type: 'prompt',
+                                title: '兌換時間',
+                                message: `匯率 1:${rate}，目前有 ${kidPts} 點：`,
+                                defaultValue: '1',
+                                onConfirm: (val) => {
+                                    const want = parseInt(val);
+                                    if (want && want <= kidPts) onUpdate(kid, -want, want * rate, '點數兌換時間', actorName);
+                                }
+                            });
                         }}
                         className="bg-cyan-500/10 border border-cyan-500/30 p-4 rounded-2xl text-cyan-400 text-xs font-black hover:bg-cyan-500/20 hover:text-cyan-400 transition-all uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/5"
                     >
                         ⭐ ➔ 📺 兌換時間
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Custom Modal Component
+function CustomModal({ config, onClose }) {
+    const [inputValue, setInputValue] = useState(config.value || '');
+
+    // Reset local value when modal opens/changes
+    useEffect(() => {
+        setInputValue(config.value || '');
+    }, [config.isOpen, config.value]);
+
+    if (!config.isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[200] p-6 animate-in fade-in duration-300">
+            <div className="glass-panel p-8 max-w-sm w-full border-cyan-500/30 shadow-[0_0_50px_rgba(0,229,255,0.1)] scale-in-center overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+
+                <h3 className="text-xl font-black text-white italic mb-2 uppercase tracking-tight">{config.title}</h3>
+                <p className="text-slate-400 text-sm font-medium mb-6 leading-relaxed">{config.message}</p>
+
+                {config.type === 'prompt' && (
+                    <input
+                        autoFocus
+                        type="text"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white font-black text-center mb-6 focus:ring-2 focus:ring-cyan-500 outline-none"
+                        value={inputValue}
+                        onChange={e => setInputValue(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && config.onConfirm(inputValue)}
+                    />
+                )}
+
+                <div className="flex gap-3">
+                    {(config.type === 'confirm' || config.type === 'prompt') && (
+                        <button onClick={() => {
+                            if (config.onCancel) config.onCancel();
+                            onClose();
+                        }} className="btn btn-ghost flex-1 py-3 text-xs font-bold">取消</button>
+                    )}
+                    <button onClick={() => config.onConfirm(inputValue)} className="btn btn-primary flex-1 py-3 text-xs font-black uppercase tracking-widest">
+                        確定
                     </button>
                 </div>
             </div>

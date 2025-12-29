@@ -4,21 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Points Bank | 數位時代的科學教養點數系統</title>
+    <title>Points Bank | 溫暖的家庭小銀行</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@500;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Zhi+Mang+Xing&family=Gaegu:wght@400;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/lib/lucide.min.js"></script>
     <style>
         :root {
-            --primary: #00E5FF;
-            --secondary: #2979FF;
-            --bg-dark: #050508;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --text-muted: #94A3B8;
+            --primary: #ff8a80;
+            --secondary: #ffd180;
+            --bg-warm: #fdfbf7;
+            --text-main: #4a4a4a;
+            --text-light: #8e8e8e;
+            --doodle: #d8c4b6;
         }
 
         * {
@@ -28,405 +28,224 @@
         }
 
         body {
-            font-family: 'Noto+Sans+TC', 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: #fff;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--text-main);
             line-height: 1.8;
             overflow-x: hidden;
-            letter-spacing: 0.02em;
+            background-image: radial-gradient(var(--doodle) 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
         }
 
         h1,
         h2,
-        h3,
-        h4 {
-            font-family: 'Outfit', 'Noto+Sans+TC', sans-serif;
-            letter-spacing: -0.02em;
+        h3 {
+            font-weight: 900;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
-        /* --- Hero Section --- */
-        header {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding-top: 4rem;
-            background: radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.08), transparent 50%);
+        /* --- Doodle SVGs --- */
+        .scribble {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.4;
         }
 
-        .hero-content {
-            flex: 1;
-            z-index: 10;
+        /* --- Header --- */
+        header {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
         }
 
         .hero-badge {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 0.6rem 1.4rem;
-            border-radius: 99px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 2.5rem;
+            font-family: 'Gaegu', cursive;
+            background: #fff;
+            border: 2px solid var(--text-main);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50% 20% 40% 10%;
+            font-size: 1.2rem;
+            color: var(--text-main);
             display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.2rem;
+            margin-bottom: 2rem;
+            transform: rotate(-3deg);
         }
 
         h1 {
-            font-size: clamp(3.5rem, 8vw, 6rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 2rem;
+            font-family: 'Gaegu', cursive;
+            font-size: clamp(3.5rem, 10vw, 5.5rem);
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
         }
 
-        h1 .outline {
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+        h1 span {
+            color: var(--primary);
+            position: relative;
+        }
+
+        h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: var(--secondary);
+            z-index: -1;
+            opacity: 0.5;
+            border-radius: 10px;
         }
 
         .hero-desc {
-            max-width: 550px;
-            color: var(--text-muted);
-            font-size: 1.15rem;
-            margin-bottom: 3.5rem;
-        }
-
-        .hero-visual {
-            flex: 1;
-            position: relative;
-            display: none;
-            /* Hidden on small screens */
-        }
-
-        @media (min-width: 1024px) {
-            .hero-visual {
-                display: block;
-            }
-
-            header .container {
-                display: flex;
-                gap: 4rem;
-                align-items: center;
-            }
-        }
-
-        .hero-img-wrapper {
-            position: relative;
-            border-radius: 2rem;
-            overflow: hidden;
-            box-shadow: 0 0 100px rgba(0, 229, 255, 0.1);
-            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
-        }
-
-        .hero-img-wrapper img {
-            width: 100%;
-            display: block;
-            mix-blend-mode: screen;
-            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 3.5rem;
+            font-size: 1.1rem;
+            color: var(--text-light);
         }
 
         .btn-main {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #000;
-            padding: 1.4rem 3.5rem;
-            border-radius: 1.2rem;
-            font-weight: 900;
+            background: var(--text-main);
+            color: #fff;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 1rem;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 20px 40px rgba(0, 229, 255, 0.2);
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 4px 4px 0px var(--doodle);
         }
 
         .btn-main:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(0, 229, 255, 0.3);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--primary);
         }
 
-        /* --- Philosophy Section --- */
+        /* --- Sections --- */
         .section-padding {
-            padding: 10rem 0;
+            padding: 6rem 0;
         }
 
-        .section-header {
-            text-align: center;
-            margin-bottom: 6rem;
-        }
-
-        .section-header h2 {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .philosophy-grid {
+        .card-grid {
             display: grid;
-            grid-template-cols: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 3rem;
+            grid-template-cols: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
         }
 
-        .phi-card {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--border);
-            padding: 4rem;
-            border-radius: 2.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s ease;
+        .card {
+            background: #fff;
+            border: 2px solid var(--text-main);
+            padding: 3rem;
+            border-radius: 30px 10px 40px 15px;
+            transition: transform 0.3s;
         }
 
-        .phi-card:hover {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: var(--primary);
-            transform: translateY(-15px);
+        .card:hover {
+            transform: rotate(1deg) scale(1.02);
         }
 
-        .phi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(to right, var(--primary), transparent);
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .phi-card:hover::before {
-            opacity: 1;
-        }
-
-        .phi-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: #fff;
-        }
-
-        .phi-card p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.8;
-        }
-
-        /* --- Manifest Segment --- */
-        .manifesto {
-            background: linear-gradient(to bottom, rgba(0, 229, 255, 0.03), transparent);
-            padding: 6rem;
-            border-radius: 3rem;
-            border: 1px solid var(--border);
-            margin-bottom: 6rem;
-        }
-
-        .manifesto-title {
+        .card i {
             color: var(--primary);
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            font-family: 'Gaegu', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
         }
 
         /* --- Footer --- */
         footer {
-            padding: 6rem 0;
+            padding: 4rem 0;
             text-align: center;
-            border-top: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .footer-logo {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.5rem;
-            letter-spacing: 0.1rem;
-            margin-bottom: 2rem;
+            border-top: 1px dashed var(--doodle);
         }
 
         .footer-links a {
             color: var(--primary);
+            font-weight: 700;
             text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border 0.3s;
-        }
-
-        .footer-links a:hover {
-            border-color: var(--primary);
         }
 
         .copyright {
-            margin-top: 3rem;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        /* --- Visual Cues --- */
-        .scroll-hint {
-            position: absolute;
-            bottom: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: float 2s infinite alternate;
-            color: var(--text-muted);
-        }
-
-        @keyframes float {
-            from {
-                transform: translateX(-50%) translateY(0);
-                opacity: 0.4;
-            }
-
-            to {
-                transform: translateX(-50%) translateY(15px);
-                opacity: 0.8;
-            }
-        }
-
-        /* --- Utility --- */
-        .text-cyan {
-            color: var(--primary);
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
     </style>
 </head>
 
 <body>
     <header>
+        <!-- Doodle Deco -->
+        <svg class="scribble" style="top: 10%; left: 5%; width: 150px;" viewBox="0 0 200 200">
+            <path d="M20,50 Q60,10 100,50 T180,50" fill="none" stroke="#d8c4b6" stroke-width="4"
+                stroke-linecap="round" />
+        </svg>
+        <svg class="scribble" style="bottom: 15%; right: 8%; width: 120px;" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="40" fill="none" stroke="#ff8a80" stroke-width="3" stroke-dasharray="10 5" />
+        </svg>
+
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-badge">Points Bank V3.5</div>
-                <h1>LIFE WITH<br><span class="outline">BALANCE</span><br><span class="text-cyan">POINTS BANK</span></h1>
-                <p class="hero-desc">
-                    我們相信，螢幕時間不一定要成為家裡的爭吵導火線。Points Bank 用溫暖的機制，陪孩子練習「管理自己的快樂」，在數位時代裡學會珍惜與規劃。
-                </p>
-                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem;">
-                    <a href="https://points-bank.vercel.app" class="btn-main">
-                        開啟家庭銀行入口 <i data-lucide="arrow-right"></i>
-                    </a>
-                    <div style="display: flex; gap: 1.5rem; opacity: 0.5;">
-                        <span
-                            style="font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;"><i
-                                data-lucide="sparkles"></i> 靈活同步</span>
-                        <span
-                            style="font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;"><i
-                                data-lucide="heart"></i> 自律養成</span>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="hero-img-wrapper">
-                    <!-- 使用剛才生成的 Hero 圖片 -->
-                    <img src="./public/hero.png" alt="Points Bank Hero">
-                </div>
-            </div>
-        </div>
-        <div class="scroll-hint">
-            <i data-lucide="mouse"></i>
+            <div class="hero-badge">孩子的成長紀錄</div>
+            <h1>Points <span>Bank</span></h1>
+            <p class="hero-desc">
+                給孩子的一封小情書：我們不是想限制你玩，而是想陪你一起練習「管理快樂」。在數位的時代裡，學會珍惜與規劃。
+            </p>
+            <a href="https://points-bank.vercel.app" class="btn-main">
+                開始我們的家庭點數旅程 <i data-lucide="heart"></i>
+            </a>
         </div>
     </header>
 
-    <section class="section-padding">
+    <section class="section-padding" style="background: #fff;">
         <div class="container">
-            <div class="manifesto">
-                <div class="manifesto-title">
-                    <i data-lucide="coffee"></i> 給家長們的小情書
-                </div>
-                <div style="font-size: 1.3rem; color: #E2E8F0; max-width: 900px; line-height: 2;">
-                    「其實，我們不是想限制孩子玩，而是想讓他們學會選擇。」<br><br>
-                    當螢幕時間變成一種需要規劃的「獎勵」，孩子會開始思考：我今天要現在把時間用完，還是存著等假日？在每一次的決定中，自律的種子就這樣悄悄發芽了。
-                </div>
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <h2 style="font-family: 'Gaegu', cursive; font-size: 3rem;">跟孩子一起變厲害 ✨</h2>
+                <p style="color: var(--text-light);">這不只是規則，更是一種陪伴的儀式。</p>
             </div>
 
-            <div class="section-header">
-                <h2>跟孩子一起<span class="text-cyan">變厲害</span></h2>
-                <p style="color: var(--text-muted); font-size: 1.2rem;">不只是規則，更是一種陪伴的儀式。 </p>
-            </div>
-
-            <div class="philosophy-grid">
-                <div class="phi-card">
-                    <i data-lucide="smile" class="text-cyan" style="margin-bottom: 2rem;"></i>
-                    <h3>練習「等一下」的幸福</h3>
-                    <p>
-                        比起馬上拿到，慢慢累積之後換來的目標，會讓孩子更有成就感。學會等待的孩子，練習的是一份受用一輩子的續航力。
-                    </p>
+            <div class="card-grid">
+                <div class="card">
+                    <i data-lucide="smile"></i>
+                    <h3>練習「等一下」</h3>
+                    <p>比起馬上拿到，慢慢累積之後換來的目標，會讓孩子更有成就感。學會等待的孩子，練習的是一份續航力。</p>
                 </div>
-                <div class="phi-card">
-                    <i data-lucide="message-circle" class="text-cyan" style="margin-bottom: 2rem;"></i>
-                    <h3>多一點討論，少一些情緒</h3>
-                    <p>
-                        用透明的餘額代替口頭的拉鋸。孩子看得到自己的努力換來多少收穫，家長的提醒也不再是說教，而是暖心的討論。
-                    </p>
+                <div class="card">
+                    <i data-lucide="coffee"></i>
+                    <h3>多討論，少情緒</h3>
+                    <p>用透明的餘額代替口頭的拉鋸。孩子看得到努力換來的收穫，親子間的對話，從今天開始只有鼓勵。</p>
                 </div>
-                <div class="phi-card">
-                    <i data-lucide="gift" class="text-cyan" style="margin-bottom: 2rem;"></i>
-                    <h3>第一堂生活的基礎課</h3>
-                    <p>
-                        把點數、時間與幸福感連在一起。讓孩子在日常中練習分配資源，提早學會這輩子最重要的「平衡與取捨」。
-                    </p>
+                <div class="card">
+                    <i data-lucide="star"></i>
+                    <h3>生活的基礎課</h3>
+                    <p>把點數與幸福感連在一起。讓孩子在日常中練習分配資源，提早學會這輩子最重要的「平衡與取捨」。</p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section-padding" style="background: rgba(255,255,255,0.01);">
-        <div class="container text-center">
-            <h2 style="margin-bottom: 4rem;">貼心的<span class="text-cyan">設計細節</span></h2>
-            <div
-                style="display: grid; grid-template-cols: repeat(auto-fit, minmax(280px, 1fr)); gap: 4rem; text-align: left;">
-                <div style="display: flex; gap: 1.5rem;">
-                    <div style="background: var(--glass); padding: 1rem; border-radius: 1rem; height: fit-content;"><i
-                            data-lucide="refresh-cw" class="text-cyan"></i></div>
-                    <div>
-                        <h4 style="margin-bottom: 0.5rem;">隨時隨地的支援</h4>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">全家人的數據同步，不管是誰在紀錄，只要打開手機，一切都準時更新。</p>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 1.5rem;">
-                    <div style="background: var(--glass); padding: 1rem; border-radius: 1rem; height: fit-content;"><i
-                            data-lucide="key" class="text-cyan"></i></div>
-                    <div>
-                        <h4 style="margin-bottom: 0.5rem;">守護家長的秘密</h4>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">重要的設定交給 PIN 碼保護。讓銀行規則維持穩定，這是家長最安心的堡壘。
-                        </p>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 1.5rem;">
-                    <div style="background: var(--glass); padding: 1rem; border-radius: 1rem; height: fit-content;"><i
-                            data-lucide="calendar" class="text-cyan"></i></div>
-                    <div>
-                        <h4 style="margin-bottom: 0.5rem;">溫柔的時光存摺</h4>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">每一筆點數背後，都是孩子的一份努力。清晰的日誌，幫您記錄下這些成長的足跡。
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div
-                style="margin-top: 8rem; padding: 4rem; background: var(--glass); border: 1px dashed var(--border); border-radius: 2rem;">
-                <p style="font-size: 1rem; color: #fff; margin-bottom: 1.5rem; font-weight: 700;">
-                    準備好跟孩子一起享受自律的生活了嗎？</p>
-                <a href="https://points-bank.vercel.app" class="btn-main">立即開啟我們的家庭銀行 ➔</a>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="container">
-            <div class="footer-logo">POINTS BANK</div>
-            <p class="footer-links">
-                CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT LIU</a>
-            </p>
+            <p style="font-family: 'Gaegu', cursive; font-size: 1.5rem; margin-bottom: 1.5rem;">POINTS BANK</p>
+            <p>CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT LIU</a></p>
             <div class="copyright">
-                &copy; 2025 ALL RIGHTS RESERVED | POWERED BY NEXT.JS & SUPABASE
+                &copy; 2025 ALL RIGHTS RESERVED | POWERED BY LOVE & CODE
             </div>
         </div>
     </footer>

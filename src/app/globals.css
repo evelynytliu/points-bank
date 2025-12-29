@@ -1,4 +1,5 @@
 ﻿@import "tailwindcss";
+
 :root {
   --primary: #00E5FF;
   --secondary: #2979FF;
@@ -16,30 +17,79 @@
 body {
   font-family: var(--font-body);
   background-color: var(--bg-dark);
-  color: #fff;
+  color: var(--text-color, #fff);
+  background-attachment: fixed;
+  margin: 0;
+  transition: background-color 0.5s, color 0.5s;
+}
+
+/* Default Theme (Cyber) */
+:root {
+  --primary: #00E5FF;
+  --secondary: #2979FF;
+  --accent: #FF2E93;
+  --bg-dark: #080812;
+  --font-display: "Outfit", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --text-color: #fff;
+  --panel-bg: rgba(255, 255, 255, 0.05);
+  --panel-border: rgba(255, 255, 255, 0.1);
+  --btn-radius: 1rem;
+  --panel-radius: 24px;
+}
+
+body:not(.theme-doodle) {
   background-image:
     radial-gradient(circle at 15% 50%, rgba(41, 121, 255, 0.12), transparent 30%),
     radial-gradient(circle at 85% 30%, rgba(255, 46, 147, 0.12), transparent 30%);
-  background-attachment: fixed;
-  margin: 0;
 }
 
-h1, h2, h3, h4 {
+/* Doodle Theme */
+.theme-doodle {
+  --primary: #ff8a80;
+  --secondary: #ffd180;
+  --accent: #ff8a80;
+  --bg-dark: #fdfbf7;
+  --font-display: "Gaegu", cursive;
+  --font-body: "Noto Sans TC", sans-serif;
+  --text-color: #4a4a4a;
+  --panel-bg: #fff;
+  --panel-border: #4a4a4a;
+  --btn-radius: 50px;
+  --panel-radius: 40px 15px 35px 20px;
+}
+
+.theme-doodle {
+  background-image: radial-gradient(#d8c4b6 0.5px, transparent 0.5px);
+  background-size: 20px 20px;
+}
+
+h1,
+h2,
+h3,
+h4 {
   font-family: var(--font-display);
 }
 
 @layer components {
   .glass-panel {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
     backdrop-filter: blur(20px);
-    border-radius: 24px;
+    border-radius: var(--panel-radius);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s;
+  }
+
+  .theme-doodle .glass-panel {
+    border-width: 2px;
+    box-shadow: 4px 4px 0px #d8c4b6;
+    backdrop-filter: none;
   }
 
   .btn {
     padding: 1rem 1.5rem;
-    border-radius: 1rem;
+    border-radius: var(--btn-radius);
     font-weight: 700;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
@@ -51,41 +101,57 @@ h1, h2, h3, h4 {
   }
 
   .btn-primary {
-    background: linear-gradient(to right, #00E5FF, #2979FF);
+    background: linear-gradient(to right, var(--primary), var(--secondary));
     color: black;
     box-shadow: 0 8px 20px rgba(0, 229, 255, 0.3);
   }
-  
+
+  .theme-doodle .btn-primary {
+    background: #4a4a4a;
+    color: white;
+    box-shadow: 4px 4px 0px var(--primary);
+  }
+
   .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 25px rgba(0, 229, 255, 0.4);
   }
 
   .btn-ghost {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94A3B8;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--text-color);
+    opacity: 0.7;
   }
-  
+
   .btn-ghost:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    opacity: 1;
   }
 
   /* Progress Bar Custom */
   .bar-wrap {
     background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(0, 229, 255, 0.2);
+    border: 2px solid var(--primary);
     border-radius: 9999px;
     height: 2.25rem;
     position: relative;
     overflow: hidden;
   }
 
+  .theme-doodle .bar-wrap {
+    background: #eee;
+    border: 2px solid #4a4a4a;
+  }
+
   .bar-fill {
     height: 100%;
     transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(to right, #00E5FF, #2979FF);
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+  }
+
+  .theme-doodle .bar-fill {
+    background: var(--primary);
   }
 
   .bar-fill.warning {
