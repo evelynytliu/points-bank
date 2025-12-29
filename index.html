@@ -7,7 +7,8 @@
     <title>Points Bank | 數位時代的科學教養點數系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@500;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@500;800&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/lib/lucide.min.js"></script>
     <style>
@@ -17,6 +18,7 @@
             --bg-dark: #050508;
             --glass: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.08);
+            --text-muted: #94A3B8;
         }
 
         * {
@@ -26,449 +28,412 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Noto+Sans+TC', 'Inter', sans-serif;
             background-color: var(--bg-dark);
             color: #fff;
-            line-height: 1.6;
+            line-height: 1.8;
             overflow-x: hidden;
+            letter-spacing: 0.02em;
         }
 
         h1,
         h2,
-        h3 {
-            font-family: 'Outfit', sans-serif;
-            text-transform: uppercase;
+        h3,
+        h4 {
+            font-family: 'Outfit', 'Noto+Sans+TC', sans-serif;
+            letter-spacing: -0.02em;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
-        /* Hero Section */
+        /* --- Hero Section --- */
         header {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
             position: relative;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05), transparent 70%);
+            padding-top: 4rem;
+            background: radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.08), transparent 50%);
+        }
+
+        .hero-content {
+            flex: 1;
+            z-index: 10;
         }
 
         .hero-badge {
             background: var(--glass);
             border: 1px solid var(--border);
-            padding: 0.5rem 1.2rem;
+            padding: 0.6rem 1.4rem;
             border-radius: 99px;
-            font-size: 0.75rem;
-            font-weight: 900;
-            letter-spacing: 0.2em;
+            font-size: 0.8rem;
+            font-weight: 700;
             color: var(--primary);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             display: inline-block;
             text-transform: uppercase;
+            letter-spacing: 0.2rem;
         }
 
         h1 {
-            font-size: clamp(3rem, 10vw, 5.5rem);
+            font-size: clamp(3.5rem, 8vw, 6rem);
             font-weight: 900;
-            font-style: italic;
-            line-height: 0.9;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.05em;
+            line-height: 1.1;
+            margin-bottom: 2rem;
         }
 
-        h1 span {
-            display: block;
-            color: var(--primary);
+        h1 .outline {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
         }
 
         .hero-desc {
-            max-width: 600px;
-            color: #94A3B8;
-            font-size: 1.1rem;
-            margin-bottom: 3rem;
+            max-width: 550px;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .hero-visual {
+            flex: 1;
+            position: relative;
+            display: none;
+            /* Hidden on small screens */
+        }
+
+        @media (min-width: 1024px) {
+            .hero-visual {
+                display: block;
+            }
+
+            header .container {
+                display: flex;
+                gap: 4rem;
+                align-items: center;
+            }
+        }
+
+        .hero-img-wrapper {
+            position: relative;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0, 229, 255, 0.1);
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+        }
+
+        .hero-img-wrapper img {
+            width: 100%;
+            display: block;
+            mix-blend-mode: screen;
+            opacity: 0.9;
         }
 
         .btn-main {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #000;
-            padding: 1.2rem 3rem;
-            border-radius: 1.5rem;
+            padding: 1.4rem 3.5rem;
+            border-radius: 1.2rem;
             font-weight: 900;
             text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 1.1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 40px rgba(0, 229, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.2rem;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0, 229, 255, 0.2);
         }
 
         .btn-main:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 50px rgba(0, 229, 255, 0.4);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 229, 255, 0.3);
         }
 
-        /* Philosophy Section */
+        /* --- Philosophy Section --- */
         .section-padding {
-            padding: 8rem 0;
+            padding: 10rem 0;
         }
 
-        .grid {
+        .section-header {
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        .section-header h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .philosophy-grid {
             display: grid;
-            grid-template-cols: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
+            grid-template-cols: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
         }
 
-        .card {
-            background: var(--glass);
+        .phi-card {
+            background: rgba(255, 255, 255, 0.01);
             border: 1px solid var(--border);
-            padding: 3rem;
-            border-radius: 2rem;
+            padding: 4rem;
+            border-radius: 2.5rem;
+            position: relative;
+            overflow: hidden;
             transition: all 0.5s ease;
         }
 
-        .card:hover {
-            border-color: rgba(0, 229, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-10px);
+        .phi-card:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: var(--primary);
+            transform: translateY(-15px);
         }
 
-        .card-icon {
-            color: var(--primary);
+        .phi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .phi-card:hover::before {
+            opacity: 1;
+        }
+
+        .phi-card h3 {
+            font-size: 1.8rem;
             margin-bottom: 1.5rem;
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
             color: #fff;
         }
 
-        .card p {
-            color: #94A3B8;
-            font-size: 0.95rem;
+        .phi-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.8;
         }
 
-        /* Visual Showcase */
-        .showcase {
-            background: var(--glass);
+        /* --- Manifest Segment --- */
+        .manifesto {
+            background: linear-gradient(to bottom, rgba(0, 229, 255, 0.03), transparent);
+            padding: 6rem;
             border-radius: 3rem;
-            overflow: hidden;
             border: 1px solid var(--border);
-            margin-top: 4rem;
+            margin-bottom: 6rem;
+        }
+
+        .manifesto-title {
+            color: var(--primary);
+            font-weight: 800;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 4rem;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
         }
 
-        .showcase-title {
+        /* --- Footer --- */
+        footer {
+            padding: 6rem 0;
             text-align: center;
-            margin-bottom: 3rem;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        .showcase-title h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+        .footer-logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 0.1rem;
+            margin-bottom: 2rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 3.5rem;
-            }
-
-            .section-padding {
-                padding: 4rem 0;
-            }
-
-            .showcase {
-                padding: 2rem;
-            }
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border 0.3s;
         }
 
-        /* Abstract Elements */
-        .glow {
+        .footer-links a:hover {
+            border-color: var(--primary);
+        }
+
+        .copyright {
+            margin-top: 3rem;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* --- Visual Cues --- */
+        .scroll-hint {
             position: absolute;
-            width: 40vw;
-            height: 40vw;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.1), transparent 70%);
-            z-index: -1;
-            filter: blur(100px);
-        }
-
-        /* New Animated Scroll Indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
+            bottom: 3rem;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            opacity: 0.6;
-            animation: bounce 2s infinite;
-            cursor: pointer;
-            text-decoration: none;
-            color: #94A3B8;
+            animation: float 2s infinite alternate;
+            color: var(--text-muted);
         }
 
-        .scroll-indicator span {
-            font-size: 0.6rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
+        @keyframes float {
+            from {
                 transform: translateX(-50%) translateY(0);
+                opacity: 0.4;
             }
 
-            40% {
-                transform: translateX(-50%) translateY(-10px);
-            }
-
-            60% {
-                transform: translateX(-50%) translateY(-5px);
+            to {
+                transform: translateX(-50%) translateY(15px);
+                opacity: 0.8;
             }
         }
 
-        /* Detailed Feature List */
-        .feature-grid {
-            display: grid;
-            grid-template-cols: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 4rem;
-        }
-
-        .feature-item {
-            display: flex;
-            gap: 1.5rem;
-            text-align: left;
-            padding: 1.5rem;
-        }
-
-        .feature-item i {
+        /* --- Utility --- */
+        .text-cyan {
             color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        .feature-item h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            color: #fff;
-        }
-
-        .feature-item p {
-            font-size: 0.85rem;
-            color: #64748B;
-        }
-
-        /* Philosophy Text Expansion */
-        .philosophy-text {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 3rem;
-            border-radius: 2rem;
-            border: 1px solid var(--border);
-        }
-
-        .philosophy-text h3 {
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            font-style: italic;
         }
     </style>
 </head>
 
 <body>
-    <div class="glow" style="top: -10%; left: -10%;"></div>
-    <div class="glow" style="bottom: -10%; right: -10%;"></div>
-
-    <!-- Hero Section -->
     <header>
         <div class="container">
-            <div class="hero-badge">Points Bank V3</div>
-            <h1>POINTS <span>BANK</span></h1>
-            <p class="hero-desc">將螢幕時間轉化為成長的動力，讓孩子在數位世界學會珍惜與規劃。這是一場關於自律、責任與成就感的家庭實驗。</p>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                <a href="https://points-bank.vercel.app" class="btn-main">立即進入銀行入口 🚀</a>
-                <span
-                    style="font-size: 0.7rem; color: #475569; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase;">Cloud
-                    Sync Enabled</span>
+            <div class="hero-content">
+                <div class="hero-badge">Points Bank V3.5</div>
+                <h1>SCIENCE OF<br><span class="outline">PARENTING</span><br><span class="text-cyan">POINTS BANK</span>
+                </h1>
+                <p class="hero-desc">
+                    我們相信螢幕時間不應是爭執的引線，而應是自律訓練的工具。Points Bank 是一個幫助孩子在數位洪流中，透過回饋機制學會時間管理與資源規劃的家庭實驗室。
+                </p>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem;">
+                    <a href="https://points-bank.vercel.app" class="btn-main">
+                        進入家庭銀行入口 <i data-lucide="arrow-right"></i>
+                    </a>
+                    <div style="display: flex; gap: 1.5rem; opacity: 0.5;">
+                        <span
+                            style="font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;"><i
+                                data-lucide="cloud"></i> 雲端同步</span>
+                        <span
+                            style="font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;"><i
+                                data-lucide="shield"></i> 密碼保護</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-img-wrapper">
+                    <!-- 使用剛才生成的 Hero 圖片 -->
+                    <img src="./public/hero.png" alt="Points Bank Hero">
+                </div>
             </div>
         </div>
-        <a href="#philosophy" class="scroll-indicator">
-            <span>向下探索更多理念</span>
-            <i data-lucide="chevron-down"></i>
-        </a>
+        <div class="scroll-hint">
+            <i data-lucide="mouse"></i>
+        </div>
     </header>
 
-    <!-- Detailed Philosophy -->
-    <section id="philosophy" class="section-padding">
+    <section class="section-padding">
+        <div class="container">
+            <div class="manifesto">
+                <div class="manifesto-title">
+                    <i data-lucide="book-open"></i> 設計初衷
+                </div>
+                <div style="font-size: 1.3rem; color: #E2E8F0; max-width: 900px;">
+                    「教養的本質，在於賦予孩子在沒有家長監督時，依然能做出正確決定的能力。」<br><br>
+                    Points Bank 不是為了限制，而是為了賦能。透過明確的代幣機制，孩子將螢幕時間視為一種「資產」而非「權利」，從而學習在誘惑面前進行理性決策。
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>教養上的<span class="text-cyan">科學優勢</span></h2>
+                <p style="color: var(--text-muted); font-size: 1.2rem;">基於行為統計學與發展心理學的數位契約。</p>
+            </div>
+
+            <div class="philosophy-grid">
+                <div class="phi-card">
+                    <i data-lucide="brain" class="text-cyan" style="margin-bottom: 2rem;"></i>
+                    <h3>延遲滿足感的具象化</h3>
+                    <p>
+                        在演算法不斷推播即時滿足的時代，累積點數兌換螢幕時間是訓練孩子「前額葉皮質」發展的最佳日常練習。這不僅是時間管理，更是人格的鍛鍊。
+                    </p>
+                </div>
+                <div class="phi-card">
+                    <i data-lucide="handshake" class="text-cyan" style="margin-bottom: 2rem;"></i>
+                    <h3>從威權轉向契約</h3>
+                    <p>
+                        當規則被數位化、透明化，親子間的爭取不再是情緒的拉鋸，而是基於「銀行餘額」的理性討論。這能有效降低家長的育兒焦慮。
+                    </p>
+                </div>
+                <div class="phi-card">
+                    <i data-lucide="trending-up" class="text-cyan" style="margin-bottom: 2rem;"></i>
+                    <h3>資源分配的早期訓練</h3>
+                    <p>
+                        點數可以兌換時間、現金或獎勵。讓孩子在安全、小規模的環境下，親身體驗機會成本、利弊權衡與預算控制。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background: rgba(255,255,255,0.01);">
         <div class="container text-center">
-            <h2 style="font-size: 3rem; text-align: center; margin-bottom: 3rem;">為什麼我們強調<br><span
-                    style="color: var(--primary);">「有條件的」螢幕時間？</span></h2>
-
-            <div class="philosophy-text">
-                <h3>數位時代的資源管理學</h3>
-                <p style="color: #CBD5E1; margin-bottom: 1.5rem;">
-                    在現代教養中，完全禁止螢幕是不現實的，但「無限制」卻會損害孩子的專注力與大腦發育。<b>Points Bank 的核心理念並非懲罰，而是教育孩子「資源有限性」。</b>
-                </p>
-                <ul style="color: #94A3B8; space-y: 1rem; list-style: none; padding-left: 0;">
-                    <li style="margin-bottom: 1rem; position: relative; padding-left: 1.5rem;">
-                        <span style="position: absolute; left: 0; color: var(--primary);">●</span>
-                        <b>把被動受贈轉為主動贏得：</b> 螢幕時間不再是家長「施捨」的恩惠，而是孩子透過完成目標「賺取」的勞動成果，這能建立深刻的自我價值感。
-                    </li>
-                    <li style="margin-bottom: 1rem; position: relative; padding-left: 1.5rem;">
-                        <span style="position: absolute; left: 0; color: var(--primary);">●</span>
-                        <b>訓練大腦的執行功能：</b> 透過預算分配（我今天剩 30 分鐘，要拿來玩遊戲還是看卡通？），孩子在反覆練習決策與放棄，這正是成年前最重要的腦力開發。
-                    </li>
-                    <li style="margin-bottom: 1rem; position: relative; padding-left: 1.5rem;">
-                        <span style="position: absolute; left: 0; color: var(--primary);">●</span>
-                        <b>消弭情緒勒索：</b> 當規則被量化在儀表板時，親子間不再因為「再玩一下下」而拉鋸，減少了因為螢幕產生的情緒內耗。
-                    </li>
-                </ul>
+            <h2 style="margin-bottom: 4rem;">強大的<span class="text-cyan">系統支援</span></h2>
+            <div
+                style="display: grid; grid-template-cols: repeat(auto-fit, minmax(280px, 1fr)); gap: 4rem; text-align: left;">
+                <div style="display: flex; gap: 1.5rem;">
+                    <div style="background: var(--glass); padding: 1rem; border-radius: 1rem; height: fit-content;"><i
+                            data-lucide="layout" class="text-cyan"></i></div>
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">多端即時同步</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">不論是家長手機還是平板，數據在 0.5 秒內完成支援同步，確保帳戶餘額正確。
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1.5rem;">
+                    <div style="background: var(--glass); padding: 1rem; border-radius: 1rem; height: fit-content;"><i
+                            data-lucide="fingerprint" class="text-cyan"></i></div>
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">家長管理密碼</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">高權限操作（如調整基本限額、新增成員）均受家長 PIN 碼保護，系統固若金湯。
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1.5rem;">
+                    <div style="background: var(--glass); padding: 1rem; border-radius: 1rem; height: fit-content;"><i
+                            data-lucide="history" class="text-cyan"></i></div>
+                    <div>
+                        <h4 style="margin-bottom: 0.5rem;">全紀錄透明化</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">每一分鐘的獲得與扣除皆有時間戳記與原因備註，杜絕任何僥倖心理。</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid">
-                <div class="card">
-                    <div class="card-icon"><i data-lucide="brain"></i></div>
-                    <h3>延遲滿足感</h3>
-                    <p>累積點數換取大獎，訓練孩子克服即時誘惑，建立長遠目標規劃能力。</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon"><i data-lucide="shield-check"></i></div>
-                    <h3>透明化誠實機制</h3>
-                    <p>讓孩子學會主動點擊扣除時間，建立「我可以管理我自己」的成熟人格與誠實品質。</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon"><i data-lucide="repeat"></i></div>
-                    <h3>動態匯率系統</h3>
-                    <p>讓點數可以兌換時間、零用錢或特許權，模擬真實社會的經濟活動與多樣化激勵方式。</p>
-                </div>
+            <div
+                style="margin-top: 8rem; padding: 4rem; background: var(--glass); border: 1px dashed var(--border); border-radius: 2rem;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; letter-spacing: 0.1rem;">
+                    READY TO START?</p>
+                <a href="https://points-bank.vercel.app" class="btn-main">立即佈署您的家庭實驗室 ➔</a>
             </div>
         </div>
     </section>
 
-    <!-- Visual Showcase & Detailed Features -->
-    <section class="section-padding" style="background: rgba(0, 229, 255, 0.02);">
+    <footer>
         <div class="container">
-            <div class="showcase-title">
-                <h2 style="font-size: 2.5rem; font-style: italic;">SYSTEM CAPABILITIES</h2>
-                <p style="color: #94A3B8;">不只是一個計分板，更是一個完整的家庭管理後台。</p>
+            <div class="footer-logo">POINTS BANK</div>
+            <p class="footer-links">
+                CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT LIU</a>
+            </p>
+            <div class="copyright">
+                &copy; 2025 ALL RIGHTS RESERVED | POWERED BY NEXT.JS & SUPABASE
             </div>
-
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <i data-lucide="users"></i>
-                    <div>
-                        <h4>多成員協作架構</h4>
-                        <p>支持多個小孩、多個家長同時管理，無論在誰的手機上，數據永遠即時同步。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="zap"></i>
-                    <div>
-                        <h4>超級管理後台</h4>
-                        <p>一鍵批量分配週末點數、一鍵發放全體獎勵，讓繁雜的管理變得極其輕鬆。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="lock"></i>
-                    <div>
-                        <h4>家長 PIN 碼保護</h4>
-                        <p>敏感操作需要 4 位密碼驗證，防止小孩在「銀行」中隨意給自己增加信貸。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="history"></i>
-                    <div>
-                        <h4>詳盡活動日誌</h4>
-                        <p>每一筆點數的變動都有跡可循，誰加的、誰扣的、什麼原因，清清楚楚。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="smartphone"></i>
-                    <div>
-                        <h4>免安裝 PWA 體驗</h4>
-                        <p>無需下載，將網頁存入桌面即享原生 App 般的流暢感與全螢幕視覺。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="globe"></i>
-                    <div>
-                        <h4>全球唯一訪問碼</h4>
-                        <p>自訂好記的家庭專屬 ID，不論身在何處，家人都能一秒進入您的銀行。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- App Showcase -->
-    <section class="section-padding" id="demo">
-        <div class="container">
-            <div class="showcase">
-                <div class="showcase-title">
-                    <h2 style="font-style: italic;">THE ECOSYSTEM</h2>
-                    <p style="color: #94A3B8;">跨平台同步，家長管理、小孩專屬儀表板一體化。</p>
-                </div>
-
-                <div
-                    style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.5); border-radius: 2rem; border: 1px solid var(--border); padding: 3rem; text-align: center;">
-                    <div
-                        style="font-weight: 900; color: var(--primary); margin-bottom: 2rem; letter-spacing: 0.3em; font-size: 0.8rem;">
-                        ACCESS BANK PORTAL</div>
-                    <div style="font-size: 1.2rem; color: #fff; margin-bottom: 2.5rem; line-height: 1.8;">
-                        銀行門口已開啟。<br>
-                        請點擊下方按鈕，開始管理您的獎勵。
-                    </div>
-                    <a href="https://points-bank.vercel.app" id="app-url" class="btn-main"
-                        style="display: block; width: fit-content; margin: 0 auto;">進入我們的家庭銀行 ➔</a>
-                    <div style="margin-top: 2rem; font-size: 0.75rem; color: #475569; line-height: 1.6;">
-                        💡 貼心小提醒：<br>
-                        點擊後可將網頁「加入手機主畫面」，使用起來會更像真正的 App 喔！
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer style="padding: 4rem 0; text-align: center; border-top: 1px solid var(--border); margin-top: 4rem;">
-        <div class="container">
-            <div style="opacity: 0.3; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.5em;">POINTS BANK BY EVELYN
-            </div>
-            <p style="margin-top: 1rem; color: #475569; font-size: 0.8rem;">Powered by Next.js & Supabase | 2024</p>
         </div>
     </footer>
 
     <script>
-        // Initialize Icons
         lucide.createIcons();
-
-        // 偵測是否已經有設定過的 URL，方便使用者
-        const searchParams = new URLSearchParams(window.location.search);
-        const customUrl = searchParams.get('url');
-        if (customUrl) {
-            document.getElementById('app-url').href = customUrl;
-            document.getElementById('main-link').href = customUrl;
-        }
     </script>
 </body>
 
