@@ -281,17 +281,31 @@
         }
 
         .feature-icon {
-            width: 54px;
-            height: 54px;
-            border: 2px solid var(--ink);
-            border-radius: 12px 18px 15px 20px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--accent);
-            box-shadow: 3px 3px 0 var(--ink);
             margin-bottom: 2rem;
-            background: white;
+            background: linear-gradient(135deg, #fff5f3 0%, #ffe8e3 100%);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .feature-icon::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, #ffb3ad 100%);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .feature-card h3 {
@@ -636,7 +650,7 @@
                             正因為我們深知「外在獎勵可能破壞內在動機」的風險，所以 Points Bank
                             的設計刻意避開了「做X得Y」的交易模式。我們訓練的核心能力是：<strong>延遲滿足</strong>。每天孩子都有固定的螢幕時間配額（例如平日 30
                             分鐘），但他可以選擇「今天不用完，存起來」。這個選擇的過程，就是在訓練大腦的自我控制迴路。研究顯示，能夠延遲滿足的孩子，在學業、人際、情緒管理上都有更好的表現。Points Bank
-                            不是要把生活變成遊戲化的積分制，而是提供一個<strong>「看得見、摸得著」的延遲滿足練習場</strong>。隨著孩子長大，這個「腳架」可以逐漸移除，但訓練出的自制力會一直留下。
+                            不是要把生活變成遊戲化的積分制，而是提供一個<strong>「看得見、摸得著」的延遲滿足練習場</strong>。隨著孩子長大，這個「輔助輪」可以逐漸移除，但訓練出的自制力會一直留下。
                         </p>
                     </div>
                     <div class="philosophy-item">
