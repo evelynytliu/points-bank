@@ -4,22 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Points Bank | 溫暖的家庭點數銀行</title>
+    <title>Points Bank | 溫馨手繪風教養系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Gaegu:wght@400;700&family=Outfit:wght@500;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/lib/lucide.min.js"></script>
     <style>
         :root {
-            --primary: #ff8a80;
-            --secondary: #ffd180;
-            --bg-warm: #fdfbf7;
-            --text-main: #4a4a4a;
-            --text-light: #7e7e7e;
-            --doodle: #d8c4b6;
-            --accent-soft: #e0f2f1;
+            --bg: #fcfaf7;
+            --ink: #333333;
+            --muted: #888888;
+            --accent: #ff8a80;
+            --accent-soft: #fff1f0;
+            --paper: #ffffff;
+            --deco: #e0d8cf;
         }
 
         * {
@@ -29,449 +28,448 @@
         }
 
         body {
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-warm);
-            color: var(--text-main);
+            /* 嚴格鎖定思源黑體，確保在所有裝置不出現標楷體 */
+            font-family: "Noto Sans TC", sans-serif;
+            background-color: var(--bg);
+            color: var(--ink);
             line-height: 1.8;
-            overflow-x: hidden;
-            background-image: radial-gradient(var(--doodle) 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
+            letter-spacing: 0.03em;
             word-break: keep-all;
         }
 
+        /* 文青感：輕盈的字體重量搭配合適的間距 */
         h1,
         h2,
         h3,
         h4 {
             font-weight: 900;
-            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            font-weight: 400;
+            color: #555;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
-        /* --- Doodle Decor --- */
-        .scribble {
+        /* --- 手繪風格組件 (Hand-drawn UI) --- */
+        .scribble-bg {
             position: absolute;
             z-index: -1;
-            opacity: 0.3;
             pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .hand-drawn-border {
+            position: relative;
+            padding: 0.8rem 1.8rem;
+            display: inline-block;
+        }
+
+        .hand-drawn-border svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            fill: none;
+            stroke: var(--ink);
+            stroke-width: 1.5;
+        }
+
+        .highlight-stroke {
+            position: relative;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .highlight-stroke::after {
+            content: "";
+            position: absolute;
+            left: -5%;
+            bottom: -8px;
+            width: 110%;
+            height: 14px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 5 Q 25 2, 50 5 T 100 4' fill='none' stroke='%23ff8a80' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            z-index: -1;
+            opacity: 0.5;
         }
 
         /* --- Header --- */
         header {
-            min-height: 95vh;
+            min-height: 90vh;
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
             position: relative;
-            padding: 4rem 0;
+            padding: 6rem 0;
+            overflow: hidden;
         }
 
-        .hero-badge {
-            font-family: 'Gaegu', cursive;
-            background: #fff;
-            border: 2px solid var(--text-main);
-            padding: 0.5rem 1.5rem;
-            border-radius: 50% 20% 40% 10%;
-            font-size: 1.3rem;
-            color: var(--text-main);
-            display: inline-block;
+        .hero-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.25rem;
             margin-bottom: 2rem;
-            transform: rotate(-2deg);
-            box-shadow: 3px 3px 0 var(--doodle);
+            display: block;
         }
 
         h1 {
-            font-family: 'Gaegu', cursive;
-            font-size: clamp(3.5rem, 10vw, 5.5rem);
-            margin-bottom: 1.5rem;
-            color: var(--text-main);
-            letter-spacing: -0.02em;
-        }
-
-        h1 span {
-            color: var(--primary);
-            display: inline-block;
-            position: relative;
-        }
-
-        h1 span::after {
-            content: '';
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 100%;
-            height: 12px;
-            background: var(--secondary);
-            z-index: -1;
-            opacity: 0.4;
-            border-radius: 10px;
+            font-size: clamp(2.5rem, 8vw, 4.2rem);
+            line-height: 1.25;
+            margin-bottom: 2.5rem;
         }
 
         .hero-desc {
-            max-width: 650px;
-            margin: 0 auto 3.5rem;
-            font-size: 1.2rem;
-            color: var(--text-light);
-            font-weight: 500;
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 450px;
+            margin-bottom: 4rem;
+            font-weight: 300;
         }
 
-        .btn-main {
-            background: var(--text-main);
+        .btn-pill {
+            background: var(--ink);
             color: #fff;
-            padding: 1.4rem 3.5rem;
-            border-radius: 50px;
-            font-weight: 700;
+            padding: 1.25rem 3.5rem;
+            border-radius: 100px;
             text-decoration: none;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 1rem;
-            font-size: 1.2rem;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 5px 5px 0px var(--doodle);
+            transition: all 0.3s;
+            box-shadow: 6px 6px 0 var(--deco);
         }
 
-        .btn-main:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 8px 8px 0px var(--primary);
+        .btn-pill:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 var(--accent);
+        }
+
+        /* --- Hero Image Frame --- */
+        .hero-visual {
+            position: absolute;
+            right: -5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .hero-visual {
+                display: block;
+            }
+        }
+
+        .sketch-frame {
+            background: var(--paper);
+            padding: 1.5rem;
+            border: 2px solid var(--ink);
+            border-radius: 40px 15px 50px 20px;
+            box-shadow: 15px 15px 0 var(--deco);
+            transform: rotate(1deg);
+        }
+
+        .sketch-frame img {
+            width: 100%;
+            border-radius: 12px;
         }
 
         /* --- Sections --- */
-        .section-padding {
-            padding: 8rem 0;
+        .section {
+            padding: 10rem 0;
             position: relative;
         }
 
-        .section-title {
-            text-align: center;
-            margin-bottom: 5rem;
-        }
-
-        .section-title h2 {
-            font-family: 'Gaegu', cursive;
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            position: relative;
-        }
-
-        .section-title h2::after {
-            content: '';
-            position: absolute;
-            width: 60%;
-            height: 4px;
-            background: var(--primary);
-            bottom: 0;
-            left: 20%;
-            border-radius: 2px;
-        }
-
-        /* --- Manifesto (The Love Letter) --- */
-        .manifesto {
-            background: #fff;
-            border: 2px solid var(--text-main);
-            padding: 4rem;
-            border-radius: 40px 15px 45px 20px;
-            box-shadow: 10px 10px 0 var(--accent-soft);
+        .sec-title {
             margin-bottom: 6rem;
+            text-align: center;
         }
 
-        .manifesto-tag {
-            font-family: 'Gaegu', cursive;
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+        .sec-title h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+
+        /* --- Philosophy Content --- */
+        .phi-layout {
+            display: grid;
+            grid-template-cols: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .phi-layout {
+                grid-template-cols: 1fr;
+                gap: 4rem;
+            }
+        }
+
+        .phi-card {
+            margin-bottom: 3.5rem;
+        }
+
+        .phi-card h3 {
+            font-size: 1.4rem;
+            color: var(--accent);
+            margin-bottom: 1.2rem;
             display: flex;
             align-items: center;
             gap: 0.8rem;
         }
 
-        .manifesto-text {
-            font-size: 1.35rem;
-            line-height: 2.2;
-            color: var(--text-main);
-            font-weight: 500;
-        }
-
-        /* --- Philosophy Cards --- */
-        .card-grid {
-            display: grid;
-            grid-template-cols: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-        }
-
-        .card {
-            background: #fff;
-            border: 2px solid var(--text-main);
-            padding: 3.5rem;
-            border-radius: 35px 15px 40px 20px;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .card:hover {
-            transform: translateY(-10px) rotate(1deg);
-            box-shadow: 8px 8px 0 var(--secondary);
-        }
-
-        .card i {
-            color: var(--primary);
-            margin-bottom: 2rem;
-            display: block;
-        }
-
-        .card h3 {
-            font-family: 'Gaegu', sans-serif;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card p {
+        .phi-card p {
             font-size: 1.05rem;
-            color: var(--text-light);
+            line-height: 1.9;
         }
 
-        /* --- Detailed Features --- */
-        .feature-list {
+        /* --- Features & Values --- */
+        .organic-grid {
             display: grid;
-            grid-template-cols: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+            grid-template-cols: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
             margin-top: 4rem;
         }
 
-        .feature-item {
+        .value-card {
+            padding: 4rem 3rem;
+            background: var(--paper);
+            border: 1.5px solid var(--ink);
+            border-radius: 40px 15px 35px 25px;
+            transition: all 0.3s;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 8px 8px 0 var(--accent-soft);
+        }
+
+        .icon-doodle {
+            width: 50px;
+            height: 50px;
+            border: 1.5px solid var(--ink);
+            border-radius: 12px 20px 15px 25px;
             display: flex;
-            gap: 1.2rem;
-            align-items: flex-start;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            border: 1px dashed var(--doodle);
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            box-shadow: 3px 3px 0 var(--ink);
         }
 
-        .feature-item i {
-            color: var(--primary);
+        /* --- System Info --- */
+        .feat-item {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .feat-item i {
+            color: var(--accent);
             flex-shrink: 0;
-            margin-top: 0.2rem;
-        }
-
-        .feature-item h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-item p {
-            font-size: 0.9rem;
-            color: var(--text-light);
         }
 
         /* --- Footer --- */
         footer {
-            padding: 6rem 0;
+            padding: 8rem 0;
             text-align: center;
-            border-top: 2px dashed var(--doodle);
-            background: #fff;
+            border-top: 1px dashed var(--deco);
         }
 
         .footer-logo {
-            font-family: 'Gaegu', cursive;
-            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 0.15rem;
             margin-bottom: 2rem;
         }
 
         .footer-links a {
-            color: var(--primary);
-            font-weight: 700;
+            color: var(--accent);
             text-decoration: none;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
+            font-weight: 700;
+            border-bottom: 1.5px solid transparent;
         }
 
         .footer-links a:hover {
-            border-color: var(--primary);
-        }
-
-        .copyright {
-            margin-top: 3rem;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            letter-spacing: 0.15em;
-            font-weight: 700;
-        }
-
-        .scroll-hint {
-            position: absolute;
-            bottom: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-            color: var(--doodle);
-        }
-
-        @keyframes bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateX(-50%) translateY(0);
-            }
-
-            40% {
-                transform: translateX(-50%) translateY(-15px);
-            }
-
-            60% {
-                transform: translateX(-50%) translateY(-7px);
-            }
+            border-color: var(--accent);
         }
     </style>
 </head>
 
 <body>
     <header>
-        <svg class="scribble" style="top: 15%; left: 10%; width: 140px;" viewBox="0 0 200 200">
-            <path d="M20,100 C20,100 50,20 100,100 C150,180 180,100 180,100" fill="none" stroke="var(--doodle)"
-                stroke-width="4" stroke-linecap="round" />
+        <!-- Random Hand-drawn marks -->
+        <svg class="scribble-bg" style="top: 15%; left: 8%; width: 100px;" viewBox="0 0 100 100">
+            <path d="M10,80 Q30,10 60,60 T95,20" fill="none" stroke="var(-- deco)" stroke-width="2"
+                stroke-linecap="round" />
         </svg>
-        <svg class="scribble" style="top: 20%; right: 12%; width: 100px;" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="30" fill="none" stroke="var(--primary)" stroke-width="2"
-                stroke-dasharray="8,4" />
+        <svg class="scribble-bg" style="bottom: 15%; right: 45%; width: 80px;" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="30" fill="none" stroke="var(--accent)" stroke-width="1.5"
+                stroke-dasharray="5 5" />
         </svg>
 
         <div class="container">
-            <div class="hero-badge">陪伴孩子變厲害的過程</div>
-            <h1>Points <span>Bank</span></h1>
-            <p class="hero-desc">
-                不只是螢幕時間的計加，更是一段關於「練習自律」的旅程。我們相信溫暖的規範能化解爭執，點點滴滴的累積，將轉化為孩子最好的規劃能力。
-            </p>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
-                <a href="https://points-bank.vercel.app" class="btn-main">
-                    開啟家庭銀行入口 <i data-lucide="arrow-right"></i>
-                </a>
-                <div style="display: flex; gap: 1.5rem; opacity: 0.6; font-size: 0.8rem; font-weight: 700;">
-                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="sparkles"
-                            class="w-4"></i> 靈活同步</span>
-                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="heart"
-                            class="w-4"></i> 自律養成</span>
+            <div style="max-width: 520px;">
+                <span class="hero-tag">FOR MY TWO BOYS</span>
+
+                <div class="hand-drawn-border" style="margin-bottom: 1.5rem;">
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M5,10 C30,5 70,15 95,10 C92,40 98,70 95,90 C70,95 30,85 5,90 C8,70 2,40 5,10"
+                            vector-effect="non-scaling-stroke" />
+                    </svg>
+                    <span style="font-weight: 900; font-size: 0.9rem;">陪伴孩子變厲害的過程</span>
+                </div>
+
+                <h1>練習「選擇」的<br><span class="highlight-stroke">家庭點數銀行。</span></h1>
+
+                <p class="hero-desc">
+                    我們不是想限制孩子玩，而是想讓他們學會規劃。Points Bank 是一個溫柔的實驗室，將螢幕時間轉化為自律的練習場，在數位的時代中，陪孩子一起長大。
+                </p>
+
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2.5rem;">
+                    <a href="https://points-bank.vercel.app" class="btn-pill">
+                        前往家庭銀行入口 <i data-lucide="arrow-right"></i>
+                    </a>
+                    <div
+                        style="display: flex; gap: 2rem; font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1rem;">
+                        <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="sparkles"
+                                size="14"></i> 雲端同步</span>
+                        <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="heart"
+                                size="14"></i> 自律陪伴</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="scroll-hint">
-            <i data-lucide="chevron-down" size="32"></i>
+
+            <div class="hero-visual">
+                <div class="sketch-frame">
+                    <img src="./public/hero.png" alt="Hero Illustration">
+                </div>
+                <!-- Mini Doodle Arrow -->
+                <svg style="position: absolute; bottom: -40px; left: -20px; width: 60px; transform: rotate(-30deg);"
+                    viewBox="0 0 100 100">
+                    <path d="M10,10 Q50,50 90,90 M90,90 L70,85 M90,90 L85,70" fill="none" stroke="var(--ink)"
+                        stroke-width="3" stroke-linecap="round" />
+                </svg>
+            </div>
         </div>
     </header>
 
-    <section class="section-padding">
+    <!-- Philosophy Section -->
+    <section class="section" style="background: var(--paper); border-top: 1px solid #efefef;">
         <div class="container">
-            <!-- Manifesto (Love Letter Content) -->
-            <div class="manifesto">
-                <div class="manifesto-tag">
-                    <i data-lucide="coffee"></i> 給家長們的小情書
+            <div class="phi-layout">
+                <div>
+                    <div class="sketch-frame" style="box-shadow: 10px 10px 0 var(--accent-soft);">
+                        <img src="./public/philosophy.png" alt="Philosophy Illustration">
+                    </div>
                 </div>
-                <div class="manifesto-text">
-                    「其實，我們不是想限制孩子玩，而是想讓他們學會選擇。」<br><br>
-                    教養的本質，在於賦予孩子在沒有人監督時，依然能做出正確決定的能力。當螢幕時間變成一種需要規劃的「資產」，孩子會開始練習：我今天要現在用完，還是存著等假日？自律的種子，就在每一次取捨中悄悄發芽。
+                <div>
+                    <div class="sec-title" style="text-align: left; margin-bottom: 4rem;">
+                        <h2 style="font-size: 2.2rem; line-height: 1.4;">為什麼我們強調<br><span
+                                class="highlight-stroke">「有條件的」自由？</span></h2>
+                    </div>
+                    <div class="phi-card">
+                        <h3><i data-lucide="coffee"></i> 數位時代的資源意識</h3>
+                        <p>當螢幕時間被量化為需努力「賺取」的資產時，孩子學會珍惜與排序。今天現在用完，還是存著等假日？每一個取捨，都在訓練大腦的前額葉執行功能。</p>
+                    </div>
+                    <div class="phi-card">
+                        <h3><i data-lucide="smile"></i> 讓對話消弭情緒拉鋸</h3>
+                        <p>讓透明的帳戶餘額代替口頭的勒索。紀錄清晰、規則穩定，孩子能看到變強的足跡，親子間的爭取不再是情緒負擔，而是理性的互動。</p>
+                    </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Detailed Philosophy Content Re-added -->
-            <div class="section-title">
-                <h2>跟孩子一起變厲害 ✨</h2>
-                <p style="color: var(--text-light); font-size: 1.2rem;">我們不教排斥數位，我們教如何「駕馭」它。</p>
+    <!-- Values & Educational Context -->
+    <section class="section">
+        <div class="container">
+            <div class="sec-title">
+                <div class="hand-drawn-border" style="margin-bottom: 2rem;">
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M10,20 C60,5 140,25 190,20 C195,45 185,75 190,85 C140,95 60,85 10,95 C5,75 15,45 10,20"
+                            vector-effect="non-scaling-stroke" />
+                    </svg>
+                    <span style="font-weight: 900; font-size: 1.4rem;">跟孩子一起變厲害 ✨</span>
+                </div>
+                <p style="color: var(--muted); font-size: 1.05rem;">不只是點數，更是一段關於成長的溫柔約定。</p>
             </div>
 
-            <div class="card-grid">
-                <div class="card">
-                    <i data-lucide="smile" size="48"></i>
-                    <h3>練習「等一下」的幸福</h3>
-                    <p>
-                        累積點數換取更大的獎勵，是訓練孩子「前額葉皮質」發展的最佳日常練習。比起馬上拿到，慢慢累積之後換來的成果，會讓孩子更有成就感與自主權。
+            <div class="organic-grid">
+                <div class="value-card">
+                    <div class="icon-doodle"><i data-lucide="brain"></i></div>
+                    <h4 style="margin-bottom: 1.2rem; font-size: 1.3rem;">延遲滿足的具象化</h4>
+                    <p style="font-size: 0.95rem; line-height: 2;">累積點數換取更大的快樂，是訓練孩子克服誘惑的最佳日常練習。比起馬上拿到，慢慢換來的成果更能建立成就感。
                     </p>
                 </div>
-                <div class="card" style="transform: rotate(-1deg);">
-                    <i data-lucide="message-circle" size="48"></i>
-                    <h3>多一點討論，少一些情緒</h3>
-                    <p>
-                        用透明的「銀行餘額」代替口頭的要求。孩子看得到每一份努力換來的收穫，親子間的爭取不再是情緒的拉鋸，而是暖心的對話與資源的討論。
-                    </p>
+                <div class="value-card" style="transform: rotate(-1deg);">
+                    <div class="icon-doodle"><i data-lucide="award"></i></div>
+                    <h4 style="margin-bottom: 1.2rem; font-size: 1.3rem;">內在自控力的養成</h4>
+                    <p style="font-size: 0.95rem; line-height: 2;">參與紀錄、主動管理。我們相信「被信任」能驅動孩子為自己負責，培養受用一輩子的誠信與規劃品質。</p>
                 </div>
-                <div class="card" style="transform: rotate(0.5deg);">
-                    <i data-lucide="gift" size="48"></i>
-                    <h3>第一堂生活的基礎課</h3>
-                    <p>
-                        把點數、時間與幸福感連在一起。讓孩子在日常中練習分配資源、體驗機會成本。在安全的環境下，提早學會這輩子最重要的「平衡與取捨」。
+                <div class="value-card">
+                    <div class="icon-doodle"><i data-lucide="layers"></i></div>
+                    <h4 style="margin-bottom: 1.2rem; font-size: 1.3rem;">機會成本的哲學</h4>
+                    <p style="font-size: 0.95rem; line-height: 2;">點數可以換遊戲時間，也能換實體獎勵。讓孩子在受控環境下，提早理解資源有限，學會如何在多個慾望中取得平衡。
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- System Features Visualized Warmly -->
-    <section class="section-padding" style="background: rgba(216, 196, 182, 0.1);">
+    <!-- Feature Support -->
+    <section class="section" style="background: #fff; border-top: 1px solid #efefef;">
         <div class="container">
-            <div class="section-title">
-                <h2 style="font-size: 2.5rem;">貼心的設計細節</h2>
-                <p style="color: var(--text-light);">不只是功能，更是為了讓家長更輕鬆。</p>
+            <div class="sec-title" style="text-align: left;">
+                <h2 style="font-size: 2rem;">系統支援細節</h2>
+                <p style="color: var(--muted);">工程與美感的平衡，只為讓家庭管理更省力。</p>
             </div>
 
-            <div class="feature-list">
-                <div class="feature-item">
+            <div style="display: grid; grid-template-cols: repeat(auto-fit, minmax(280px, 1fr)); gap: 4rem;">
+                <div class="feat-item">
                     <i data-lucide="refresh-cw"></i>
                     <div>
-                        <h4>全家同步支援</h4>
-                        <p>爸爸媽媽都能各別登入紀錄，數據即時在 0.5 秒內完成同步更新。</p>
+                        <h5 style="margin-bottom: 0.6rem; font-size: 1.1rem;">全家雲端即時同步</h5>
+                        <p style="color: var(--muted); font-size: 0.9rem;">不管爸媽在哪個裝置紀錄，同步都在 0.5 秒內完成。資訊公開透明，不再有記錯或爭吵。
+                        </p>
                     </div>
                 </div>
-                <div class="feature-item">
-                    <i data-lucide="key"></i>
+                <div class="feat-item">
+                    <i data-lucide="lock"></i>
                     <div>
-                        <h4>守護家長的秘密</h4>
-                        <p>高權限操作皆受 PIN 碼保護，維持銀行規則穩定，是家長最安心的堡壘。</p>
+                        <h5 style="margin-bottom: 0.6rem; font-size: 1.1rem;">家長 Pin 碼安全守護</h5>
+                        <p style="color: var(--muted); font-size: 0.9rem;">敏感權限（如修改基數或批量調整）皆受密碼保護。維持規則的穩定性，是家長最安心的後盾。
+                        </p>
                     </div>
                 </div>
-                <div class="feature-item">
+                <div class="feat-item">
                     <i data-lucide="history"></i>
                     <div>
-                        <h4>溫柔的時光存摺</h4>
-                        <p>每一筆扣除與獲得都有跡可循，記錄下孩子每一秒學會克制的成長足跡。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="smartphone"></i>
-                    <div>
-                        <h4>免下載 PWA 體驗</h4>
-                        <p>將網頁加入桌面就像實體 App，不管是手機還是平板都有一致的流暢感。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="globe"></i>
-                    <div>
-                        <h4>專屬家庭 ID</h4>
-                        <p>設定好記的訪問代碼，不論身在哪個裝置，全家人都能一秒進入您的銀行。</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <i data-lucide="sparkles"></i>
-                    <div>
-                        <h4>多樣介面風格</h4>
-                        <p>不論是科幻感還是溫馨風，您可以隨心更換最適合您家庭氛围的 UI 樣式。</p>
+                        <h5 style="margin-bottom: 0.6rem; font-size: 1.1rem;">清新的變動日誌</h5>
+                        <p style="color: var(--muted); font-size: 0.9rem;">每一分鐘的變動都附帶原因。回頭看日誌，紀錄的不只是數字，更是孩子學會克制的成長足跡。
+                        </p>
                     </div>
                 </div>
             </div>
 
             <div
-                style="margin-top: 8rem; padding: 4rem; background: #fff; border: 2px dashed var(--doodle); border-radius: 30px; text-align: center;">
-                <p style="font-size: 1.3rem; margin-bottom: 2rem; font-weight: 700; color: var(--text-main);">
-                    準備好跟孩子一起享受自律的生活了嗎？
-                </p>
-                <a href="https://points-bank.vercel.app" class="btn-main">立即佈署您的家庭銀行 ➔</a>
+                style="margin-top: 8rem; padding: 5rem; border: 2.5px solid var(-- ink); border-radius: 40px; background: var(--bg); text-align: center; position: relative;">
+                <svg class="scribble-bg" style="top: -20px; right: -20px; width: 60px; transform: rotate(15deg);"
+                    viewBox="0 0 100 100">
+                    <path d="M10,50 L30,40 L50,60 L70,30 L90,50" fill="none" stroke="var(--accent)" stroke-width="4"
+                        stroke-linecap="round" />
+                </svg>
+                <h3 style="font-size: 1.8rem; margin-bottom: 2.5rem;">準備好開啟這段溫柔的實驗了嗎？</h3>
+                <a href="https://points-bank.vercel.app" class="btn-pill">現在就進入家庭入口 ➔</a>
             </div>
         </div>
     </section>
@@ -479,10 +477,10 @@
     <footer>
         <div class="container">
             <div class="footer-logo">POINTS BANK</div>
-            <p class="footer-links">
-                CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT LIU</a>
-            </p>
-            <div class="copyright">
+            <p style="font-size: 0.9rem;">CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT
+                    LIU</a></p>
+            <div
+                style="margin-top: 3.5rem; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.15rem; font-weight: 700;">
                 &copy; 2025 ALL RIGHTS RESERVED | POWERED BY LOVE & CODE
             </div>
         </div>
