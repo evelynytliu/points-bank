@@ -202,6 +202,97 @@
             z-index: -1;
             filter: blur(100px);
         }
+
+        /* New Animated Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.6;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            text-decoration: none;
+            color: #94A3B8;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        /* Detailed Feature List */
+        .feature-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 1.5rem;
+            text-align: left;
+            padding: 1.5rem;
+        }
+
+        .feature-item i {
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .feature-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+            color: #64748B;
+        }
+
+        /* Philosophy Text Expansion */
+        .philosophy-text {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 3rem;
+            border-radius: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .philosophy-text h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -214,7 +305,7 @@
         <div class="container">
             <div class="hero-badge">Points Bank V3</div>
             <h1>POINTS <span>BANK</span></h1>
-            <p class="hero-desc">將螢幕時間轉化為激勵，讓孩子在規律中學會自律。這不只是一個點數系統，更是現代家庭的數位契約。</p>
+            <p class="hero-desc">將螢幕時間轉化為成長的動力，讓孩子在數位世界學會珍惜與規劃。這是一場關於自律、責任與成就感的家庭實驗。</p>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
                 <a href="https://points-bank.vercel.app" class="btn-main">立即進入銀行入口 🚀</a>
                 <span
@@ -222,31 +313,109 @@
                     Sync Enabled</span>
             </div>
         </div>
+        <a href="#philosophy" class="scroll-indicator">
+            <span>向下探索更多理念</span>
+            <i data-lucide="chevron-down"></i>
+        </a>
     </header>
 
-    <!-- Why This? -->
-    <section class="section-padding">
+    <!-- Detailed Philosophy -->
+    <section id="philosophy" class="section-padding">
         <div class="container text-center">
-            <h2 style="font-size: 3rem; text-align: center; margin-bottom: 1rem;">為什麼選擇<br><span
-                    style="color: var(--primary);">點數制度教養？</span></h2>
-            <p style="color: #94A3B8; max-width: 700px; margin: 0 auto; text-align: center;">科學證明，即時正向反饋與明確的代幣制度（Token
-                Economy）能顯著提升孩子的行為動機與自我管理能力。</p>
+            <h2 style="font-size: 3rem; text-align: center; margin-bottom: 3rem;">為什麼我們強調<br><span
+                    style="color: var(--primary);">「有條件的」螢幕時間？</span></h2>
+
+            <div class="philosophy-text">
+                <h3>數位時代的資源管理學</h3>
+                <p style="color: #CBD5E1; margin-bottom: 1.5rem;">
+                    在現代教養中，完全禁止螢幕是不現實的，但「無限制」卻會損害孩子的專注力與大腦發育。<b>Points Bank 的核心理念並非懲罰，而是教育孩子「資源有限性」。</b>
+                </p>
+                <ul style="color: #94A3B8; space-y: 1rem; list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 1rem; position: relative; padding-left: 1.5rem;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">●</span>
+                        <b>把被動受贈轉為主動贏得：</b> 螢幕時間不再是家長「施捨」的恩惠，而是孩子透過完成目標「賺取」的勞動成果，這能建立深刻的自我價值感。
+                    </li>
+                    <li style="margin-bottom: 1rem; position: relative; padding-left: 1.5rem;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">●</span>
+                        <b>訓練大腦的執行功能：</b> 透過預算分配（我今天剩 30 分鐘，要拿來玩遊戲還是看卡通？），孩子在反覆練習決策與放棄，這正是成年前最重要的腦力開發。
+                    </li>
+                    <li style="margin-bottom: 1rem; position: relative; padding-left: 1.5rem;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">●</span>
+                        <b>消弭情緒勒索：</b> 當規則被量化在儀表板時，親子間不再因為「再玩一下下」而拉鋸，減少了因為螢幕產生的情緒內耗。
+                    </li>
+                </ul>
+            </div>
 
             <div class="grid">
                 <div class="card">
                     <div class="card-icon"><i data-lucide="brain"></i></div>
-                    <h3>建立延遲滿足感</h3>
-                    <p>透過累積點數兌換螢幕時間，孩子學會「等待」與「努力」帶來的報酬，這是發展心理學中最重要的自律指標。</p>
+                    <h3>延遲滿足感</h3>
+                    <p>累積點數換取大獎，訓練孩子克服即時誘惑，建立長遠目標規劃能力。</p>
                 </div>
                 <div class="card">
                     <div class="card-icon"><i data-lucide="shield-check"></i></div>
-                    <h3>化衝突為契約</h3>
-                    <p>當規則變得透明且數據化，家長不再需要口頭說教或爭執，一切都以銀行的「數位契約」為準。</p>
+                    <h3>透明化誠實機制</h3>
+                    <p>讓孩子學會主動點擊扣除時間，建立「我可以管理我自己」的成熟人格與誠實品質。</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon"><i data-lucide="trending-up"></i></div>
-                    <h3>理財觀念啟蒙</h3>
-                    <p>將點數與時間、現金掛鉤，讓孩子在日常中練習分配資源與成本計算，提早建立基礎經濟觀念。</p>
+                    <div class="card-icon"><i data-lucide="repeat"></i></div>
+                    <h3>動態匯率系統</h3>
+                    <p>讓點數可以兌換時間、零用錢或特許權，模擬真實社會的經濟活動與多樣化激勵方式。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Showcase & Detailed Features -->
+    <section class="section-padding" style="background: rgba(0, 229, 255, 0.02);">
+        <div class="container">
+            <div class="showcase-title">
+                <h2 style="font-size: 2.5rem; font-style: italic;">SYSTEM CAPABILITIES</h2>
+                <p style="color: #94A3B8;">不只是一個計分板，更是一個完整的家庭管理後台。</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i data-lucide="users"></i>
+                    <div>
+                        <h4>多成員協作架構</h4>
+                        <p>支持多個小孩、多個家長同時管理，無論在誰的手機上，數據永遠即時同步。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="zap"></i>
+                    <div>
+                        <h4>超級管理後台</h4>
+                        <p>一鍵批量分配週末點數、一鍵發放全體獎勵，讓繁雜的管理變得極其輕鬆。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="lock"></i>
+                    <div>
+                        <h4>家長 PIN 碼保護</h4>
+                        <p>敏感操作需要 4 位密碼驗證，防止小孩在「銀行」中隨意給自己增加信貸。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="history"></i>
+                    <div>
+                        <h4>詳盡活動日誌</h4>
+                        <p>每一筆點數的變動都有跡可循，誰加的、誰扣的、什麼原因，清清楚楚。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="smartphone"></i>
+                    <div>
+                        <h4>免安裝 PWA 體驗</h4>
+                        <p>無需下載，將網頁存入桌面即享原生 App 般的流暢感與全螢幕視覺。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="globe"></i>
+                    <div>
+                        <h4>全球唯一訪問碼</h4>
+                        <p>自訂好記的家庭專屬 ID，不論身在何處，家人都能一秒進入您的銀行。</p>
+                    </div>
                 </div>
             </div>
         </div>
