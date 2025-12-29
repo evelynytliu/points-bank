@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/lib/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg: #fdfcf9;
@@ -705,7 +705,14 @@
     </footer>
 
     <script>
-        lucide.createIcons();
+        // Ensure icons are created after DOM is fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () {
+                lucide.createIcons();
+            });
+        } else {
+            lucide.createIcons();
+        }
     </script>
 </body>
 
