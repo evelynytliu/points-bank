@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Points Bank | 溫暖的家庭小銀行</title>
+    <title>Points Bank | 溫暖的家庭點數銀行</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Zhi+Mang+Xing&family=Gaegu:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Gaegu:wght@400;700&family=Outfit:wght@500;800&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/lib/lucide.min.js"></script>
     <style>
@@ -17,8 +17,9 @@
             --secondary: #ffd180;
             --bg-warm: #fdfbf7;
             --text-main: #4a4a4a;
-            --text-light: #8e8e8e;
+            --text-light: #7e7e7e;
             --doodle: #d8c4b6;
+            --accent-soft: #e0f2f1;
         }
 
         * {
@@ -28,19 +29,22 @@
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-warm);
             color: var(--text-main);
             line-height: 1.8;
             overflow-x: hidden;
             background-image: radial-gradient(var(--doodle) 0.5px, transparent 0.5px);
-            background-size: 20px 20px;
+            background-size: 30px 30px;
+            word-break: keep-all;
         }
 
         h1,
         h2,
-        h3 {
+        h3,
+        h4 {
             font-weight: 900;
+            line-height: 1.3;
         }
 
         .container {
@@ -49,201 +53,435 @@
             padding: 0 2rem;
         }
 
-        /* --- Doodle SVGs --- */
+        /* --- Doodle Decor --- */
         .scribble {
             position: absolute;
             z-index: -1;
-            opacity: 0.4;
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         /* --- Header --- */
         header {
-            min-height: 90vh;
+            min-height: 95vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             position: relative;
+            padding: 4rem 0;
         }
 
         .hero-badge {
             font-family: 'Gaegu', cursive;
             background: #fff;
             border: 2px solid var(--text-main);
-            padding: 0.4rem 1.2rem;
+            padding: 0.5rem 1.5rem;
             border-radius: 50% 20% 40% 10%;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--text-main);
             display: inline-block;
             margin-bottom: 2rem;
-            transform: rotate(-3deg);
+            transform: rotate(-2deg);
+            box-shadow: 3px 3px 0 var(--doodle);
         }
 
         h1 {
             font-family: 'Gaegu', cursive;
             font-size: clamp(3.5rem, 10vw, 5.5rem);
-            line-height: 1;
             margin-bottom: 1.5rem;
             color: var(--text-main);
+            letter-spacing: -0.02em;
         }
 
         h1 span {
             color: var(--primary);
+            display: inline-block;
             position: relative;
         }
 
         h1 span::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: 10px;
             left: 0;
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: var(--secondary);
             z-index: -1;
-            opacity: 0.5;
+            opacity: 0.4;
             border-radius: 10px;
         }
 
         .hero-desc {
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto 3.5rem;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--text-light);
+            font-weight: 500;
         }
 
         .btn-main {
             background: var(--text-main);
             color: #fff;
-            padding: 1.2rem 3rem;
+            padding: 1.4rem 3.5rem;
             border-radius: 50px;
             font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 1rem;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            box-shadow: 4px 4px 0px var(--doodle);
+            font-size: 1.2rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 5px 5px 0px var(--doodle);
         }
 
         .btn-main:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px var(--primary);
+            transform: translate(-3px, -3px);
+            box-shadow: 8px 8px 0px var(--primary);
         }
 
         /* --- Sections --- */
         .section-padding {
-            padding: 6rem 0;
+            padding: 8rem 0;
+            position: relative;
         }
 
+        .section-title {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-title h2 {
+            font-family: 'Gaegu', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            position: relative;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 4px;
+            background: var(--primary);
+            bottom: 0;
+            left: 20%;
+            border-radius: 2px;
+        }
+
+        /* --- Manifesto (The Love Letter) --- */
+        .manifesto {
+            background: #fff;
+            border: 2px solid var(--text-main);
+            padding: 4rem;
+            border-radius: 40px 15px 45px 20px;
+            box-shadow: 10px 10px 0 var(--accent-soft);
+            margin-bottom: 6rem;
+        }
+
+        .manifesto-tag {
+            font-family: 'Gaegu', cursive;
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .manifesto-text {
+            font-size: 1.35rem;
+            line-height: 2.2;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        /* --- Philosophy Cards --- */
         .card-grid {
             display: grid;
-            grid-template-cols: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
+            grid-template-cols: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
         }
 
         .card {
             background: #fff;
             border: 2px solid var(--text-main);
-            padding: 3rem;
-            border-radius: 30px 10px 40px 15px;
-            transition: transform 0.3s;
+            padding: 3.5rem;
+            border-radius: 35px 15px 40px 20px;
+            transition: all 0.3s;
+            position: relative;
         }
 
         .card:hover {
-            transform: rotate(1deg) scale(1.02);
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 8px 8px 0 var(--secondary);
         }
 
         .card i {
             color: var(--primary);
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            display: block;
         }
 
         .card h3 {
             font-family: 'Gaegu', sans-serif;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card p {
+            font-size: 1.05rem;
+            color: var(--text-light);
+        }
+
+        /* --- Detailed Features --- */
+        .feature-list {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-start;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            border: 1px dashed var(--doodle);
+        }
+
+        .feature-item i {
+            color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .feature-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item p {
+            font-size: 0.9rem;
+            color: var(--text-light);
         }
 
         /* --- Footer --- */
         footer {
-            padding: 4rem 0;
+            padding: 6rem 0;
             text-align: center;
-            border-top: 1px dashed var(--doodle);
+            border-top: 2px dashed var(--doodle);
+            background: #fff;
+        }
+
+        .footer-logo {
+            font-family: 'Gaegu', cursive;
+            font-size: 2rem;
+            margin-bottom: 2rem;
         }
 
         .footer-links a {
             color: var(--primary);
             font-weight: 700;
             text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            border-color: var(--primary);
         }
 
         .copyright {
-            margin-top: 2rem;
-            font-size: 0.8rem;
+            margin-top: 3rem;
+            font-size: 0.85rem;
             color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
+            font-weight: 700;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: var(--doodle);
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            40% {
+                transform: translateX(-50%) translateY(-15px);
+            }
+
+            60% {
+                transform: translateX(-50%) translateY(-7px);
+            }
         }
     </style>
 </head>
 
 <body>
     <header>
-        <!-- Doodle Deco -->
-        <svg class="scribble" style="top: 10%; left: 5%; width: 150px;" viewBox="0 0 200 200">
-            <path d="M20,50 Q60,10 100,50 T180,50" fill="none" stroke="#d8c4b6" stroke-width="4"
-                stroke-linecap="round" />
+        <svg class="scribble" style="top: 15%; left: 10%; width: 140px;" viewBox="0 0 200 200">
+            <path d="M20,100 C20,100 50,20 100,100 C150,180 180,100 180,100" fill="none" stroke="var(--doodle)"
+                stroke-width="4" stroke-linecap="round" />
         </svg>
-        <svg class="scribble" style="bottom: 15%; right: 8%; width: 120px;" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="40" fill="none" stroke="#ff8a80" stroke-width="3" stroke-dasharray="10 5" />
+        <svg class="scribble" style="top: 20%; right: 12%; width: 100px;" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="30" fill="none" stroke="var(--primary)" stroke-width="2"
+                stroke-dasharray="8,4" />
         </svg>
 
         <div class="container">
-            <div class="hero-badge">孩子的成長紀錄</div>
+            <div class="hero-badge">陪伴孩子變厲害的過程</div>
             <h1>Points <span>Bank</span></h1>
             <p class="hero-desc">
-                給孩子的一封小情書：我們不是想限制你玩，而是想陪你一起練習「管理快樂」。在數位的時代裡，學會珍惜與規劃。
+                不只是螢幕時間的計加，更是一段關於「練習自律」的旅程。我們相信溫暖的規範能化解爭執，點點滴滴的累積，將轉化為孩子最好的規劃能力。
             </p>
-            <a href="https://points-bank.vercel.app" class="btn-main">
-                開始我們的家庭點數旅程 <i data-lucide="heart"></i>
-            </a>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                <a href="https://points-bank.vercel.app" class="btn-main">
+                    開啟家庭銀行入口 <i data-lucide="arrow-right"></i>
+                </a>
+                <div style="display: flex; gap: 1.5rem; opacity: 0.6; font-size: 0.8rem; font-weight: 700;">
+                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="sparkles"
+                            class="w-4"></i> 靈活同步</span>
+                    <span style="display: flex; align-items: center; gap: 0.4rem;"><i data-lucide="heart"
+                            class="w-4"></i> 自律養成</span>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-hint">
+            <i data-lucide="chevron-down" size="32"></i>
         </div>
     </header>
 
-    <section class="section-padding" style="background: #fff;">
+    <section class="section-padding">
         <div class="container">
-            <div style="text-align: center; margin-bottom: 4rem;">
-                <h2 style="font-family: 'Gaegu', cursive; font-size: 3rem;">跟孩子一起變厲害 ✨</h2>
-                <p style="color: var(--text-light);">這不只是規則，更是一種陪伴的儀式。</p>
+            <!-- Manifesto (Love Letter Content) -->
+            <div class="manifesto">
+                <div class="manifesto-tag">
+                    <i data-lucide="coffee"></i> 給家長們的小情書
+                </div>
+                <div class="manifesto-text">
+                    「其實，我們不是想限制孩子玩，而是想讓他們學會選擇。」<br><br>
+                    教養的本質，在於賦予孩子在沒有人監督時，依然能做出正確決定的能力。當螢幕時間變成一種需要規劃的「資產」，孩子會開始練習：我今天要現在用完，還是存著等假日？自律的種子，就在每一次取捨中悄悄發芽。
+                </div>
+            </div>
+
+            <!-- Detailed Philosophy Content Re-added -->
+            <div class="section-title">
+                <h2>跟孩子一起變厲害 ✨</h2>
+                <p style="color: var(--text-light); font-size: 1.2rem;">我們不教排斥數位，我們教如何「駕馭」它。</p>
             </div>
 
             <div class="card-grid">
                 <div class="card">
-                    <i data-lucide="smile"></i>
-                    <h3>練習「等一下」</h3>
-                    <p>比起馬上拿到，慢慢累積之後換來的目標，會讓孩子更有成就感。學會等待的孩子，練習的是一份續航力。</p>
+                    <i data-lucide="smile" size="48"></i>
+                    <h3>練習「等一下」的幸福</h3>
+                    <p>
+                        累積點數換取更大的獎勵，是訓練孩子「前額葉皮質」發展的最佳日常練習。比起馬上拿到，慢慢累積之後換來的成果，會讓孩子更有成就感與自主權。
+                    </p>
                 </div>
-                <div class="card">
-                    <i data-lucide="coffee"></i>
-                    <h3>多討論，少情緒</h3>
-                    <p>用透明的餘額代替口頭的拉鋸。孩子看得到努力換來的收穫，親子間的對話，從今天開始只有鼓勵。</p>
+                <div class="card" style="transform: rotate(-1deg);">
+                    <i data-lucide="message-circle" size="48"></i>
+                    <h3>多一點討論，少一些情緒</h3>
+                    <p>
+                        用透明的「銀行餘額」代替口頭的要求。孩子看得到每一份努力換來的收穫，親子間的爭取不再是情緒的拉鋸，而是暖心的對話與資源的討論。
+                    </p>
                 </div>
-                <div class="card">
-                    <i data-lucide="star"></i>
-                    <h3>生活的基礎課</h3>
-                    <p>把點數與幸福感連在一起。讓孩子在日常中練習分配資源，提早學會這輩子最重要的「平衡與取捨」。</p>
+                <div class="card" style="transform: rotate(0.5deg);">
+                    <i data-lucide="gift" size="48"></i>
+                    <h3>第一堂生活的基礎課</h3>
+                    <p>
+                        把點數、時間與幸福感連在一起。讓孩子在日常中練習分配資源、體驗機會成本。在安全的環境下，提早學會這輩子最重要的「平衡與取捨」。
+                    </p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Features Visualized Warmly -->
+    <section class="section-padding" style="background: rgba(216, 196, 182, 0.1);">
+        <div class="container">
+            <div class="section-title">
+                <h2 style="font-size: 2.5rem;">貼心的設計細節</h2>
+                <p style="color: var(--text-light);">不只是功能，更是為了讓家長更輕鬆。</p>
+            </div>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <i data-lucide="refresh-cw"></i>
+                    <div>
+                        <h4>全家同步支援</h4>
+                        <p>爸爸媽媽都能各別登入紀錄，數據即時在 0.5 秒內完成同步更新。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="key"></i>
+                    <div>
+                        <h4>守護家長的秘密</h4>
+                        <p>高權限操作皆受 PIN 碼保護，維持銀行規則穩定，是家長最安心的堡壘。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="history"></i>
+                    <div>
+                        <h4>溫柔的時光存摺</h4>
+                        <p>每一筆扣除與獲得都有跡可循，記錄下孩子每一秒學會克制的成長足跡。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="smartphone"></i>
+                    <div>
+                        <h4>免下載 PWA 體驗</h4>
+                        <p>將網頁加入桌面就像實體 App，不管是手機還是平板都有一致的流暢感。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="globe"></i>
+                    <div>
+                        <h4>專屬家庭 ID</h4>
+                        <p>設定好記的訪問代碼，不論身在哪個裝置，全家人都能一秒進入您的銀行。</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="sparkles"></i>
+                    <div>
+                        <h4>多樣介面風格</h4>
+                        <p>不論是科幻感還是溫馨風，您可以隨心更換最適合您家庭氛围的 UI 樣式。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 8rem; padding: 4rem; background: #fff; border: 2px dashed var(--doodle); border-radius: 30px; text-align: center;">
+                <p style="font-size: 1.3rem; margin-bottom: 2rem; font-weight: 700; color: var(--text-main);">
+                    準備好跟孩子一起享受自律的生活了嗎？
+                </p>
+                <a href="https://points-bank.vercel.app" class="btn-main">立即佈署您的家庭銀行 ➔</a>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="container">
-            <p style="font-family: 'Gaegu', cursive; font-size: 1.5rem; margin-bottom: 1.5rem;">POINTS BANK</p>
-            <p>CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT LIU</a></p>
+            <div class="footer-logo">POINTS BANK</div>
+            <p class="footer-links">
+                CREATED BY <a href="https://evelynytliu.github.io/" target="_blank">EVELYN YT LIU</a>
+            </p>
             <div class="copyright">
                 &copy; 2025 ALL RIGHTS RESERVED | POWERED BY LOVE & CODE
             </div>
