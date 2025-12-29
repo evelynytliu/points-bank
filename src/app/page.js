@@ -83,7 +83,7 @@ export default function Home() {
   };
 
   return (
-    <main className="container-center relative overflow-hidden bg-[#050508]">
+    <main className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#050508] p-4">
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cyan-500/10 rounded-full blur-[120px]" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px]" />
 
