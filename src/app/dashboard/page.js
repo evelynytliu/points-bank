@@ -1279,7 +1279,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
                     </div>
                 </div>
-                <div className={`py-4 px-6 w-full relative flex items-center justify-end gap-12 ${familySettings?.theme === 'doodle'
+                <div className={`py-4 px-6 w-fit ml-auto relative flex items-center justify-end gap-12 ${familySettings?.theme === 'doodle'
                     ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-6'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-6 p-4'}`}>
 
