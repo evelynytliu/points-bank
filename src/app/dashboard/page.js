@@ -1,8 +1,19 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2 } from 'lucide-react';
+import { Reorder } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2 } from 'lucide-react';
+import { dictionaries } from '@/lib/dictionaries';
+
+const AVATARS = [
+    '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', '🐷', '🐯',
+    '🐸', '🐙', '🦖', '🦄', '🐝', '🦋', '⚽', '🏀',
+    '🎨', '🚀', '🚁', '🚃', '🌈', '🍦', '🍩', '🍕',
+    '🍓', '🥑', '🎮', '🍎', '🧩', '🎸', '🛹', '🎻',
+    '🎭', '🎬', '🧬', '💎', '🔥', '⚡', '🍀', '🌸'
+];
 
 export default function Dashboard() {
     const router = useRouter();
@@ -15,12 +26,32 @@ export default function Dashboard() {
     const [familyMembers, setFamilyMembers] = useState([]);
     const [userRole, setUserRole] = useState('parent'); // 'parent' or 'kid'
 
+    // Language
+    const [language, setLanguage] = useState('zh');
+    const t = dictionaries[language] || dictionaries['zh'];
+
+    useEffect(() => {
+        setLanguage(localStorage.getItem('app_language') || 'zh');
+    }, []);
+
     // UI 狀態
     const [showAddModal, setShowAddModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [isAdminExpanded, setIsAdminExpanded] = useState(false);
     const [newKidName, setNewKidName] = useState('');
+    const [newKidAvatar, setNewKidAvatar] = useState(AVATARS[0]);
     const [allocPlan, setAllocPlan] = useState('weekday');
+
+    // 自動判斷平日/假日
+    useEffect(() => {
+        const day = new Date().getDay();
+        const isHoliday = (day === 0 || day === 6); // 0 is Sunday, 6 is Saturday
+        setAllocPlan(isHoliday ? 'holiday' : 'weekday');
+    }, []);
+    const [showAvatarPicker, setShowAvatarPicker] = useState(null); // kidId for which we are picking
+    const [editingKidId, setEditingKidId] = useState(null);
+    const [editName, setEditName] = useState('');
+    const [editPin, setEditPin] = useState('');
 
     // 管理後台狀態
     const [selectedKids, setSelectedKids] = useState([]);
@@ -59,11 +90,18 @@ export default function Dashboard() {
         setModal({
             isOpen: true,
             type: config.type || 'alert',
-            title: config.title || '',
+            title: config.title || '系統訊息',
             message: config.message || '',
             value: config.defaultValue || '',
+            unit: config.unit || '',
+            rate: config.rate,
+            mode: config.mode,
             onConfirm: (val) => {
-                if (config.onConfirm) config.onConfirm(val);
+                config.onConfirm && config.onConfirm(val);
+                setModal(prev => ({ ...prev, isOpen: false }));
+            },
+            onCancel: () => {
+                config.onCancel && config.onCancel();
                 setModal(prev => ({ ...prev, isOpen: false }));
             }
         });
@@ -174,6 +212,7 @@ export default function Dashboard() {
                 .from('kids')
                 .select('*')
                 .eq('family_id', currentFamilyId)
+                .order('sort_order', { ascending: true })
                 .order('created_at', { ascending: true });
 
             if (kidsError) {
@@ -186,16 +225,38 @@ export default function Dashboard() {
                 throw kidsError;
             }
 
-            // 如果查不到小孩，且是家長模式，試著幫忙遷移舊資料 (parent_id 匹配但 family_id 是 null 的)
-            if (kidsData?.length === 0 && authUser) {
-                const { data: legacyKids } = await supabase.from('kids').select('*').eq('parent_id', authUser.id).is('family_id', null);
-                if (legacyKids?.length > 0) {
-                    // 自動幫忙補上 family_id
-                    await supabase.from('kids').update({ family_id: currentFamilyId }).eq('parent_id', authUser.id).is('family_id', null);
-                    kidsData = legacyKids.map(k => ({ ...k, family_id: currentFamilyId }));
+            let finalKids = kidsData || [];
+
+            // --- 個人化排序邏輯 ---
+            // --- 個人化排序邏輯 ---
+            // Note: Use !authUser because userRole state update is async and might not be reflected yet
+            if (!authUser && localStorage.getItem('kid_session')) {
+                // 1. 小孩模式：自己排第一
+                const kidSession = localStorage.getItem('kid_session');
+                if (kidSession) {
+                    const currentKid = JSON.parse(kidSession);
+                    const me = finalKids.find(k => k.id === currentKid.id);
+                    if (me) {
+                        const others = finalKids.filter(k => k.id !== currentKid.id);
+                        finalKids = [me, ...others];
+                    }
+                }
+            } else if (authUser && currentProfile) {
+                // 2. 家長模式：讀取資料庫中的個人偏好排序 (kid_order)
+                const orderIds = currentProfile.kid_order || JSON.parse(localStorage.getItem(`dashboard_sort_${authUser.id}`) || 'null');
+
+                if (orderIds && Array.isArray(orderIds)) {
+                    const sorted = [];
+                    orderIds.forEach(id => {
+                        const found = finalKids.find(k => k.id === id);
+                        if (found) sorted.push(found);
+                    });
+                    const missing = finalKids.filter(k => !orderIds.includes(k.id));
+                    finalKids = [...sorted, ...missing];
                 }
             }
-            setKids(kidsData || []);
+
+            setKids(finalKids);
 
             // 獲取日誌
             const { data: logsData, error: lError } = await supabase
@@ -203,7 +264,7 @@ export default function Dashboard() {
                 .select(`*, kids!inner(name, family_id)`)
                 .eq('kids.family_id', currentFamilyId)
                 .order('created_at', { ascending: false })
-                .limit(20);
+                .limit(10);
 
             if (lError) console.error('獲取日誌失敗:', lError);
             setLogs(logsData || []);
@@ -252,7 +313,7 @@ export default function Dashboard() {
         for (const kidId of selectedKids) {
             const kid = kids.find(k => k.id === kidId);
             if (kid) {
-                await updateKidAction(kid, p, m, customReason || '後台批量調整', actor, false);
+                await updateKidAction(kid, p, m, customReason || '後台批次調整', actor, false);
             }
         }
 
@@ -260,21 +321,42 @@ export default function Dashboard() {
         setMinChange('');
         setCustomReason('');
         setSelectedKids([]);
-        alert('批量更新完成！');
+        alert('更新完成！');
         fetchData();
     };
 
-    const handleLogout = async () => {
-        if (userRole === 'parent') {
-            await supabase.auth.signOut();
-        } else {
-            localStorage.removeItem('kid_session');
-        }
-        router.push('/');
+    const handleLogout = () => {
+        showModal({
+            type: 'confirm',
+            title: t.logout_confirm_title,
+            message: t.logout_confirm_msg,
+            onConfirm: async () => {
+                if (userRole === 'parent') {
+                    await supabase.auth.signOut();
+                } else {
+                    localStorage.removeItem('kid_session');
+                }
+                router.push('/');
+            }
+        });
     };
 
     const saveSettings = async () => {
         if (!family) return;
+
+        // 檢查家庭代碼是否重複 (排除自己)
+        if (tempSettings.short_id && tempSettings.short_id !== family.short_id) {
+            const { data: duplicates } = await supabase
+                .from('families')
+                .select('id')
+                .eq('short_id', tempSettings.short_id)
+                .neq('id', family.id);
+
+            if (duplicates && duplicates.length > 0) {
+                return alert('⚠️ 這個家庭訪問碼已經被其他人使用了，請換一個！(試試點擊隨機產生)');
+            }
+        }
+
         const { error } = await supabase.from('families').update(tempSettings).eq('id', family.id);
         if (error) alert('儲存失敗: ' + error.message);
         else {
@@ -300,15 +382,81 @@ export default function Dashboard() {
         if (!newKidName.trim() || !profile?.family_id) return;
         const { error } = await supabase.from('kids').insert({
             name: newKidName,
-            parent_id: user.id === family.admin_id ? user.id : family.admin_id, // 確保關聯正確
+            avatar: newKidAvatar,
+            parent_id: user.id === family.admin_id ? user.id : family.admin_id,
             family_id: profile.family_id,
             login_pin: '1234'
         });
         if (error) alert(error.message);
         else {
             setNewKidName('');
+            setNewKidAvatar(AVATARS[Math.floor(Math.random() * AVATARS.length)]);
             setShowAddModal(false);
             fetchData();
+        }
+    };
+
+    const updateKidAvatar = async (kidId, avatar) => {
+        const { error } = await supabase.from('kids').update({ avatar }).eq('id', kidId);
+        if (error) alert(error.message);
+        else {
+            setShowAvatarPicker(null);
+            fetchData();
+        }
+    };
+
+    const updateKidPin = async (kidId, newPin) => {
+        if (!/^\d{4}$/.test(newPin)) return;
+        const { error } = await supabase.from('kids').update({ login_pin: newPin }).eq('id', kidId);
+        if (error) alert(error.message);
+        else fetchData();
+    };
+
+    const startEditKid = (kid) => {
+        setEditingKidId(kid.id);
+        setEditName(kid.name);
+        setEditPin(kid.login_pin || '1234');
+    };
+
+    const cancelEditKid = () => {
+        setEditingKidId(null);
+    };
+
+    const saveEditKid = async (kidId) => {
+        if (!editName.trim()) return;
+        if (!/^\d{4}$/.test(editPin)) return alert('PIN 碼必須為 4 位數字');
+
+        const { error } = await supabase.from('kids').update({
+            name: editName.trim(),
+            login_pin: editPin
+        }).eq('id', kidId);
+
+        if (error) {
+            alert(error.message);
+        } else {
+            setEditingKidId(null);
+            fetchData();
+            // 同步更新小孩模式的 Session (如果修正的是當前使用者)
+            const kidSession = localStorage.getItem('kid_session');
+            if (kidSession) {
+                const kData = JSON.parse(kidSession);
+                if (kData.id === kidId) {
+                    localStorage.setItem('kid_session', JSON.stringify({ ...kData, name: editName.trim() }));
+                }
+            }
+        }
+    };
+
+    const handleReorderKids = async (newOrder) => {
+        setKids(newOrder); // 立即更新 UI
+
+        // 儲存到個人帳號設定中 (profiles.kid_order)
+        if (user?.id && userRole === 'parent') {
+            const orderIds = newOrder.map(k => k.id);
+
+            // 遠端與本地同步更新
+            await supabase.from('profiles').update({ kid_order: orderIds }).eq('id', user.id);
+            localStorage.setItem(`dashboard_sort_${user.id}`, JSON.stringify(orderIds));
         }
     };
 
@@ -362,7 +510,7 @@ export default function Dashboard() {
 
         showModal({
             type: 'confirm',
-            title: '批量分配',
+            title: '批次分配',
             message: `確定要為所有小孩分配 ${minutes} 分鐘嗎？`,
             onConfirm: async () => {
                 const actor = getActorName();
@@ -375,6 +523,109 @@ export default function Dashboard() {
         });
     };
 
+    const resetLogsOnly = async () => {
+        if (!await checkParentPin()) return;
+        showModal({
+            type: 'confirm',
+            title: '清空異動紀錄',
+            message: '確定要清空所有異動紀錄嗎？這將會刪除日誌，但「保留」目前的點數與剩餘時間。此操作無法復原。',
+            onConfirm: async () => {
+                const kidIds = kids.map(k => k.id);
+                const { error } = await supabase.from('logs').delete().in('kid_id', kidIds);
+                if (error) showModal({ title: '失敗', message: error.message });
+                else {
+                    showModal({ title: '成功', message: '異動紀錄已清空' });
+                    fetchData();
+                }
+            }
+        });
+    };
+
+    const resetFamilyData = async () => {
+        if (!await checkParentPin()) return;
+        showModal({
+            type: 'confirm',
+            title: '危險：徹底清空',
+            message: '確定要清空所有紀錄「並歸零點數」嗎？所有小孩的點數與時間將會變為 0。此操作無法復原。',
+            onConfirm: async () => {
+                const kidIds = kids.map(k => k.id);
+                // 1. Delete logs
+                await supabase.from('logs').delete().in('kid_id', kidIds);
+                // 2. Reset kids stats
+                const { error } = await supabase.from('kids').update({ total_points: 0, total_minutes: 0 }).in('id', kidIds);
+
+                if (error) showModal({ title: '失敗', message: error.message });
+                else {
+                    showModal({ title: '成功', message: '所有資料已重設並歸零' });
+                    fetchData();
+                }
+            }
+        });
+    };
+
+    const deleteLog = async (logId) => {
+        if (userRole !== 'parent') return;
+        if (!await checkParentPin()) return;
+
+        showModal({
+            type: 'confirm',
+            title: '撤銷並刪除紀錄',
+            message: '確定要刪除並撤銷此紀錄嗎？這會自動還原該次異動的點數與時間。',
+            onConfirm: async () => {
+                const { error } = await supabase.rpc('delete_and_revert_log', { target_log_id: logId });
+                if (error) showModal({ title: '撤銷失敗', message: error.message });
+                else {
+                    fetchData();
+                }
+            }
+        });
+    };
+
+    const exportLogsToCSV = async () => {
+        try {
+            const { data: allLogs, error } = await supabase
+                .from('logs')
+                .select(`*, kids!inner(name, family_id)`)
+                .eq('kids.family_id', family.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            if (!allLogs || allLogs.length === 0) {
+                showModal({ title: '提醒', message: '目前沒有任何紀錄可以匯出。' });
+                return;
+            }
+
+            // CSV Header
+            const headers = ['時間', '對象', '原因', '點數變動', '分鐘變動', '操作者'];
+            const csvRows = [headers.join(',')];
+
+            for (const log of allLogs) {
+                const row = [
+                    `"${new Date(log.created_at).toLocaleString().replace(/"/g, '""')}"`,
+                    `"${(log.kids?.name || '未知').replace(/"/g, '""')}"`,
+                    `"${(log.reason || '調整').replace(/"/g, '""')}"`,
+                    log.points_change,
+                    log.minutes_change,
+                    `"${(log.actor_name || '系統').replace(/"/g, '""')}"`
+                ];
+                csvRows.push(row.join(','));
+            }
+
+            const csvString = '\uFEFF' + csvRows.join('\n'); // Add BOM for Excel Chinese support
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `點數紀錄_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+            console.error('Export error:', e);
+            showModal({ title: '匯出失敗', message: e.message });
+        }
+    };
+
     if (loading) return (
         <div className="min-h-screen bg-[#080812] flex items-center justify-center text-cyan-400 font-bold animate-pulse">載入中...</div>
     );
@@ -383,18 +634,18 @@ export default function Dashboard() {
         <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 glass-panel p-6 border-cyan-500/10">
                 <div className="flex items-center gap-3">
-                    <Monitor className="text-cyan-400 w-8 h-8" />
-                    <h1 className="text-2xl md:text-3xl font-black text-white italic tracking-tighter uppercase">控制後台 {userRole === 'kid' && <span className="text-xs bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full ml-2 non-italic tracking-normal normal-case">小孩模式</span>}</h1>
+                    <Monitor className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-8 h-8`} />
+                    <h1 className={`text-2xl md:text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic tracking-tighter uppercase`}>{t.points_bank} {userRole === 'kid' && <span className={`text-xs ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} px-3 py-1 rounded-full ml-2 non-italic tracking-normal normal-case`}>{t.kid_mode}</span>}</h1>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-3">
                     {userRole === 'parent' && (
-                        <button onClick={() => setShowSettingsModal(true)} className="flex items-center gap-2 p-3 bg-white/5 hover:bg-cyan-500/20 rounded-2xl border border-white/5 group transition-all text-xs text-slate-400">
+                        <button onClick={() => setShowSettingsModal(true)} className={`flex items-center gap-2 p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'} rounded-2xl border group transition-all text-xs ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
                             <Settings className="w-5 h-5 group-hover:rotate-90 transition-all duration-500" />
-                            <span className="hidden md:inline font-bold">系統與成員管理</span>
+                            <span className="hidden md:inline font-bold">{t.system_member_mgmt}</span>
                         </button>
                     )}
-                    <button onClick={handleLogout} className="p-3 bg-white/5 hover:bg-red-500/20 rounded-2xl border border-white/5 group transition-all"><LogOut className="w-5 h-5 text-slate-500 group-hover:text-red-400" /></button>
+                    <button onClick={handleLogout} className={`p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-red-500/20'} rounded-2xl border group transition-all`} title={t.logout}><LogOut className={`w-5 h-5 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} group-hover:text-red-400`} /></button>
                 </div>
             </header>
 
@@ -403,15 +654,15 @@ export default function Dashboard() {
 
                     {/* Only show Admin Panel to parents or if needed */}
                     {/* Admin Panel available to all, but actions may require PIN */}
-                    <div className={`glass-panel border-cyan-500/20 overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
+                    <div className={`glass-panel ${family?.theme === 'doodle' ? 'border-[#4a4a4a]' : 'border-cyan-500/20'} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
                         <button
                             onClick={() => setIsAdminExpanded(!isAdminExpanded)}
-                            className="w-full flex justify-between items-center p-6 bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20 transition-all"
+                            className={`w-full flex justify-between items-center p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5 hover:bg-[#ff8a80]/10' : 'bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20'} transition-all`}
                         >
-                            <div className="flex items-center gap-3 font-black italic text-white uppercase tracking-wider">
-                                <Zap className="text-cyan-400 w-5 h-5 animate-pulse" /> 管理控制台 (批量點數/時間)
+                            <div className={`flex items-center gap-3 font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} uppercase tracking-wider`}>
+                                <Zap className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-5 h-5 animate-pulse`} /> {t.admin_console}
                             </div>
-                            {isAdminExpanded ? <ChevronUp className="text-slate-500" /> : <ChevronDown className="text-slate-500" />}
+                            {isAdminExpanded ? <ChevronUp className={family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} /> : <ChevronDown className={family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} />}
                         </button>
 
                         <div className="p-8 pt-2">
@@ -420,39 +671,69 @@ export default function Dashboard() {
                                     <button
                                         key={k.id}
                                         onClick={() => toggleKidSelection(k.id)}
-                                        className={`px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 border ${selectedKids.includes(k.id) ? 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'}`}
+                                        className={`px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 border ${selectedKids.includes(k.id)
+                                            ? (family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white border-[#4a4a4a] shadow-[4px_4px_0px_#d8c4b6]' : 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]')
+                                            : (family?.theme === 'doodle' ? 'bg-white text-[#4a4a4a] border-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white')}`}
                                     >
                                         {selectedKids.includes(k.id) && <CheckCircle2 className="w-4 h-4" />}
                                         {k.name}
                                     </button>
                                 ))}
-                                {userRole === 'parent' && <button onClick={() => setShowAddModal(true)} className="px-4 py-3 rounded-2xl bg-white/5 border border-dashed border-white/20 text-slate-500 hover:text-white transition-all"><Plus className="w-5 h-5" /></button>}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">⭐ 點數調整</label>
-                                    <input type="number" placeholder="例如: +10 / -5" className="w-full bg-black/40 border border-white/10 p-4 rounded-2xl text-white font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none" value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
+                                    <label className={`text-[10px] font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
+                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-4 rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">📺 分鐘調整</label>
-                                    <input type="number" placeholder="例如: +30 / -20" className="w-full bg-black/40 border border-white/10 p-4 rounded-2xl text-white font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none" value={minChange} onChange={e => setMinChange(e.target.value)} />
+                                    <label className={`text-[10px] font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
+                                    <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-4 rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">📝 說明原因</label>
-                                    <input type="text" placeholder="例如: 洗碗獎勵" className="w-full bg-black/40 border border-white/10 p-4 rounded-2xl text-white font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none" value={customReason} onChange={e => setCustomReason(e.target.value)} />
+                                    <label className={`text-[10px] font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
+                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-4 rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
                                 </div>
                             </div>
-                            <button onClick={handleBatchUpdate} className="btn btn-primary w-full !py-4 text-sm font-black uppercase tracking-widest shadow-xl">執行批次更新 🚀</button>
+                            <button onClick={handleBatchUpdate} className="btn btn-primary w-full !py-4 text-sm font-black uppercase tracking-widest shadow-xl">{t.execute_update}</button>
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <h2 className="text-2xl font-black italic text-white flex items-center gap-3 uppercase font-black"><TrendingUp className="text-cyan-400" /> 狀態總覽</h2>
-                        <div className="flex items-center gap-2 bg-white/5 p-1 rounded-2xl border border-white/10 font-bold">
-                            <button onClick={() => setAllocPlan('weekday')} className={`px-4 py-2 rounded-xl text-xs transition-all ${allocPlan === 'weekday' ? 'bg-cyan-500 text-black shadow-lg' : 'text-slate-400 hover:text-white'}`}>平日 ({family?.weekday_limit}m)</button>
-                            <button onClick={() => setAllocPlan('holiday')} className={`px-4 py-2 rounded-xl text-xs transition-all ${allocPlan === 'holiday' ? 'bg-purple-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}>假日 ({family?.holiday_limit}m)</button>
-                            <button onClick={batchAllocate} className="ml-2 p-2 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-all" title="一鍵分配當前模式時間"><Calendar className="w-4 h-4" /></button>
+                        <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase font-black`}><TrendingUp className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} /> {t.status_overview}</h2>
+                        <div className="flex flex-col sm:flex-row items-center gap-3">
+                            <div className={`flex items-center p-1 rounded-2xl border font-bold ${family?.theme === 'doodle' ? 'bg-[#eee] border-[#4a4a4a]' : 'bg-white/5 border-white/10'}`}>
+                                <button
+                                    onClick={() => setAllocPlan('weekday')}
+                                    className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'weekday'
+                                        ? (family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white shadow-lg' : 'bg-cyan-500 text-black shadow-lg')
+                                        : (family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-400 hover:text-white')
+                                        }`}
+                                >
+                                    🏢 {t.weekday} ({family?.weekday_limit}m)
+                                </button>
+                                <button
+                                    onClick={() => setAllocPlan('holiday')}
+                                    className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'holiday'
+                                        ? (family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white shadow-lg' : 'bg-purple-500 text-white shadow-lg')
+                                        : (family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-400 hover:text-white')
+                                        }`}
+                                >
+                                    🏖️ {t.holiday} ({family?.holiday_limit}m)
+                                </button>
+                            </div>
+
+                            <button
+                                onClick={batchAllocate}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl hover:scale-105 active:scale-95 ${family?.theme === 'doodle'
+                                    ? 'bg-[#ff8a80] text-white border-b-4 border-r-4 border-[#4a4a4a]'
+                                    : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black hover:shadow-cyan-500/25'
+                                    }`}
+                                title={t.one_click_allocate}
+                            >
+                                <Zap className="w-4 h-4" />
+                                {t.one_click_allocate}
+                            </button>
                         </div>
                     </div>
 
@@ -468,63 +749,262 @@ export default function Dashboard() {
                                 actorName={getActorName()}
                                 hideSensitive={userRole === 'kid'}
                                 showModal={showModal}
+                                t={t}
                             />
                         ))}
                     </div>
                 </div>
 
                 <div className="lg:col-span-4 space-y-8">
-                    <h2 className="text-2xl font-black italic text-white flex items-center gap-3 uppercase tracking-tight"><History className="text-pink-500" /> 異動紀錄</h2>
-                    <div className="glass-panel p-6 border-pink-500/5 min-h-[500px]">
+                    <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
+                    <div className={`glass-panel p-6 ${family?.theme === 'doodle' ? 'border-[#4a4a4a]' : 'border-pink-500/5'} min-h-[500px]`}>
                         {logs.map(log => (
-                            <li key={log.id} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col gap-2 list-none mb-4 font-bold border-l-2 border-l-cyan-500/20">
+                            <li key={log.id} className={`p-4 rounded-xl ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5'} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme === 'doodle' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20'}`}>
                                 <div className="flex justify-between items-start">
-                                    <span className="font-bold text-cyan-400 uppercase text-xs tracking-widest">{log.kids?.name}</span>
-                                    <span className="text-[10px] text-slate-600 font-mono italic">{new Date(log.created_at).toLocaleTimeString()}</span>
+                                    <div className="flex flex-col">
+                                        <span className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'} uppercase text-xs tracking-widest`}>{log.kids?.name}</span>
+                                        <span className={`text-[10px] ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
+                                    </div>
+                                    {userRole === 'parent' && (
+                                        <button
+                                            onClick={() => deleteLog(log.id)}
+                                            className={`p-1.5 rounded-lg ${family?.theme === 'doodle' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-white/5'} transition-all`}
+                                            title="刪除此筆紀錄"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
                                 </div>
-                                <div className="text-sm text-slate-300 font-medium">{log.reason || '調整'}</div>
+                                <div className={`text-sm ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-300'} font-medium`}>{log.reason || '調整'}</div>
                                 <div className="flex justify-between items-center mt-1">
                                     <div className="flex gap-2">
                                         {log.points_change !== 0 && <span className={`text-[10px] px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} 點</span>}
-                                        {log.minutes_change !== 0 && <span className={`text-[10px] px-2 py-0.5 rounded ${log.minutes_change > 0 ? 'bg-cyan-500/10 text-cyan-400' : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
+                                        {log.minutes_change !== 0 && <span className={`text-[10px] px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme === 'doodle' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
                                     </div>
-                                    <div className="text-[10px] text-slate-600 flex items-center gap-1"><User className="w-3 h-3" /> {log.actor_name || '系統'}</div>
+                                    <div className={`text-[10px] ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} flex items-center gap-1`}><User className="w-3 h-3" /> {log.actor_name || '系統'}</div>
                                 </div>
                             </li>
                         ))}
                     </div>
+                    <button
+                        onClick={() => router.push('/logs')}
+                        className={`w-full mt-4 py-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
+                    >
+                        <History className="w-4 h-4" /> 查看全部異動紀錄
+                    </button>
                 </div>
             </div>
 
             {/* Settings Modal */}
             {showSettingsModal && (
-                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-6">
-                    <div className="glass-panel p-8 md:p-10 max-w-2xl w-full border-cyan-500/30 max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black text-white italic flex items-center gap-3"><Settings className="text-cyan-400 w-6 h-6" /> 系統規則與帳號管理</h3>
-                            <button onClick={() => setShowSettingsModal(false)} className="text-slate-500 hover:text-white"><X /></button>
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-4">
+                    <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme === 'doodle' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30'} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
+                        {/* Sticky Header */}
+                        <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'doodle' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md z-10`}>
+                            <h3 className={`text-2xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.system_rules_title}</h3>
+                            <button onClick={() => setShowSettingsModal(false)} className={`${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
                         </div>
 
-                        <div className="space-y-8">
-                            {/* Member Management */}
+                        {/* Scrollable Content */}
+                        <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-10 scroll-smooth">
+                            {/* 1. 點數與時間規則 (最常用) */}
                             <section>
-                                <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-                                    <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em]">家長管理權限 ({familyMembers.length})</h4>
-                                    <div className="group relative">
-                                        <button className="text-[9px] bg-white/5 px-2 py-1 rounded-md text-slate-500 hover:text-cyan-300 transition-colors" onClick={() => {
-                                            navigator.clipboard.writeText(family.id);
-                                            alert('完整邀請碼已複製！別人可以使用此碼加入管理員。');
-                                        }}>複製家長邀請碼</button>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
+                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                            <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
+                                            <span className={`pr-3 text-xs font-black ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
+                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.holiday_limit}</label>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                            <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
+                                            <span className={`pr-3 text-xs font-black ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
+                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.pts_to_time_rate}</label>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                            <span className={`pl-3 text-sm font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1:</span>
+                                            <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
+                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.pts_to_cash_rate}</label>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                            <span className={`pl-3 text-sm font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1:</span>
+                                            <input type="number" step="0.1" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
+                                        </div>
                                     </div>
                                 </div>
+                            </section>
+
+                            <section>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_members_mgmt}</h4>
+                                <Reorder.Group axis="y" values={kids} onReorder={handleReorderKids} className="space-y-3 mb-4">
+                                    {kids.map(kid => (
+                                        <Reorder.Item
+                                            key={kid.id}
+                                            value={kid}
+                                            className="relative"
+                                        >
+                                            <div className={`flex items-center justify-between p-4 rounded-2xl border ${family?.theme === 'doodle' ? 'bg-[#fdfbf7] border-[#eee]' : 'bg-white/5 border-white/5'} cursor-default select-none`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`cursor-grab active:cursor-grabbing p-1 ${family?.theme === 'doodle' ? 'text-[#ccc]' : 'text-slate-600'}`}>
+                                                        <GripVertical className="w-4 h-4" />
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setShowAvatarPicker(showAvatarPicker === kid.id ? null : kid.id)}
+                                                        className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 ${family?.theme === 'doodle' ? 'bg-white shadow-sm border-[#eee]' : 'bg-black/40 border-white/10'} border`}
+                                                    >
+                                                        {kid.avatar || '👶'}
+                                                    </button>
+                                                    {editingKidId === kid.id ? (
+                                                        <input
+                                                            autoFocus
+                                                            className={`bg-black/20 border border-white/10 rounded-lg px-3 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-cyan-500 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'text-white'}`}
+                                                            value={editName}
+                                                            onChange={(e) => setEditName(e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <span className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.name}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col items-center gap-1 mr-2">
+                                                        <label className={`text-[9px] font-black uppercase tracking-tighter ${family?.theme === 'doodle' ? 'text-slate-400' : 'text-slate-500'}`}>{t.kid_login_pin}</label>
+                                                        {editingKidId === kid.id ? (
+                                                            <input
+                                                                type="text"
+                                                                maxLength={4}
+                                                                className={`w-14 h-8 text-center font-mono text-xs rounded-lg border focus:outline-none focus:ring-1 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-cyan-400 focus:ring-cyan-500'}`}
+                                                                value={editPin}
+                                                                onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ''))}
+                                                            />
+                                                        ) : (
+                                                            <div className={`w-14 h-8 flex items-center justify-center font-mono text-xs rounded-lg border ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#eee] text-[#888]' : 'bg-black/20 border-white/5 text-slate-500'}`}>
+                                                                {kid.login_pin || '1234'}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {editingKidId === kid.id ? (
+                                                        <>
+                                                            <button onClick={() => saveEditKid(kid.id)} className="p-2 text-green-500 hover:scale-110 transition-all" title="儲存變更"><CheckCircle2 className="w-5 h-5" /></button>
+                                                            <button onClick={cancelEditKid} className="p-2 text-red-500 hover:scale-110 transition-all" title="取消編輯"><X className="w-5 h-5" /></button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button onClick={() => startEditKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'text-blue-500 hover:bg-blue-50' : 'text-blue-400 hover:bg-blue-500/20'}`} title="修改資料"><Edit2 className="w-4 h-4" /></button>
+                                                            <button onClick={() => deleteKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-red-400 hover:bg-red-500/20'}`} title="刪除小孩"><Trash2 className="w-4 h-4" /></button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {showAvatarPicker === kid.id && (
+                                                <div className={`absolute left-0 right-0 z-20 mt-2 p-4 rounded-2xl border shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 ${family?.theme === 'doodle' ? 'bg-white border-[#eee]' : 'bg-black/90 border-white/10 backdrop-blur-xl'}`}>
+                                                    <div className="grid grid-cols-8 gap-2">
+                                                        {AVATARS.map(emoji => (
+                                                            <button
+                                                                key={emoji}
+                                                                onClick={() => updateKidAvatar(kid.id, emoji)}
+                                                                className={`p-2 text-xl rounded-xl hover:bg-black/5 flex items-center justify-center transition-all hover:scale-125 ${kid.avatar === emoji ? 'bg-orange-400/20' : ''}`}
+                                                            >
+                                                                {emoji}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </Reorder.Item>
+                                    ))}
+                                </Reorder.Group>
+                                <button onClick={() => { setShowAddModal(true); setShowSettingsModal(false); }} className={`w-full py-4 rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 font-black transition-all ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30 text-[#ff8a80] hover:bg-[#ff8a80]/5' : 'border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10'}`}>
+                                    <Plus className="w-5 h-5" /> {t.add_kid_member}
+                                </button>
+                            </section>
+
+                            {/* 3. 風格選擇 */}
+                            <section>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.ui_style_selection}</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className="text-sm font-bold mb-1">Cyber Neon</div>
+                                        <div className="text-xs uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
+                                    </button>
+                                    <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
+                                        <div className="text-sm font-bold mb-1">Warm Doodle</div>
+                                        <div className="text-xs uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
+                                    </button>
+                                </div>
+                            </section>
+
+                            {/* 4. 連線與代碼 (標準化) */}
+                            <section className={`p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
+                                        <button
+                                            onClick={() => {
+                                                const randomCode = `FAMILY${Math.floor(1000 + Math.random() * 9000)}`;
+                                                setTempSettings({ ...tempSettings, short_id: randomCode });
+                                            }}
+                                            className={`text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-all flex items-center gap-1`}
+                                        >
+                                            <span className="text-xs">🎲</span> {t.random_generate}
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input type="text" className={`flex-1 ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-4 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`} value={tempSettings.short_id} onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })} placeholder="例如: FAMILY123" />
+                                        <button onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }} className={`p-4 rounded-2xl ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400'} border hover:bg-cyan-500/10 hover:text-cyan-400 shadow-sm transition-all`}><Copy className="w-5 h-5" /></button>
+                                    </div>
+                                    <p className="text-xs text-slate-500 italic opacity-60">{t.access_code_hint}</p>
+                                </div>
+                            </section>
+
+                            {/* 5. 安全保護 */}
+                            <section>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white' : 'bg-black/40'} rounded-2xl border ${family?.theme === 'doodle' ? 'border-[#eee]' : 'border-white/5'}`}>
+                                        <div className="space-y-0.5">
+                                            <div className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
+                                            <div className={`text-xs ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_desc}</div>
+                                        </div>
+                                        <button
+                                            onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
+                                            className={`w-14 h-7 rounded-full transition-all relative flex items-center px-1 shadow-inner ${tempSettings.use_parent_pin
+                                                ? (family?.theme === 'doodle' ? 'bg-orange-400' : 'bg-cyan-500')
+                                                : (family?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10')
+                                                }`}
+                                        >
+                                            <div className={`text-xs font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
+                                                {tempSettings.use_parent_pin ? 'ON' : 'OFF'}
+                                            </div>
+                                            <div className={`w-5 h-5 bg-white rounded-full transition-all shadow-md z-10 transform ${tempSettings.use_parent_pin ? 'translate-x-7' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <input type="text" maxLength={4} placeholder={t.four_digit_pin} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'} p-4 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80]`} value={tempSettings.parent_pin} onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })} />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* 6. 家長管理團隊 */}
+                            <section>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
                                 <div className="space-y-3">
                                     {familyMembers.map(m => (
-                                        <div key={m.id} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                                        <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs uppercase">{m.email?.charAt(0)}</div>
+                                                <div className={`w-8 h-8 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
                                                 <div>
-                                                    <div className="text-sm font-bold text-white">{m.email}</div>
-                                                    <div className="text-[10px] text-slate-500 font-black">{m.id === family.admin_id ? '🔑 管理員 (Admin)' : '👤 家長'}</div>
+                                                    <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
+                                                    <div className={`text-[10px] ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} font-black`}>{m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
                                                 </div>
                                             </div>
                                             {m.id !== family.admin_id && m.id !== user.id && (
@@ -535,110 +1015,66 @@ export default function Dashboard() {
                                 </div>
                             </section>
 
-                            {/* Kid Login Config */}
-                            <section className="p-6 bg-cyan-500/5 rounded-3xl border border-cyan-500/10">
-                                <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">小孩訪問設定</h4>
-                                <div className="space-y-6">
-                                    <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-3">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-white uppercase italic">家庭訪問碼 (自訂 ID)</label>
-                                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">唯一，他人不可重複</span>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-xl font-black font-mono text-cyan-400 text-center focus:ring-2 focus:ring-cyan-500 outline-none uppercase"
-                                            value={tempSettings.short_id}
-                                            onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
-                                            placeholder="例如: FAMILY888"
-                                        />
-                                        <p className="text-[9px] text-slate-600 text-center uppercase tracking-widest font-bold">這是小孩登入時要輸入的第一串代碼</p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* PIN Settings */}
-                            <section className="p-6 bg-cyan-500/5 rounded-3xl border border-cyan-500/10">
-                                <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">安全保護設定</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5">
-                                        <div className="space-y-0.5">
-                                            <div className="text-xs font-bold text-white">啟動家長密碼</div>
-                                            <div className="text-[9px] text-slate-500">加分或批量操作時需驗證</div>
-                                        </div>
-                                        <button
-                                            onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
-                                            className={`w-12 h-6 rounded-full transition-all relative ${tempSettings.use_parent_pin ? 'bg-cyan-500' : 'bg-slate-700'}`}
-                                        >
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${tempSettings.use_parent_pin ? 'left-7' : 'left-1'}`} />
-                                        </button>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase">管理密碼 (4 位數)</label>
-                                        <input type="text" maxLength={4} className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white font-mono font-bold text-center tracking-[0.5em]" value={tempSettings.parent_pin} onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })} />
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Theme Selection */}
-                            <section className="p-6 bg-cyan-500/5 rounded-3xl border border-cyan-500/10">
-                                <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">介面風格選擇 (Theme)</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button
-                                        onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })}
-                                        className={`p-4 rounded-2xl border-2 transition-all text-center ${tempSettings.theme === 'cyber' ? 'border-cyan-500 bg-cyan-500/10' : 'border-white/5 bg-white/5 text-slate-500'}`}
-                                    >
-                                        <div className="text-sm font-bold mb-1">Cyber Neon</div>
-                                        <div className="text-[9px] uppercase tracking-widest opacity-60">科幻電子風</div>
+                            {/* 7. 資料重設與匯出 */}
+                            <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5'}`}>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-red-500'} uppercase tracking-[0.2em] mb-4 flex items-center gap-2`}><Trash2 className="w-3 h-3" /> {t.data_mgmt_export}</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'}`}>
+                                        <div className="flex justify-between items-start w-full"><div className="text-sm font-bold mb-1">{t.export_full_history}</div><Download className="w-4 h-4 text-cyan-500" /></div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'doodle' ? 'text-[#666]' : 'text-slate-400'}`}>{t.csv_desc}</div>
                                     </button>
-                                    <button
-                                        onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })}
-                                        className={`p-4 rounded-2xl border-2 transition-all text-center ${tempSettings.theme === 'doodle' ? 'border-orange-400 bg-orange-400/10' : 'border-white/5 bg-white/5 text-slate-500'}`}
-                                    >
-                                        <div className="text-sm font-bold mb-1">Warm Doodle</div>
-                                        <div className="text-[9px] uppercase tracking-widest opacity-60">手繪生活風</div>
+                                    <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10'}`}>
+                                        <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'doodle' ? 'text-[#666]' : 'text-slate-400'}`}>{t.clear_history_desc}</div>
                                     </button>
-                                </div>
-                            </section>
-
-                            {/* Conversion Rules */}
-                            <section>
-                                <h4 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">點數與時間規則</h4>
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <div className="space-y-2 text-center">
-                                        <label className="text-[9px] font-bold text-slate-500 uppercase">平日分鐘</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white font-bold text-center" value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
-                                    </div>
-                                    <div className="space-y-2 text-center">
-                                        <label className="text-[9px] font-bold text-slate-500 uppercase">假日分鐘</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white font-bold text-center" value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
-                                    </div>
-                                    <div className="space-y-2 text-center">
-                                        <label className="text-[9px] font-bold text-slate-500 uppercase">1點換分</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white font-bold text-center" value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
-                                    </div>
-                                    <div className="space-y-2 text-center">
-                                        <label className="text-[9px] font-bold text-slate-500 uppercase">1點換現</label>
-                                        <input type="number" className="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-white font-bold text-center" value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseInt(e.target.value) })} />
-                                    </div>
+                                    <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'doodle' ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30'} md:col-span-2`}>
+                                        <div className="text-sm font-bold mb-1">{t.reset_family_data}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-red-400'}`}>{t.reset_family_desc}</div>
+                                    </button>
                                 </div>
                             </section>
                         </div>
 
-                        <button onClick={saveSettings} className="btn btn-primary w-full gap-2 font-black !py-4 mt-10"><Save className="w-5 h-5" /> 儲存所有變更</button>
+                        <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme === 'doodle' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md`}>
+                            <button onClick={saveSettings} className="btn btn-primary w-full gap-2 font-black !py-4 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"><Save className="w-5 h-5" /> {t.save_changes}</button>
+                        </div>
                     </div>
                 </div>
             )}
 
-            <CustomModal config={modal} onClose={() => setModal(prev => ({ ...prev, isOpen: false }))} />
+            <CustomModal config={modal} onClose={() => setModal(prev => ({ ...prev, isOpen: false }))} familyTheme={family?.theme} t={t} />
 
             {showAddModal && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
-                    <div className="glass-panel p-10 max-w-sm w-full border-cyan-500/30">
-                        <h3 className="text-2xl font-black mb-6 italic text-white tracking-tight uppercase">新增成員</h3>
-                        <input type="text" placeholder="輸入姓名" className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white font-bold mb-6 text-center focus:ring-2 focus:ring-cyan-500 outline-none" value={newKidName} onChange={e => setNewKidName(e.target.value)} />
+                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[110] p-6 animate-in fade-in duration-300">
+                    <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl'}`}>
+                        <h3 className={`text-2xl font-black mb-8 italic flex items-center gap-3 uppercase tracking-tight ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}><Plus className="text-cyan-500" /> {t.add_member}</h3>
+
+                        <div className="flex flex-col items-center gap-6 mb-8">
+                            <button
+                                onClick={() => {
+                                    const nextIdx = (AVATARS.indexOf(newKidAvatar) + 1) % AVATARS.length;
+                                    setNewKidAvatar(AVATARS[nextIdx]);
+                                }}
+                                className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme === 'doodle' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30'}`}
+                            >
+                                {newKidAvatar}
+                            </button>
+                            <p className={`text-[10px] font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase tracking-widest`}>{t.click_to_change_avatar}</p>
+
+                            <input
+                                autoFocus
+                                type="text"
+                                placeholder={t.enter_kid_name}
+                                className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500'}`}
+                                value={newKidName}
+                                onChange={e => setNewKidName(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && addKid()}
+                            />
+                        </div>
+
                         <div className="flex gap-4">
-                            <button onClick={() => setShowAddModal(false)} className="btn btn-ghost flex-1">取消</button>
-                            <button onClick={addKid} className="btn btn-primary flex-1 font-black">執行</button>
+                            <button onClick={() => setShowAddModal(false)} className={`flex-1 py-4 px-6 rounded-xl font-bold transition-all ${family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-500 hover:text-white'}`}>{t.cancel}</button>
+                            <button onClick={addKid} className="btn btn-primary flex-1 font-black shadow-xl">{t.join_member} 🚀</button>
                         </div>
                     </div>
                 </div>
@@ -647,110 +1083,188 @@ export default function Dashboard() {
     );
 }
 
-function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal }) {
+function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
     const timePercent = Math.min(100, (kid.total_minutes / timeLimit) * 100);
     const isWarning = timePercent > 0 && timePercent <= 30;
     const isDanger = timePercent <= 10;
 
+    const prevPointsRef = useRef(kid.total_points);
+    const cardRef = useRef(null);
+
+    useEffect(() => {
+        if (kid.total_points > prevPointsRef.current) {
+            // Trigger confetti
+            const rect = cardRef.current?.getBoundingClientRect();
+
+            // Default to center if no rect, otherwise center of card
+            const origin = rect ? {
+                x: (rect.left + rect.width / 2) / window.innerWidth,
+                y: (rect.top + rect.height / 2) / window.innerHeight
+            } : { x: 0.5, y: 0.5 };
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: origin,
+                zIndex: 1500, // Above modals
+                colors: familySettings?.theme === 'doodle'
+                    ? ['#ff8a80', '#ffd180', '#88d8b0', '#4a4a4a']
+                    : ['#22d3ee', '#e879f9', '#ffffff']
+            });
+        }
+        prevPointsRef.current = kid.total_points;
+    }, [kid.total_points, familySettings?.theme]);
+
+    // Need to pass kidCard props correctly, so we need to inject t into KidCard or pass it down.
+    // Since KidCard is a separate function component defined in the same file but doesn't have access to 't' from dashboard scope automatically unless passed.
+    // I will update KidCard signature to accept 't'.
+
+    // Wait, I need to pass 't' to KidCard first.
+    // Let's first update the KidCard usage in Dashboard component.
+    // But first let's finish the replacement list. I will assume I can update the KidCard signature in a separate chunk.
+
+    // Let's modify the KidCard usage first.
     return (
-        <div className="glass-panel p-8 group relative overflow-hidden transition-all duration-500 hover:bg-white/[0.04] border-cyan-500/5">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+        <div ref={cardRef} className={`p-8 group relative overflow-hidden transition-all duration-500 ${familySettings?.theme === 'doodle'
+            ? 'bg-[#fcfbf9] border-2 border-[#4a4a4a] rounded-[40px_10px_35px_15px] shadow-[6px_6px_0px_rgba(74,74,74,0.05)]'
+            : 'glass-panel border-cyan-500/5'}`}>
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-6 mb-8">
                 <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                        <h3 className="text-4xl font-black text-white italic uppercase tracking-tighter">{kid.name}</h3>
-                        {!hideSensitive && (
-                            <button onClick={() => onDelete(kid)} className="p-1.5 bg-white/5 rounded-lg text-slate-500 hover:text-red-500 transition-colors shadow-inner" title="刪除成員"><Trash2 className="w-3.5 h-3.5" /></button>
-                        )}
+                    <div className="flex items-center gap-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-sm border-2 ${familySettings?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]'}`}>
+                            {kid.avatar || '👶'}
+                        </div>
+                        <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
                     </div>
                 </div>
-                <div className="bg-black/40 border border-white/10 rounded-2xl p-6 text-center min-w-[150px] shadow-2xl relative overflow-hidden text-white">
-                    <div className="absolute top-0 right-0 p-1 opacity-20 text-white"><Star className="w-12 h-12 text-yellow-500" /></div>
-                    <div className="text-[10px] text-cyan-400 font-black uppercase mb-1 relative z-10">星等點數</div>
-                    <div className="text-5xl font-black flex items-center justify-center gap-2 font-black italic relative z-10">{kid.total_points}</div>
-                    <div className="mt-3 pt-3 border-t border-white/5 text-[10px] text-slate-500 leading-relaxed font-black uppercase tracking-tighter italic relative z-10">
-                        兌換：<span className="text-cyan-400">{kid.total_points * (familySettings?.point_to_minutes || 2)} M</span> | <span className="text-green-400">${kid.total_points * (familySettings?.point_to_cash || 5)}</span>
+                <div className={`p-5 min-w-[210px] relative overflow-hidden transition-all duration-500 flex items-center gap-4 ${familySettings?.theme === 'doodle'
+                    ? 'bg-[#fff5e6] border-b-4 border-r-4 border-[#4a4a4a] rounded-[15px_30px_10px_25px] rotate-[-1deg]'
+                    : 'bg-black/40 border border-white/10 text-white shadow-2xl rounded-2xl'}`}>
+                    {familySettings?.theme === 'doodle' && (
+                        <div className="absolute -top-1 -left-1 w-6 h-6 bg-[#4a4a4a]/10 rounded-full border-2 border-[#4a4a4a]/20 flex items-center justify-center transform scale-50 opacity-30">
+                            <div className="w-1 h-1 bg-white rounded-full" />
+                        </div>
+                    )}
+                    <div className={`absolute top-0 right-0 p-1 opacity-10 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-white'}`}><Star className={`w-10 h-10 ${familySettings?.theme === 'doodle' ? 'fill-[#ff8a80] text-[#ff8a80]' : 'text-yellow-500'}`} /></div>
+
+                    {/* Left Side: Points */}
+                    <div className="flex flex-col items-center justify-center border-r border-[#4a4a4a]/10 pr-4 min-w-[70px]">
+                        <div className={`text-[10px] ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-0.5 relative z-10 tracking-widest`}>{t.points_label}</div>
+                        <div className={`text-5xl font-black italic relative z-10 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : ''}`}>{kid.total_points}</div>
+                    </div>
+
+                    {/* Right Side: Rewards Info */}
+                    <div className="flex flex-col gap-1.5 flex-1 relative z-10">
+                        <div className={`text-[8px] font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.redeemable_rewards}</div>
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                                <Clock className={`w-3 h-3 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
+                                <span className={`text-sm font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.total_points * (familySettings?.point_to_minutes || 2)} <span className="text-[10px] font-bold not-italic">{t.minutes_unit}</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Coins className={`w-3 h-3 text-green-600`} />
+                                <span className={`text-sm font-black italic text-green-600`}>{kid.total_points * (familySettings?.point_to_cash || 5)} <span className="text-[10px] font-bold not-italic">{t.cash_unit}</span></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div className="space-y-3 mb-8">
                 <div className="flex justify-between items-end px-1 font-black">
-                    <div className="flex items-center gap-2 text-cyan-400 font-bold italic text-sm uppercase leading-none"><Clock className="w-4 h-4" /> 今日剩餘螢幕時間紀錄</div>
-                    <div className="text-white font-black text-2xl">{kid.total_minutes} <span className="text-slate-500 text-sm">/ {timeLimit}m</span></div>
+                    <div className={`flex items-center gap-2 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-bold italic text-sm uppercase leading-none`}><Clock className="w-4 h-4" /> {t.today_remaining}</div>
+                    <div className={`font-black text-2xl ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.total_minutes} <span className={familySettings?.theme === 'doodle' ? 'text-[#888] text-sm' : 'text-slate-500 text-sm'}>/ {timeLimit} {t.minutes_unit}</span></div>
                 </div>
-                <div className="bar-wrap shadow-inner"><div className={`bar-fill transition-all duration-1000 ${isDanger ? 'danger' : isWarning ? 'warning' : ''}`} style={{ width: `${timePercent}%` }} /></div>
+                <div className={`bar-wrap ${familySettings?.theme === 'doodle' ? 'bg-[#eee] h-6 border-none' : 'shadow-inner'}`}>
+                    <div
+                        className={`bar-fill transition-all duration-1000 ${isDanger ? 'danger' : isWarning ? 'warning' : ''} ${familySettings?.theme === 'doodle' ? 'h-full rounded-full border-r-2 border-[#4a4a4a]/20' : ''}`}
+                        style={{
+                            width: `${timePercent}%`,
+                            background: familySettings?.theme === 'doodle' ? (isDanger ? '#ff8a80' : isWarning ? '#ffd180' : '#88d8b0') : undefined
+                        }}
+                    />
+                </div>
             </div>
 
             <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <button onClick={() => onUpdate(kid, 0, -10, '快速扣除', actorName)} className="bg-white/5 border border-white/10 p-3 rounded-xl text-slate-400 text-sm font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center">−10m</button>
-                    <button onClick={() => onUpdate(kid, 0, -20, '快速扣除', actorName)} className="bg-white/5 border border-white/10 p-3 rounded-xl text-slate-400 text-sm font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center">−20m</button>
-                    <button onClick={() => onUpdate(kid, 0, -30, '快速扣除', actorName)} className="bg-white/5 border border-white/10 p-3 rounded-xl text-slate-400 text-sm font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center">−30m</button>
+                    <button onClick={() => onUpdate(kid, 0, -10, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10 {t.minutes_unit}</button>
+                    <button onClick={() => onUpdate(kid, 0, -20, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20 {t.minutes_unit}</button>
+                    <button onClick={() => onUpdate(kid, 0, -30, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−30 {t.minutes_unit}</button>
                     <button onClick={() => {
                         showModal({
                             type: 'prompt',
-                            title: '自訂扣除',
-                            message: '請輸入要扣除的分鐘數：',
+                            title: t.prompt_custom_deduct,
+                            message: t.prompt_enter_mins_deduct,
+                            unit: t.minutes_unit,
                             onConfirm: (val) => {
                                 const m = parseInt(val);
-                                if (m) onUpdate(kid, 0, -m, '手動扣除', actorName);
+                                if (m) onUpdate(kid, 0, -m, t.manual_deduct, actorName);
                             }
                         });
-                    }} className="bg-white/5 border border-white/10 p-3 rounded-xl text-red-500/60 text-sm font-black hover:bg-red-500/20 hover:text-red-400 transition-all uppercase tracking-widest flex items-center justify-center">自訂</button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <button
-                        onClick={() => {
-                            const kidMins = kid.total_minutes;
-                            const rate = familySettings?.point_to_minutes || 2;
-                            const maxPts = Math.floor(kidMins / rate);
-                            if (maxPts < 1) return showModal({ title: '提醒', message: '分鐘不足！' });
-                            showModal({
-                                type: 'prompt',
-                                title: '兌換點數',
-                                message: `匯率 ${rate}:1，目前最多可換 ${maxPts} 點：`,
-                                defaultValue: maxPts.toString(),
-                                onConfirm: (val) => {
-                                    const want = parseInt(val);
-                                    if (want && want <= maxPts) onUpdate(kid, want, -(want * rate), '時間兌換點數', actorName);
-                                }
-                            });
-                        }}
-                        className="bg-white/5 border border-white/10 p-4 rounded-2xl text-slate-400 text-xs font-black hover:bg-white/10 hover:text-white transition-all uppercase tracking-widest flex items-center justify-center gap-2"
-                    >
-                        📺 ➔ ⭐ 換成點數
-                    </button>
-                    <button
-                        onClick={() => {
-                            const kidPts = kid.total_points;
-                            const rate = familySettings?.point_to_minutes || 2;
-                            if (kidPts < 1) return showModal({ title: '提醒', message: '點數不足！' });
-                            showModal({
-                                type: 'prompt',
-                                title: '兌換時間',
-                                message: `匯率 1:${rate}，目前有 ${kidPts} 點：`,
-                                defaultValue: '1',
-                                onConfirm: (val) => {
-                                    const want = parseInt(val);
-                                    if (want && want <= kidPts) onUpdate(kid, -want, want * rate, '點數兌換時間', actorName);
-                                }
-                            });
-                        }}
-                        className="bg-cyan-500/10 border border-cyan-500/30 p-4 rounded-2xl text-cyan-400 text-xs font-black hover:bg-cyan-500/20 hover:text-cyan-400 transition-all uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/5"
-                    >
-                        ⭐ ➔ 📺 兌換時間
-                    </button>
+                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fafafa] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-red-500/60 hover:bg-red-500/20 hover:text-red-400'} border-b-2 p-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center`}>{t.custom}</button>
                 </div>
             </div>
-        </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button
+                    onClick={() => {
+                        const kidMins = kid.total_minutes;
+                        const rate = familySettings?.point_to_minutes || 2;
+                        const maxPts = Math.floor(kidMins / rate);
+                        if (maxPts < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
+                        showModal({
+                            type: 'prompt',
+                            title: t.prompt_redeem_points,
+                            message: t.prompt_rate_mins_to_pts?.replace('{rate}', rate).replace('{value}', kidMins),
+                            defaultValue: kidMins.toString(),
+                            unit: t.minutes_unit,
+                            rate: rate,
+                            mode: 'minsToPts',
+                            onConfirm: (val) => {
+                                const mins = parseInt(val);
+                                const pts = Math.floor(mins / rate);
+                                if (pts > 0 && mins <= kidMins) onUpdate(kid, pts, -(pts * rate), t.time_to_points, actorName);
+                            }
+                        });
+                    }}
+                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#edf2f4] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-4 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center gap-2`}
+                >
+                    📺 ➔ ⭐ {t.convert_to_points}
+                </button>
+                <button
+                    onClick={() => {
+                        const kidPts = kid.total_points;
+                        const rate = familySettings?.point_to_minutes || 2;
+                        if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                        showModal({
+                            type: 'prompt',
+                            title: t.prompt_redeem_time,
+                            message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
+                            defaultValue: '1',
+                            unit: t.points_label,
+                            rate: rate,
+                            mode: 'ptsToMins',
+                            onConfirm: (val) => {
+                                const want = parseInt(val);
+                                if (want && want <= kidPts) onUpdate(kid, -want, want * rate, t.points_to_time, actorName);
+                            }
+                        });
+                    }}
+                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#e8f5e9] border-[#4a4a4a] text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'} border-b-2 p-4 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center gap-2`}
+                >
+                    ⭐ ➔ 📺 {t.convert_to_minutes}
+                </button>
+            </div>
+        </div >
     );
 }
 
 // Custom Modal Component
-function CustomModal({ config, onClose }) {
+function CustomModal({ config, onClose, familyTheme, t = {} }) {
     const [inputValue, setInputValue] = useState(config.value || '');
+    const isDoodle = familyTheme === 'doodle';
 
     // Reset local value when modal opens/changes
     useEffect(() => {
@@ -761,21 +1275,60 @@ function CustomModal({ config, onClose }) {
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[200] p-6 animate-in fade-in duration-300">
-            <div className="glass-panel p-8 max-w-sm w-full border-cyan-500/30 shadow-[0_0_50px_rgba(0,229,255,0.1)] scale-in-center overflow-hidden relative">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+            <div className={`glass-panel p-8 max-w-sm w-full border-2 shadow-2xl scale-in-center overflow-hidden relative ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30'}`}>
+                {!isDoodle && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />}
 
-                <h3 className="text-xl font-black text-white italic mb-2 uppercase tracking-tight">{config.title}</h3>
-                <p className="text-slate-400 text-sm font-medium mb-6 leading-relaxed">{config.message}</p>
+                <h3 className={`text-xl font-black italic mb-2 uppercase tracking-tight ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>{config.title}</h3>
+                <p className={`text-sm font-medium mb-6 leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-400'}`}>{config.message}</p>
 
                 {config.type === 'prompt' && (
-                    <input
-                        autoFocus
-                        type="text"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white font-black text-center mb-6 focus:ring-2 focus:ring-cyan-500 outline-none"
-                        value={inputValue}
-                        onChange={e => setInputValue(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && config.onConfirm(inputValue)}
-                    />
+                    <div className="relative mb-6">
+                        <input
+                            autoFocus
+                            type="text"
+                            className={`w-full border rounded-xl p-4 font-black text-center outline-none transition-all ${isDoodle ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-white focus:ring-2 focus:ring-cyan-500'}`}
+                            value={inputValue}
+                            onChange={e => setInputValue(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && config.onConfirm(inputValue)}
+                        />
+                        {config.unit && (
+                            <span className={`absolute right-4 top-1/2 -translate-y-1/2 font-black text-sm pointer-events-none ${isDoodle ? 'text-[#ff8a80]' : 'text-cyan-400'}`}>
+                                {config.unit}
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {config.type === 'prompt' && config.mode && (
+                    <div className={`mb-6 p-3 rounded-xl border text-center animate-in zoom-in duration-300 ${isDoodle ? 'bg-[#fdfbf7] border-[#eee] shadow-inner' : 'bg-white/5 border-white/5 shadow-2xl'}`}>
+                        <div className={`text-[9px] font-black uppercase tracking-widest mb-1 ${isDoodle ? 'text-[#888]' : 'text-slate-500'}`}>{t.preview_convert || '即時換算預覽'}</div>
+                        <div className={`text-sm font-black italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                            {(() => {
+                                const val = parseInt(inputValue) || 0;
+                                const rate = config.rate || 2;
+                                if (config.mode === 'minsToPts') {
+                                    const earnedPts = Math.floor(val / rate);
+                                    return (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <span className="text-orange-500">-{earnedPts * rate} {t.minutes_unit}</span>
+                                            <span className="opacity-30">➔</span>
+                                            <span className="text-green-500">+{earnedPts} {t.points_label}</span>
+                                        </div>
+                                    );
+                                }
+                                if (config.mode === 'ptsToMins') {
+                                    return (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <span className="text-red-500">-{val} {t.points_label}</span>
+                                            <span className="opacity-30">➔</span>
+                                            <span className="text-cyan-500">+{val * rate} {t.minutes_unit}</span>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
+                        </div>
+                    </div>
                 )}
 
                 <div className="flex gap-3">
@@ -783,10 +1336,10 @@ function CustomModal({ config, onClose }) {
                         <button onClick={() => {
                             if (config.onCancel) config.onCancel();
                             onClose();
-                        }} className="btn btn-ghost flex-1 py-3 text-xs font-bold">取消</button>
+                        }} className={`flex-1 py-3 text-xs font-bold rounded-xl border transition-all ${isDoodle ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-black/5' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>{t.cancel || '取消'}</button>
                     )}
-                    <button onClick={() => config.onConfirm(inputValue)} className="btn btn-primary flex-1 py-3 text-xs font-black uppercase tracking-widest">
-                        確定
+                    <button onClick={() => config.onConfirm(inputValue)} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg ${isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400 font-black'}`}>
+                        {t.confirm || '確定'}
                     </button>
                 </div>
             </div>

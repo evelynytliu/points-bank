@@ -10,8 +10,9 @@ export default function RootLayout({ children }) {
     <html lang="zh-Hant">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@500;800&family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/earlyaccess/cwtexyen.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@500;800&family=Gaegu:wght@400;700&family=M+PLUS+Rounded+1c:wght@700;900&display=swap" rel="stylesheet" />
       </head>
       <body>{children}</body>
     </html>

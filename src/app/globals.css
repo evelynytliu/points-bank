@@ -50,8 +50,8 @@ body:not(.theme-doodle) {
   --secondary: #ffd180;
   --accent: #ff8a80;
   --bg-dark: #fdfbf7;
-  --font-display: "Gaegu", cursive;
-  --font-body: "Noto Sans TC", sans-serif;
+  --font-display: "cwTeXYen", "M PLUS Rounded 1c", sans-serif;
+  --font-body: "cwTeXYen", "Noto Sans TC", sans-serif;
   --text-color: #4a4a4a;
   --panel-bg: #fff;
   --panel-border: #4a4a4a;
