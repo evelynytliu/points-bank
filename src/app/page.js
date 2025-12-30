@@ -187,7 +187,7 @@ export default function Home() {
             {kidStep === 'family' ? (
               <div className="space-y-6">
                 <div className="text-left space-y-1">
-                  <label className={`text-xs font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>{t.step1_title}</label>
+                  <label className={`text-sm font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>{t.step1_title}</label>
                   <input
                     type="text"
                     placeholder={t.step1_placeholder}
@@ -207,8 +207,8 @@ export default function Home() {
             ) : kidStep === 'member' ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-sm font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
-                  <span className={`text-xs font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step2_title}</span>
+                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-base font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
+                  <span className={`text-sm font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step2_title}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {familyMembers.map(m => (
@@ -234,8 +234,8 @@ export default function Home() {
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={() => setKidStep('member')} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-sm font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
-                  <span className={`text-xs font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step3_title}</span>
+                  <button onClick={() => setKidStep('member')} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-base font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
+                  <span className={`text-sm font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step3_title}</span>
                 </div>
                 <div className="text-center space-y-4">
                   <div className="text-4xl mb-2">{selectedKid?.avatar || '👶'}</div>
@@ -265,7 +265,7 @@ export default function Home() {
         )}
 
         <div className="flex flex-col items-center gap-4 mt-12">
-          <div className={`flex items-center justify-center gap-2 text-xs uppercase tracking-[0.3em] font-black opacity-40 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>
+          <div className={`flex items-center justify-center gap-2 text-sm uppercase tracking-[0.3em] font-black opacity-40 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>
             <ShieldCheck className="w-4 h-4" />
             <span>{t.encrypted_storage}</span>
           </div>
