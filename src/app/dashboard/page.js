@@ -1175,6 +1175,18 @@ export default function Dashboard() {
 
             <CustomModal config={modal} onClose={() => setModal(prev => ({ ...prev, isOpen: false }))} familyTheme={family?.theme} t={t} />
 
+            <TourOverlay
+                step={tourStep}
+                onNext={() => setTourStep(2)}
+                onFinish={() => {
+                    setTourStep(0);
+                    localStorage.setItem('tour_completed', 'true');
+                    setShowSettingsModal(true); // Open settings to encourage action
+                }}
+                t={t}
+                familyTheme={family?.theme}
+            />
+
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[110] p-6 animate-in fade-in duration-300">
                     <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl'}`}>
@@ -1504,6 +1516,48 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                 </button>
             </div>
         </div >
+    );
+}
+
+// Tour Overlay Component
+function TourOverlay({ step, onNext, onFinish, t, familyTheme }) {
+    if (step === 0) return null;
+    const isDoodle = familyTheme === 'doodle';
+
+    return (
+        <div className="fixed inset-0 z-[200] pointer-events-none">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto transition-opacity duration-500" />
+
+            {/* Step 1: Welcome & Add Kids */}
+            {step === 1 && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md pointer-events-auto p-6 animate-in zoom-in duration-300">
+                    <div className={`p-8 rounded-3xl border-2 text-center relative overflow-hidden ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.3)]'}`}>
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
+                        <h3 className={`text-2xl font-black mb-4 uppercase italic tracking-tighter ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>🎉 {t.tour_welcome}</h3>
+                        <p className={`mb-8 font-bold leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-300'}`}>{t.tour_step1_msg}</p>
+                        <div className="flex justify-center">
+                            <button onClick={onNext} className={`px-8 py-3 rounded-xl font-black uppercase tracking-widest transition-all ${isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#4a4a4a]' : 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.5)]'}`}>
+                                {t.tour_next}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Step 2: Join Family Hint */}
+            {step === 2 && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md pointer-events-auto p-6 animate-in slide-in-from-right-10 duration-300">
+                    <div className={`p-8 rounded-3xl border-2 text-center relative overflow-hidden ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.2)]'}`}>
+                        <h3 className={`text-xl font-black mb-4 uppercase italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>🔗 {t.onboarding_join_title}</h3>
+                        <p className={`mb-8 font-bold leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-300'}`}>{t.tour_step2_msg}</p>
+                        <button onClick={onFinish} className={`w-full py-4 rounded-xl font-black uppercase tracking-widest transition-all ${isDoodle ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:opacity-90' : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'}`}>
+                            {t.tour_finish}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
