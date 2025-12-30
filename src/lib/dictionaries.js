@@ -81,6 +81,7 @@ const rawTranslations = {
     redeemable_rewards: ['可兌換獎勵', 'Redeemable Rewards'],
     cash_unit: ['元', '$'],
     quick_deduct: ['快速扣除', 'Quick Deduct'],
+    confirm_deduct: ['確認扣除', 'Confirm deduct'],
     manual_deduct: ['手動扣除', 'Manual Deduct'],
     time_to_points: ['時間兌換點數', 'Time to Points'],
     points_to_time: ['點數兌換時間', 'Points to Time'],
