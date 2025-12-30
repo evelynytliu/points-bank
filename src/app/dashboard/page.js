@@ -1284,7 +1284,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             <div className="w-1 h-1 bg-white rounded-full" />
                         </div>
                     )}
-                    <div className={`absolute top-0 right-0 p-1 opacity-10 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-white'}`}><Star className={`w-10 h-10 ${familySettings?.theme === 'doodle' ? 'fill-[#ff8a80] text-[#ff8a80]' : 'text-yellow-500'}`} /></div>
+                    <div className={`absolute top-0 right-0 p-1 opacity-10 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-white'}`}><Star className={`w-10 h-10 ${familySettings?.theme === 'doodle' ? 'fill-orange-500 text-orange-500' : 'text-yellow-500'}`} /></div>
 
                     {/* Left Side: Points */}
                     <div className="flex flex-col items-center justify-center border-r border-[#4a4a4a]/10 pr-4 min-w-[70px]">
@@ -1297,7 +1297,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <div className={`text-xs font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.redeemable_rewards}</div>
                         <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                                <Clock className={`w-3 h-3 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
+                                <Monitor className={`w-4 h-4 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
                                 <span className={`text-sm font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.total_points * (familySettings?.point_to_minutes || 2)} <span className="text-[10px] font-bold not-italic">{t.minutes_unit}</span></span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -1311,7 +1311,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
 
             <div className="space-y-3 mb-8">
                 <div className="flex justify-between items-end px-1 font-black">
-                    <div className={`flex items-center gap-2 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-bold italic text-sm uppercase leading-none`}><Clock className="w-4 h-4" /> {t.today_remaining}</div>
+                    <div className={`flex items-center gap-2 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-bold italic text-sm uppercase leading-none`}><Monitor className="w-5 h-5" /> {t.today_remaining}</div>
                     <div className={`font-black text-2xl ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.total_minutes} <span className={familySettings?.theme === 'doodle' ? 'text-[#888] text-sm' : 'text-slate-500 text-sm'}>/ {timeLimit} {t.minutes_unit}</span></div>
                 </div>
                 <div className={`bar-wrap ${familySettings?.theme === 'doodle' ? 'bg-[#eee] h-6 border-none' : 'shadow-inner'}`}>
@@ -1326,10 +1326,10 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
             </div>
 
             <div className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <button onClick={() => onUpdate(kid, 0, -10, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10 {t.minutes_unit}</button>
-                    <button onClick={() => onUpdate(kid, 0, -20, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20 {t.minutes_unit}</button>
-                    <button onClick={() => onUpdate(kid, 0, -30, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−30 {t.minutes_unit}</button>
+                <div className="grid grid-cols-4 gap-2">
+                    <button onClick={() => onUpdate(kid, 0, -10, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10</button>
+                    <button onClick={() => onUpdate(kid, 0, -20, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20</button>
+                    <button onClick={() => onUpdate(kid, 0, -30, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−30</button>
                     <button onClick={() => {
                         showModal({
                             type: 'prompt',
@@ -1341,11 +1341,11 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                                 if (m) onUpdate(kid, 0, -m, t.manual_deduct, actorName);
                             }
                         });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fafafa] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-red-500/60 hover:bg-red-500/20 hover:text-red-400'} border-b-2 p-3 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>{t.custom}</button>
+                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fafafa] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-red-500/60 hover:bg-red-500/20 hover:text-red-400'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>{t.custom}</button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
                 <button
                     onClick={() => {
                         const kidMins = kid.total_minutes;
@@ -1367,9 +1367,9 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             }
                         });
                     }}
-                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#edf2f4] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-4 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center gap-2`}
+                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#edf2f4] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
                 >
-                    📺 ➔ ⭐ {t.convert_to_points}
+                    <Monitor className="w-5 h-5" /> ➔ <Star className="w-5 h-5 text-orange-400" />
                 </button>
                 <button
                     onClick={() => {
@@ -1390,9 +1390,9 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             }
                         });
                     }}
-                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#e8f5e9] border-[#4a4a4a] text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'} border-b-2 p-4 rounded-xl text-xs font-black transition-all uppercase tracking-widest flex items-center justify-center gap-2`}
+                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#e8f5e9] border-[#4a4a4a] text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'} border-b-2 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
                 >
-                    ⭐ ➔ 📺 {t.convert_to_minutes}
+                    <Star className="w-5 h-5 text-orange-400" /> ➔ <Monitor className="w-5 h-5" />
                 </button>
             </div>
         </div >
