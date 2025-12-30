@@ -152,6 +152,11 @@ const rawTranslations = {
     no_logs_found: ['沒有找到任何異動紀錄', 'No transaction records found'],
     pt_unit: ['點', 'pts'],
     min_unit_short: ['分鐘', 'mins'],
+    tour_welcome: ['歡迎使用 Points Bank！', 'Welcome to Points Bank!'],
+    tour_step1_msg: ['第一次使用嗎？請先點擊設定，新增您的小孩成員。', 'First time? Click Settings to add your kids.'],
+    tour_step2_msg: ['如果您要加入現有的家庭，也可以在設定中輸入邀請碼。', 'You can also join an existing family here.'],
+    tour_next: ['下一步', 'Next'],
+    tour_finish: ['知道了', 'Got it'],
 };
 
 // Helper to generate dictionaries
