@@ -1184,88 +1184,84 @@
         <style>
             .demo-card {
                 background: white;
-                border: 2px solid var(--ink);
-                border-radius: 40px;
-                padding: 2.5rem;
+                border: 4px solid var(--ink);
+                border-radius: 40px 10px 35px 15px;
+                box-shadow: 10px 10px 0 rgba(74, 74, 74, 0.15);
+                padding: 2rem;
                 display: flex;
                 flex-direction: column;
-                gap: 1.5rem;
-                box-shadow: 8px 8px 0 var(--deco);
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 position: relative;
                 overflow: hidden;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
 
             .demo-card:hover {
                 transform: translateY(-8px) scale(1.01);
-                box-shadow: 15px 15px 0 var(--deco);
+                box-shadow: 15px 15px 0 rgba(74, 74, 74, 0.15);
             }
 
-            .demo-progress-bg {
-                background: #eee;
-                height: 12px;
-                border-radius: 10px;
-                width: 100%;
-                overflow: hidden;
+            .demo-dashed-divider {
+                width: 2px;
+                height: 40px;
+                background-image: linear-gradient(to bottom, var(--ink) 33%, rgba(255, 255, 255, 0) 0%);
+                background-position: right;
+                background-size: 2px 6px;
+                background-repeat: repeat-y;
+                opacity: 0.2;
+            }
+
+            .demo-btn-act {
+                background: var(--btn-bg);
+                color: var(--btn-color);
                 border: 2px solid var(--ink);
-            }
-
-            .demo-progress-fill {
-                background: #80cbc4;
-                height: 100%;
-                transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            }
-
-            .demo-btn-group {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 1rem;
-            }
-
-            .demo-btn-sm {
-                padding: 0.5rem;
+                border-bottom-width: 4px;
                 border-radius: 12px;
-                border: 2px solid var(--ink);
-                background: #fdfcf9;
                 font-weight: 900;
+                padding: 0.6rem;
                 cursor: pointer;
                 transition: all 0.2s;
-                font-size: 0.8rem;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
             }
 
-            .demo-btn-sm:hover {
-                background: white;
-                transform: scale(1.08) rotate(1deg);
-                box-shadow: 4px 4px 0 var(--deco);
+            .demo-btn-act:hover {
+                transform: translateY(-2px);
+                filter: brightness(0.95);
             }
 
-            .demo-action-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
+            .demo-btn-act:active {
+                transform: translateY(2px);
+                border-bottom-width: 2px;
             }
 
-            .demo-action-btn {
-                padding: 1.2rem;
-                border-radius: 20px;
+            .demo-btn-big {
                 border: 2px solid var(--ink);
+                border-bottom-width: 4px;
+                border-radius: 14px;
                 font-weight: 900;
+                padding: 0.8rem;
+                cursor: pointer;
+                transition: all 0.2s;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 gap: 0.5rem;
-                cursor: pointer;
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                box-shadow: 4px 4px 0 var(--deco);
+                font-size: 1rem;
             }
 
-            .demo-action-btn:hover {
-                transform: translateY(-4px);
-                box-shadow: 8px 8px 0 var(--deco);
+            .demo-btn-big:hover {
+                transform: translateY(-2px);
+                filter: brightness(0.95);
+            }
+
+            .demo-btn-big:active {
+                transform: translateY(2px);
+                border-bottom-width: 2px;
             }
 
             .demo-pill {
-                padding: 0.5rem 1rem;
+                padding: 0.6rem 1.2rem;
                 border-radius: 16px;
                 border: 2px solid var(--ink);
                 font-weight: 900;
@@ -1273,65 +1269,54 @@
                 transition: all 0.2s;
                 background: white;
                 color: #444;
-                font-size: 0.9rem;
+                font-size: 0.95rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
             }
 
             .demo-pill:hover {
                 transform: scale(1.05);
+                background: #f5f5f5;
             }
 
             .demo-pill.selected {
-                background: var(--ink);
+                background: var(--accent);
                 color: white;
-                box-shadow: 4px 4px 0 var(--accent);
+                border-color: var(--ink);
+                box-shadow: 4px 4px 0 var(--ink);
+            }
+
+            .demo-admin-grid-wrapper {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+                margin-bottom: 2rem;
             }
 
             @media (max-width: 768px) {
-                .demo-btn-group {
-                    grid-template-columns: repeat(2, 1fr);
-                }
-
-                .demo-action-grid {
-                    grid-template-columns: 1fr;
-                }
-
                 .demo-wrapper {
-                    padding: clamp(1rem, 3vw, 2.5rem) !important;
+                    padding: 1.5rem !important;
                     border-radius: 25px !important;
-                }
-
-                .demo-header-control {
-                    flex-direction: row !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
-                    gap: 0.5rem !important;
-                }
-
-                .demo-controls {
-                    width: auto !important;
-                    gap: 0.5rem !important;
                 }
 
                 .demo-card {
-                    padding: 1rem !important;
-                    gap: 0.8rem !important;
-                    border-radius: 25px !important;
+                    padding: 1.5rem !important;
+                    border-radius: 30px !important;
                 }
 
                 .demo-admin-grid-wrapper {
-                    display: grid;
                     grid-template-columns: 1fr;
-                    gap: 0.8rem;
-                    margin-bottom: 1.2rem;
                 }
-            }
 
-            @media (min-width: 769px) {
-                .demo-admin-grid-wrapper {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 1.5rem;
-                    margin-bottom: 2rem;
+                .demo-header-control {
+                    flex-direction: column;
+                    align-items: flex-start !important;
+                }
+
+                .demo-controls {
+                    width: 100%;
+                    justify-content: space-between;
                 }
             }
         </style>
@@ -1690,77 +1675,136 @@
 
                 // Render Cards
                 grid.innerHTML = demoKids.map((kid, index) => {
-                    const progress = (kid.minutes / kid.limit) * 100;
+                    const progress = Math.min(100, (kid.minutes / kid.limit) * 100);
                     const canRedeemMins = Math.floor(kid.points * 2);
                     const canRedeemMoney = Math.floor(kid.points * 5);
+                    const isDanger = progress <= 10;
+                    const isWarning = progress > 10 && progress <= 30;
+
+                    const barColor = isDanger ? '#ff8a80' : (isWarning ? '#ffd180' : '#88d8b0');
 
                     return `
                     <div class="demo-card animate-pop-in" style="animation-delay: ${index * 0.1}s">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="width: 60px; height: 60px; min-width: 60px; border: 2px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: white; box-shadow: 3px 3px 0 var(--deco); animation: float 3s ease-in-out infinite;">
-                                    ${kid.avatar}
-                                </div>
-                                <h3 style="font-size: clamp(2rem, 8vw, 3rem); font-weight: 900; font-style: italic; color: #444; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -2px; line-height: 1;">${kid.name}</h3>
-                            </div>
-                            <div style="background: #fff5e6; border: 2px solid var(--ink); border-radius: 25px; padding: 1.2rem; position: relative; width: 100%; min-width: 0; box-shadow: 4px 4px 0 var(--deco); transition: all 0.3s ease;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <div>
-                                        <div style="font-size: 0.7rem; font-weight: 900; color: #ff8a80; text-transform: uppercase; letter-spacing: 1px;">點數</div>
-                                        <div id="demo-points-${kid.id}" style="font-size: clamp(2.5rem, 10vw, 3.5rem); font-weight: 900; line-height: 1; color: #444;">${kid.points}</div>
+                        
+                        <!-- Header: Avatar & Name -->
+                        <div style="display: flex; flex-direction: column; md:flex-row; gap: 1.5rem; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: white; border: 2px solid var(--ink); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                        ${kid.avatar}
                                     </div>
-                                    <div style="text-align: right;">
-                                        <div style="font-size: 0.7rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 1px;">可兌換獎勵</div>
-                                        <div style="font-size: 0.9rem; font-weight: 700; color: #444; margin-bottom: 0.3rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
-                                            <i data-lucide="clock" size="14" style="color: #ff8a80"></i> 
-                                            <span id="demo-redeem-mins-${kid.id}">${canRedeemMins}</span> 分鐘
-                                        </div>
-                                        <div style="font-size: 0.9rem; font-weight: 700; color: #444; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
-                                            <i data-lucide="coins" size="14" style="color: #80cbc4"></i> 
-                                            <span id="demo-redeem-money-${kid.id}">${canRedeemMoney}</span> 元
-                                        </div>
-                                    </div>
+                                    <h3 style="font-size: 2rem; font-weight: 900; font-style: italic; color: var(--ink); margin: 0; text-transform: uppercase;">
+                                        ${kid.name}
+                                    </h3>
                                 </div>
                             </div>
-                        </div>
 
-                        <div style="margin-top: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-weight: 900; color: #ff8a80; font-size: 0.9rem;">
-                                <span style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="clock" size="16"></i> 今日剩餘螢幕時間紀錄</span>
-                                <span><span id="demo-mins-${kid.id}">${kid.minutes}</span> / ${kid.limit} 分鐘</span>
+                            <!-- Values Block (Points & Rewards) -->
+                            <div style="
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: space-between;
+                                padding: 1rem 1.5rem;
+                                border-top: 2px dashed rgba(74,74,74,0.1);
+                                border-bottom: 2px dashed rgba(74,74,74,0.1);
+                                margin-top: 0.5rem;">
+                                
+                                <!-- Points -->
+                                <div style="display: flex; flex-direction: column; align-items: center; min-width: 80px;">
+                                    <div style="font-size: 0.75rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 0.3rem;">
+                                        <i data-lucide="star" size="12" fill="currentColor"></i> 點數
+                                    </div>
+                                    <div id="demo-points-${kid.id}" style="font-size: 2.8rem; font-weight: 900; font-style: italic; line-height: 1; color: var(--ink);">
+                                        ${kid.points}
+                                    </div>
+                                </div>
+
+                                <!-- Vertical Divider -->
+                                <div class="demo-dashed-divider"></div>
+
+                                <!-- Rewards -->
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.7rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.05em; opacity: 0.7;">可兌換獎勵</div>
+                                    <div style="font-size: 1.1rem; font-weight: 900; font-style: italic; color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
+                                        <i data-lucide="monitor" size="16" style="color: var(--accent)"></i> 
+                                        <span id="demo-redeem-mins-${kid.id}">${canRedeemMins}</span> <span style="font-size: 0.7rem; font-style: normal; opacity: 0.6;">分鐘</span>
+                                    </div>
+                                    <div style="font-size: 1.1rem; font-weight: 900; font-style: italic; color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
+                                        <i data-lucide="coins" size="16" style="color: #4caf50"></i> 
+                                        <span id="demo-redeem-money-${kid.id}">${canRedeemMoney}</span> <span style="font-size: 0.7rem; font-style: normal; opacity: 0.6;">元</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="demo-progress-bg">
-                                <div id="demo-progress-${kid.id}" class="demo-progress-fill" style="width: ${progress}%"></div>
+                        </div>
+
+                        <!-- Progress Bar (Minutes) -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="position: relative; width: 100%; height: 44px; background: #eee; border: 2px solid var(--ink); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <div id="demo-progress-${kid.id}" style="position: absolute; top: 0; left: 0; height: 100%; width: ${progress}%; background: ${barColor}; border-right: 2px solid rgba(74,74,74,0.1); transition: width 0.5s ease, background 0.3s ease;"></div>
+                                
+                                <div style="position: relative; z-index: 2; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink);">
+                                    <i data-lucide="monitor" size="16"></i> 
+                                    <span style="font-size: 1.1rem;"><span id="demo-mins-${kid.id}">${kid.minutes}</span> <span style="font-size: 0.8rem">MINS</span></span>
+                                </div>
+                                <div style="position: absolute; right: 1rem; z-index: 2; font-weight: 900; color: var(--ink); opacity: 0.4;">
+                                    / ${kid.limit}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="demo-btn-group">
-                            <button onclick="adjustDemoKid('${kid.id}', 0, -10, '使用時間')" class="demo-btn-sm" style="background: #fff1f0; color: #f5222d;">-10 分鐘</button>
-                            <button onclick="adjustDemoKid('${kid.id}', 0, -20, '使用時間')" class="demo-btn-sm" style="background: #fff1f0; color: #f5222d;">-20 分鐘</button>
-                            <button onclick="adjustDemoKid('${kid.id}', 0, -30, '使用時間')" class="demo-btn-sm" style="background: #fff1f0; color: #f5222d;">-30 分鐘</button>
-                            <button onclick="adjustDemoCardIndividual('${kid.id}')" class="demo-btn-sm" style="background: white;">自訂</button>
+                        <!-- Quick Deduct Buttons -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 0.8rem;">
+                            <button onclick="adjustDemoKid('${kid.id}', 0, -10, '使用時間')" class="demo-btn-act" style="--btn-color: #d32f2f; --btn-bg: #fbe9e7;">-10</button>
+                            <button onclick="adjustDemoKid('${kid.id}', 0, -20, '使用時間')" class="demo-btn-act" style="--btn-color: #d32f2f; --btn-bg: #fbe9e7;">-20</button>
+                            <button onclick="adjustDemoKid('${kid.id}', 0, -30, '使用時間')" class="demo-btn-act" style="--btn-color: #d32f2f; --btn-bg: #fbe9e7;">-30</button>
+                            <button onclick="adjustDemoCardIndividual('${kid.id}')" class="demo-btn-act" style="--btn-color: var(--ink); --btn-bg: #fafafa; font-size: 0.8rem;">自訂</button>
                         </div>
 
-                        <div class="demo-action-grid">
-                            <button onclick="demoExchangeToPoints('${kid.id}')" class="demo-action-btn" style="background: #eef2f5; color: #444;">
-                                <i data-lucide="monitor" size="18"></i> → <i data-lucide="star" size="18" style="color: #ffb74d"></i> 換成點數
+                        <!-- Exchange Buttons -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+                            <button onclick="demoExchangeToPoints('${kid.id}')" class="demo-btn-big" style="background: #edf2f4; color: var(--ink);">
+                                <i data-lucide="monitor" size="18"></i> ➔ <i data-lucide="star" size="18" style="color: #ff9800"></i>
                             </button>
-                            <button onclick="demoExchangeToTime('${kid.id}')" class="demo-action-btn" style="background: #e6f7f5; color: #444;">
-                                <i data-lucide="star" size="18" style="color: #ffb74d"></i> → <i data-lucide="monitor" size="18"></i> 兌換時間
+                            <button onclick="demoExchangeToTime('${kid.id}')" class="demo-btn-big" style="background: #e8f5e9; color: #2e7d32;">
+                                <i data-lucide="star" size="18" style="color: #ff9800"></i> ➔ <i data-lucide="monitor" size="18"></i>
                             </button>
                         </div>
+
                     </div>
-                `;
+                    `;
                 }).join('');
 
-                // Render Selection Pills
+                // Render Selection Pills using new style
                 selection.innerHTML = demoKids.map(kid => `
                     <button onclick="toggleDemoKidSelection('${kid.id}')" class="demo-pill ${demoSelectedIds.includes(kid.id) ? 'selected' : ''}">
-                        ${kid.name}
+                        ${demoSelectedIds.includes(kid.id) ? '<i data-lucide="check-circle-2" size="16"></i>' : ''} ${kid.name}
                     </button>
                 `).join('');
 
                 lucide.createIcons();
+            }
+
+            function getProgressBarColor(p) {
+                if (p <= 10) return '#ff8a80'; // Danger
+                if (p <= 30) return '#ffd180'; // Warning
+                return '#88d8b0'; // Normal
+            }
+
+            function updateKidVisuals(id) {
+                const kid = demoKids.find(k => k.id === id);
+                if (!kid) return;
+
+                animateNumber(document.getElementById(`demo-points-${id}`), kid.points);
+                animateNumber(document.getElementById(`demo-mins-${id}`), kid.minutes);
+                animateNumber(document.getElementById(`demo-redeem-mins-${id}`), Math.floor(kid.points * 2));
+                animateNumber(document.getElementById(`demo-redeem-money-${id}`), Math.floor(kid.points * 5));
+
+                const progress = (kid.minutes / kid.limit) * 100;
+                const progressEl = document.getElementById(`demo-progress-${id}`);
+                if (progressEl) {
+                    progressEl.style.width = `${progress}%`;
+                    progressEl.style.background = getProgressBarColor(progress);
+                }
             }
 
             window.setDemoPlan = function (plan) {
@@ -1786,19 +1830,9 @@
             window.adjustDemoKid = function (id, pts, mins, reason) {
                 const kid = demoKids.find(k => k.id === id);
                 if (kid) {
-                    const oldPts = kid.points;
-                    const oldMins = kid.minutes;
-
                     kid.points = Math.max(0, kid.points + pts);
                     kid.minutes = Math.max(0, Math.min(kid.limit, kid.minutes + mins));
-
-                    animateNumber(document.getElementById(`demo-points-${id}`), kid.points);
-                    animateNumber(document.getElementById(`demo-mins-${id}`), kid.minutes);
-                    animateNumber(document.getElementById(`demo-redeem-mins-${id}`), Math.floor(kid.points * 2));
-                    animateNumber(document.getElementById(`demo-redeem-money-${id}`), Math.floor(kid.points * 5));
-
-                    const progressEl = document.getElementById(`demo-progress-${id}`);
-                    if (progressEl) progressEl.style.width = `${(kid.minutes / kid.limit) * 100}%`;
+                    updateKidVisuals(id);
 
                     if (pts > 0) {
                         confetti({
@@ -1817,14 +1851,7 @@
                     const minsToConvert = kid.minutes;
                     kid.points += Math.floor(minsToConvert / 2);
                     kid.minutes = 0;
-
-                    animateNumber(document.getElementById(`demo-points-${id}`), kid.points);
-                    animateNumber(document.getElementById(`demo-mins-${id}`), kid.minutes);
-                    animateNumber(document.getElementById(`demo-redeem-mins-${id}`), Math.floor(kid.points * 2));
-                    animateNumber(document.getElementById(`demo-redeem-money-${id}`), Math.floor(kid.points * 5));
-
-                    const progressEl = document.getElementById(`demo-progress-${id}`);
-                    if (progressEl) progressEl.style.width = `0%`;
+                    updateKidVisuals(id);
 
                     confetti({
                         particleCount: 100,
@@ -1840,14 +1867,7 @@
                 if (kid && kid.points >= 5) {
                     kid.points -= 5;
                     kid.minutes += 10;
-
-                    animateNumber(document.getElementById(`demo-points-${id}`), kid.points);
-                    animateNumber(document.getElementById(`demo-mins-${id}`), kid.minutes);
-                    animateNumber(document.getElementById(`demo-redeem-mins-${id}`), Math.floor(kid.points * 2));
-                    animateNumber(document.getElementById(`demo-redeem-money-${id}`), Math.floor(kid.points * 5));
-
-                    const progressEl = document.getElementById(`demo-progress-${id}`);
-                    if (progressEl) progressEl.style.width = `${(kid.minutes / kid.limit) * 100}%`;
+                    updateKidVisuals(id);
 
                     confetti({
                         particleCount: 20,
@@ -1862,9 +1882,11 @@
                 const limit = demoPlan === 'weekday' ? 30 : 90;
                 demoKids.forEach(k => {
                     k.minutes = limit;
-                    animateNumber(document.getElementById(`demo-mins-${k.id}`), k.minutes);
-                    const progressEl = document.getElementById(`demo-progress-${k.id}`);
-                    if (progressEl) progressEl.style.width = `100%`;
+                    // Directly update minutes text since renderDemoKids might not be called? 
+                    // Actually animate works on existing DOM.
+                    // But if plan changed, limit changed.
+                    // Let's just updateVisuals
+                    updateKidVisuals(k.id);
                 });
 
                 confetti({
@@ -1887,14 +1909,7 @@
                     if (demoSelectedIds.includes(k.id)) {
                         k.points = Math.max(0, k.points + pts);
                         k.minutes = Math.max(0, Math.min(k.limit, k.minutes + mins));
-
-                        animateNumber(document.getElementById(`demo-points-${k.id}`), k.points);
-                        animateNumber(document.getElementById(`demo-mins-${k.id}`), k.minutes);
-                        animateNumber(document.getElementById(`demo-redeem-mins-${k.id}`), Math.floor(k.points * 2));
-                        animateNumber(document.getElementById(`demo-redeem-money-${k.id}`), Math.floor(k.points * 5));
-
-                        const progressEl = document.getElementById(`demo-progress-${k.id}`);
-                        if (progressEl) progressEl.style.width = `${(k.minutes / k.limit) * 100}%`;
+                        updateKidVisuals(k.id);
                     }
                 });
 

@@ -1234,6 +1234,43 @@ export default function Dashboard() {
     );
 }
 
+function AnimatedCounter({ value }) {
+    const [display, setDisplay] = useState(value);
+
+    useEffect(() => {
+        const start = display;
+        if (start === value) return;
+
+        const duration = 1000;
+        let startTime = null;
+        let reqId;
+
+        const animate = (time) => {
+            if (!startTime) startTime = time;
+            const progress = Math.min((time - startTime) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3); // Cubic ease out
+
+            const current = start + (value - start) * ease;
+
+            if (Number.isInteger(value)) {
+                setDisplay(Math.floor(current));
+            } else {
+                setDisplay(parseFloat(current.toFixed(1)));
+            }
+
+            if (progress < 1) {
+                reqId = requestAnimationFrame(animate);
+            } else {
+                setDisplay(value);
+            }
+        };
+        reqId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(reqId);
+    }, [value]);
+
+    return <>{display}</>;
+}
+
 function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
     const timePercent = Math.min(100, (kid.total_minutes / timeLimit) * 100);
@@ -1294,11 +1331,13 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     : 'bg-white/5 rounded-2xl border border-white/5 my-6 p-4'}`}>
 
                     {/* Left Side: Points */}
-                    <div className="flex flex-col items-center justify-center min-w-[100px]">
+                    <div className="flex flex-col items-start justify-center min-w-[100px]">
                         <div className={`text-sm ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-1 tracking-widest flex items-center gap-1`}>
                             <Star className="w-4 h-4 fill-current" /> {t.points_label}
                         </div>
-                        <div className={`${kid.total_points.toString().length > 4 ? 'text-4xl' : kid.total_points.toString().length > 3 ? 'text-5xl' : 'text-6xl'} font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>{kid.total_points}</div>
+                        <div className={`${kid.total_points.toString().length > 4 ? 'text-4xl' : kid.total_points.toString().length > 3 ? 'text-5xl' : 'text-6xl'} font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>
+                            <AnimatedCounter value={kid.total_points} />
+                        </div>
                     </div>
 
                     {/* Divider */}
@@ -1311,14 +1350,14 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             <div className="flex items-center justify-end gap-3">
                                 <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                    {kid.total_points * (familySettings?.point_to_minutes || 2)}
+                                    <AnimatedCounter value={kid.total_points * (familySettings?.point_to_minutes || 2)} />
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.minutes_unit}</span>
                                 </span>
                             </div>
                             <div className="flex items-center justify-end gap-3">
                                 <Coins className={`w-5 h-5 text-green-500`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                    {kid.total_points * (familySettings?.point_to_cash || 5)}
+                                    <AnimatedCounter value={kid.total_points * (familySettings?.point_to_cash || 5)} />
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.cash_unit}</span>
                                 </span>
                             </div>
@@ -1342,7 +1381,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     <div className={`relative z-10 flex items-center gap-2 font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                         <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? '' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
                         <span className={familySettings?.theme === 'doodle' ? '' : 'drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]'}>
-                            <span className="text-xl">{kid.total_minutes}</span> <span className="text-sm">{t.minutes_unit}</span>
+                            <span className="text-xl"><AnimatedCounter value={kid.total_minutes} /></span> <span className="text-sm">{t.minutes_unit}</span>
                         </span>
                     </div>
 
@@ -1362,7 +1401,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             message: `${t.confirm_deduct} 10 ${t.minutes_unit}?`,
                             onConfirm: () => onUpdate(kid, 0, -10, t.quick_deduct, actorName)
                         });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10</button>
+                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10</button>
                     <button onClick={() => {
                         showModal({
                             type: 'confirm',
@@ -1370,7 +1409,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             message: `${t.confirm_deduct} 20 ${t.minutes_unit}?`,
                             onConfirm: () => onUpdate(kid, 0, -20, t.quick_deduct, actorName)
                         });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20</button>
+                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20</button>
                     <button onClick={() => {
                         showModal({
                             type: 'confirm',
@@ -1378,7 +1417,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             message: `${t.confirm_deduct} 30 ${t.minutes_unit}?`,
                             onConfirm: () => onUpdate(kid, 0, -30, t.quick_deduct, actorName)
                         });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−30</button>
+                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−30</button>
                     <button onClick={() => {
                         showModal({
                             type: 'prompt',
@@ -1390,7 +1429,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                                 if (m) onUpdate(kid, 0, -m, t.manual_deduct, actorName);
                             }
                         });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fafafa] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-red-500/60 hover:bg-red-500/20 hover:text-red-400'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>{t.custom}</button>
+                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fafafa] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-red-500/60 hover:bg-red-500/20 hover:text-red-400'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>{t.custom}</button>
                 </div>
             </div>
 
@@ -1416,7 +1455,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             }
                         });
                     }}
-                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#edf2f4] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
+                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#edf2f4] border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
                 >
                     <Monitor className="w-5 h-5" /> ➔ <Star className="w-5 h-5 text-orange-400" />
                 </button>
@@ -1439,7 +1478,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             }
                         });
                     }}
-                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#e8f5e9] border-[#4a4a4a] text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'} border-b-2 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
+                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#e8f5e9] border-[#4a4a4a] text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'} border-2 border-b-4 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
                 >
                     <Star className="w-5 h-5 text-orange-400" /> ➔ <Monitor className="w-5 h-5" />
                 </button>
