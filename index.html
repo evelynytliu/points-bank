@@ -1070,88 +1070,114 @@
         </div>
 
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="section-header"
-                style="text-align: left; margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
-                <div>
-                    <h2
-                        style="font-size: 2.5rem; font-weight: 900; color: var(--ink); font-style: italic; margin: 0; display: flex; align-items: center; gap: 0.8rem;">
-                        <i data-lucide="trending-up" style="color: var(--accent);"></i>
-                        狀態總覽
-                    </h2>
+            <!-- New Main Section Header -->
+            <div class="section-header" style="text-align: center; margin-bottom: 5rem;">
+                <div class="section-badge">
+                    <svg viewBox="0 0 200 80" preserveAspectRatio="none">
+                        <path d="M5,12 C70,4 140,18 195,10 C197,32 193,58 195,68 C140,78 70,72 5,75 C7,58 3,32 5,12 Z"
+                            fill="none" stroke="var(--ink)" stroke-width="2" />
+                    </svg>
+                    互動體驗 Zone
                 </div>
-                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                    <div
-                        style="background: #eee; padding: 5px; border-radius: 18px; display: flex; gap: 5px; border: 2px solid var(--ink);">
-                        <button onclick="setDemoPlan('weekday')" id="btn-weekday"
-                            style="padding: 0.5rem 1.2rem; border-radius: 12px; border: none; font-weight: 900; transition: all 0.3s; cursor: pointer; background: var(--ink); color: white;">平日
-                            (30M)</button>
-                        <button onclick="setDemoPlan('holiday')" id="btn-holiday"
-                            style="padding: 0.5rem 1.2rem; border-radius: 12px; border: none; font-weight: 900; transition: all 0.3s; cursor: pointer; background: transparent; color: #888;">假日
-                            (90M)</button>
-                    </div>
-                    <button onclick="applyBatchDemoAllocation()"
-                        style="background: #ff8a80; color: white; border: 2px solid var(--ink); padding: 0.8rem 1.5rem; border-radius: 18px; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); transition: all 0.2s;">
-                        <i data-lucide="zap" size="18"></i> 一鍵發放額度
-                    </button>
-                </div>
+                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 900;">
+                    親自操作，體驗<span class="highlight">讓存摺代替碎念</span>
+                </h2>
+                <p class="section-desc">
+                    這是一個完全獨立的模擬環境。您可以扮演家長的角色，試試看「一鍵發放額度」、或者手動增減點數。<br>觀察看看：當規則變得透明、可預測時，孩子的帳戶會發生什麼變化？
+                </p>
             </div>
 
-            <!-- Demo Kids Grid -->
-            <div id="demoKidsGrid" style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 4rem;">
-                <!-- Cards will be injected by JS -->
-            </div>
+            <!-- Demo Interface Wrapper -->
+            <div class="demo-wrapper"
+                style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 3px solid var(--ink); border-radius: 40px; padding: 3rem; box-shadow: 20px 20px 0 rgba(0,0,0,0.05);">
 
-            <!-- Admin Control Panel -->
-            <div
-                style="background: white; border: 2px solid var(--ink); border-radius: 40px; padding: 0; overflow: hidden; box-shadow: 10px 10px 0 var(--deco);">
+                <!-- Interface Header Control -->
                 <div
-                    style="background: #fffafa; padding: 1.5rem 2.5rem; border-bottom: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: center;">
-                    <h3
-                        style="font-size: 1.2rem; font-weight: 900; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 0.8rem;">
-                        <i data-lucide="zap" style="color: #ff8a80;"></i>
-                        管理控制台 (批次點數/時間)
-                    </h3>
-                    <i data-lucide="chevron-up" style="color: #888;"></i>
+                    style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; border-bottom: 2px dashed var(--deco); padding-bottom: 2rem;">
+                    <div>
+                        <h3
+                            style="font-size: 2rem; font-weight: 900; color: var(--ink); font-style: italic; margin: 0; display: flex; align-items: center; gap: 0.8rem;">
+                            <i data-lucide="layout-dashboard" style="color: var(--accent);"></i>
+                            家庭概況儀表板
+                        </h3>
+                        <span style="font-size: 0.9rem; color: #888; font-weight: 700; margin-left: 3rem;">Live Demo
+                            Preview</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <span style="font-weight: 700; color: #666;">情境設定：</span>
+                        <div
+                            style="background: #fff; padding: 5px; border-radius: 18px; display: flex; gap: 5px; border: 2px solid var(--ink);">
+                            <button onclick="setDemoPlan('weekday')" id="btn-weekday"
+                                style="padding: 0.5rem 1.2rem; border-radius: 12px; border: none; font-weight: 900; transition: all 0.3s; cursor: pointer; background: var(--ink); color: white;">平日
+                                (30M)</button>
+                            <button onclick="setDemoPlan('holiday')" id="btn-holiday"
+                                style="padding: 0.5rem 1.2rem; border-radius: 12px; border: none; font-weight: 900; transition: all 0.3s; cursor: pointer; background: transparent; color: #888;">假日
+                                (90M)</button>
+                        </div>
+                        <button onclick="applyBatchDemoAllocation()"
+                            style="background: #ff8a80; color: white; border: 2px solid var(--ink); padding: 0.8rem 1.5rem; border-radius: 18px; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); transition: all 0.2s;">
+                            <i data-lucide="zap" size="18"></i> 一鍵發放額度
+                        </button>
+                    </div>
                 </div>
-                <div style="padding: 2.5rem;">
-                    <!-- Kid Selection Pills -->
-                    <div id="demoKidSelection"
-                        style="display: flex; gap: 1rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
-                        <!-- Pills injected by JS -->
-                    </div>
 
+                <!-- Demo Kids Grid -->
+                <div id="demoKidsGrid"
+                    style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 3rem;">
+                    <!-- Cards will be injected by JS -->
+                </div>
+
+                <!-- Admin Control Panel -->
+                <div
+                    style="background: white; border: 2px solid var(--ink); border-radius: 30px; padding: 0; overflow: hidden; box-shadow: 8px 8px 0 var(--deco);">
                     <div
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                        <div class="demo-input-group">
-                            <label
-                                style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
-                                <i data-lucide="star" size="14"></i> 點數調整
-                            </label>
-                            <input type="number" id="manualDemoPoints" placeholder="例如: +10 / -5"
-                                style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 20px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fff;">
-                        </div>
-                        <div class="demo-input-group">
-                            <label
-                                style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
-                                <i data-lucide="monitor" size="14"></i> 分鐘調整
-                            </label>
-                            <input type="number" id="manualDemoMinutes" placeholder="例如: +30 / -20"
-                                style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 20px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fff;">
-                        </div>
-                        <div class="demo-input-group">
-                            <label
-                                style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
-                                <i data-lucide="edit-3" size="14"></i> 說明原因
-                            </label>
-                            <input type="text" id="manualDemoReason" placeholder="例如: 洗碗獎勵"
-                                style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 20px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fff;">
-                        </div>
+                        style="background: #fffafa; padding: 1.2rem 2rem; border-bottom: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: center;">
+                        <h3
+                            style="font-size: 1.1rem; font-weight: 900; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 0.8rem;">
+                            <i data-lucide="settings-2" style="color: #666;"></i>
+                            家長管理控制台
+                        </h3>
                     </div>
+                    <div style="padding: 2rem;">
+                        <!-- Kid Selection Pills -->
+                        <div id="demoKidSelection"
+                            style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                            <!-- Pills injected by JS -->
+                        </div>
 
-                    <button onclick="applyManualDemoUpdate()"
-                        style="width: 100%; background: #444; color: white; border: none; padding: 1.2rem; border-radius: 30px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        執行更新 🚀
-                    </button>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                            <div class="demo-input-group">
+                                <label
+                                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
+                                    <i data-lucide="star" size="14"></i> 點數調整
+                                </label>
+                                <input type="number" id="manualDemoPoints" placeholder="例如: +10 / -5"
+                                    style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 15px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fdfcf9;">
+                            </div>
+                            <div class="demo-input-group">
+                                <label
+                                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
+                                    <i data-lucide="monitor" size="14"></i> 分鐘調整
+                                </label>
+                                <input type="number" id="manualDemoMinutes" placeholder="例如: +30 / -20"
+                                    style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 15px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fdfcf9;">
+                            </div>
+                            <div class="demo-input-group">
+                                <label
+                                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
+                                    <i data-lucide="edit-3" size="14"></i> 說明原因
+                                </label>
+                                <input type="text" id="manualDemoReason" placeholder="例如: 洗碗獎勵"
+                                    style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 15px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fdfcf9;">
+                            </div>
+                        </div>
+
+                        <button onclick="applyManualDemoUpdate()"
+                            style="width: 100%; background: var(--ink); color: white; border: none; padding: 1.2rem; border-radius: 20px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);">
+                            執行更新 🚀
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1480,6 +1506,63 @@
                         <div class="faq-answer">
                             <p style="margin-top: 1rem; color: #666; line-height: 1.8;">使用 Supabase
                                 企業級資料庫，所有資料都經過加密。每個家庭的資料完全獨立，只有擁有家庭代碼的成員才能存取。</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
+                            <span>🔑 為什麼要登入 Google 帳號？密碼安全嗎？</span>
+                            <i data-lucide="chevron-down" size="20"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p style="margin-top: 1rem; color: #666; line-height: 1.8;">
+                                為了確保您的資料安全與同步，Points Bank 使用 Google 帳號進行身分驗證。這代表我們<strong>不會</strong>接觸或儲存您的 Google
+                                密碼。此應用程式僅會取得您的 Email 與頭像作為識別，所有的驗證過程皆由 Google 安全處理，請放心使用。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
+                            <span>👶 適合幾歲的孩子？</span>
+                            <i data-lucide="chevron-down" size="20"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p style="margin-top: 1rem; color: #666; line-height: 1.8;">
+                                其實 <strong>3~4 歲</strong>就可以開始嘗試！雖然這個年紀的數字概念可能還不成熟，但 Points Bank
+                                運用了<strong>圖像化的進度條</strong>，孩子不需要精通數學，只要看著顏色的消長就能直觀理解概念。可以將這個系統視為一個實驗計畫，歡迎家長帶著小小孩一起試試看。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
+                            <span>🧹 可以用點數獎勵做家事或考一百分嗎？</span>
+                            <i data-lucide="chevron-down" size="20"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p style="margin-top: 1rem; color: #666; line-height: 1.8;">
+                                這完全由您決定！雖然我們原本的設計哲學傾向於將點數專注於「資源交換」（時間換快樂），避免外部獎勵削弱孩子對家事或學習的責任感。但<strong>教養沒有標準答案</strong>。有些家庭將其作為特殊任務（如年終大掃除）的獎勵，或養成新習慣初期的增強物，效果也很好。系統保留了最大的彈性，讓您依據孩子的特質靈活運用。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
+                            <span>📈 孩子點數存太多換不完怎麼辦？</span>
+                            <i data-lucide="chevron-down" size="20"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p style="margin-top: 1rem; color: #666; line-height: 1.8;">
+                                這是好事！代表孩子學會了自制。您可以考慮：<br>
+                                1. <strong>提高兌換門檻</strong>（順便教一點通貨膨脹的概念？）<br>
+                                2. 新增<strong>「高價商品」</strong>（如去遊樂園），讓孩子練習長期儲蓄。<br>
+                                重點是信守承諾，讓孩子相信儲蓄是有意義的。
+                            </p>
                         </div>
                     </div>
                 </div>
