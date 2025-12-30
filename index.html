@@ -1141,12 +1141,11 @@
                     <div style="padding: 2rem;">
                         <!-- Kid Selection Pills -->
                         <div id="demoKidSelection"
-                            style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                            style="display: flex; gap: 0.8rem; margin-bottom: 2rem; flex-wrap: wrap;">
                             <!-- Pills injected by JS -->
                         </div>
 
-                        <div
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="demo-admin-grid-wrapper">
                             <div class="demo-input-group">
                                 <label
                                     style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
@@ -1172,23 +1171,24 @@
                                     style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 15px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fdfcf9;">
                             </div>
                         </div>
-
-                        <button onclick="applyManualDemoUpdate()"
-                            style="width: 100%; background: var(--ink); color: white; border: none; padding: 1.2rem; border-radius: 20px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);">
-                            執行更新 🚀
-                        </button>
                     </div>
+
+                    <button onclick="applyManualDemoUpdate()"
+                        style="width: 100%; background: var(--ink); color: white; border: none; padding: 1.2rem; border-radius: 20px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);">
+                        執行更新 🚀
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <div style="margin-top: 3rem; text-align: center;">
-                <p style="color: #888; font-size: 0.95rem; font-weight: 500;">
-                    💡 <strong>體驗提示</strong>：這是一個部分仿真的功能Demo，數據僅保存在您的瀏覽器中。
-                    <a href="https://points-bank.vercel.app"
-                        style="color: var(--accent); font-weight: 700; text-decoration: underline; margin-left: 0.5rem;">開啟真實系統入口
-                        →</a>
-                </p>
-            </div>
+        <div style="margin-top: 3rem; text-align: center;">
+            <p style="color: #888; font-size: 0.95rem; font-weight: 500;">
+                💡 <strong>體驗提示</strong>：這是一個部分仿真的功能Demo，數據僅保存在您的瀏覽器中。
+                <a href="https://points-bank.vercel.app"
+                    style="color: var(--accent); font-weight: 700; text-decoration: underline; margin-left: 0.5rem;">開啟真實系統入口
+                    →</a>
+            </p>
+        </div>
         </div>
 
         <style>
@@ -1305,7 +1305,25 @@
                 }
 
                 .demo-card {
-                    padding: 1.5rem;
+                    padding: 1rem !important;
+                    gap: 1rem !important;
+                }
+
+                .demo-admin-grid-wrapper {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    /* Stack inputs on mobile */
+                    gap: 1rem;
+                    margin-bottom: 1.5rem;
+                }
+            }
+
+            @media (min-width: 769px) {
+                .demo-admin-grid-wrapper {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 1.5rem;
+                    margin-bottom: 2rem;
                 }
             }
         </style>
