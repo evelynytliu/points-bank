@@ -144,7 +144,7 @@ export default function Home() {
         </div>
 
         <h1 className="text-4xl font-black mb-6 tracking-tight">
-          <span className={`${theme === 'cyber' ? 'bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent italic' : 'text-[#4a4a4a]'} uppercase`}>POINTS</span>
+          <span className={`${theme === 'cyber' ? 'bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent italic pr-2' : 'text-[#4a4a4a]'} uppercase`}>POINTS</span>
           <span className={theme === 'cyber' ? 'text-cyan-400 italic' : 'text-[#ff8a80]'}> Bank</span>
         </h1>
 
