@@ -1279,7 +1279,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
                     </div>
                 </div>
-                <div className={`py-4 px-6 w-fit ml-auto relative flex items-center justify-end gap-12 ${familySettings?.theme === 'doodle'
+                <div className={`py-4 px-6 w-fit ml-auto relative flex items-center justify-end gap-6 ${familySettings?.theme === 'doodle'
                     ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-6'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-6 p-4'}`}>
 
@@ -1288,14 +1288,14 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <div className={`text-sm ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-1 tracking-widest flex items-center gap-1`}>
                             <Star className="w-4 h-4 fill-current" /> {t.points_label}
                         </div>
-                        <div className={`text-6xl font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>{kid.total_points}</div>
+                        <div className={`text-7xl font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>{kid.total_points}</div>
                     </div>
 
                     {/* Divider */}
                     <div className={`w-0.5 self-stretch ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10 border-l-2 border-dashed border-[#4a4a4a]/20' : 'bg-white/10'}`}></div>
 
                     {/* Right Side: Rewards Info */}
-                    <div className="flex flex-col gap-3 justify-center items-end text-right">
+                    <div className="flex flex-col gap-3 justify-center items-end text-right whitespace-nowrap">
                         <div className={`text-xs font-black uppercase tracking-widest opacity-60 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>{t.redeemable_rewards}</div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-end gap-3">
