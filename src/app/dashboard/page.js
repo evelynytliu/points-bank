@@ -88,6 +88,16 @@ export default function Dashboard() {
         onConfirm: () => { }
     });
 
+    const [tourStep, setTourStep] = useState(0);
+
+    // Initial check for tour
+    useEffect(() => {
+        if (kids && kids.length === 0 && !localStorage.getItem('tour_completed')) {
+            // Wait a bit for UI to settle
+            setTimeout(() => setTourStep(1), 1000);
+        }
+    }, [kids]);
+
     // Apply theme class to body
     useEffect(() => {
         const theme = family?.theme || 'cyber';
