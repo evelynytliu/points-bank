@@ -450,6 +450,66 @@
             .section {
                 padding: 5rem 0;
             }
+
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            /* 手機版統計數字改為單欄 */
+            .hero-content>div[style*="grid-template-columns: repeat(3"] {
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+
+            /* 系統功能卡片改為單欄 */
+            div[style*="grid-template-columns: repeat(2, 1fr)"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* 底部貼心細節改為單欄 */
+            div[style*="grid-template-columns: repeat(3, 1fr)"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* 調整卡片padding */
+            .feature-card {
+                padding: 2.5rem 1.8rem;
+            }
+
+            /* 調整section標題 */
+            .section-header h2,
+            h2 {
+                font-size: 2rem !important;
+            }
+
+            /* FAQ項目padding調整 */
+            .faq-item {
+                padding: 1.2rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .btn-primary {
+                padding: 1rem 2rem;
+                font-size: 0.95rem;
+            }
+
+            .hero-tag {
+                font-size: 0.65rem;
+            }
+
+            /* 更小螢幕的統計數字字體 */
+            .hero-content div[style*="font-size: 2.5rem"] {
+                font-size: 2rem !important;
+            }
         }
     </style>
 </head>
