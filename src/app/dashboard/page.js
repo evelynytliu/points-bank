@@ -1268,8 +1268,8 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
     // Let's modify the KidCard usage first.
     return (
         <div ref={cardRef} className={`p-8 group relative overflow-hidden transition-all duration-500 ${familySettings?.theme === 'doodle'
-            ? 'bg-[#fcfbf9] border-2 border-[#4a4a4a] rounded-[40px_10px_35px_15px] shadow-[6px_6px_0px_rgba(74,74,74,0.05)]'
-            : 'glass-panel border-cyan-500/5'}`}>
+            ? 'bg-white border-4 border-[#4a4a4a] rounded-[40px_10px_35px_15px] shadow-[10px_10px_0px_rgba(74,74,74,0.15)]'
+            : 'glass-panel border-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.15)] ring-1 ring-cyan-400/20'}`}>
             <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-6 mb-8">
                 <div className="space-y-1">
                     <div className="flex items-center gap-4">
