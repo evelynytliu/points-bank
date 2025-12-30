@@ -1330,7 +1330,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                 </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-3">
                 <div className="grid grid-cols-4 gap-2">
                     <button onClick={() => onUpdate(kid, 0, -10, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10</button>
                     <button onClick={() => onUpdate(kid, 0, -20, t.quick_deduct, actorName)} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a] text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-b-2 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20</button>
