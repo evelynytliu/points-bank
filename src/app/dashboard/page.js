@@ -1288,7 +1288,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <div className={`text-sm ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-1 tracking-widest flex items-center gap-1`}>
                             <Star className="w-4 h-4 fill-current" /> {t.points_label}
                         </div>
-                        <div className={`text-7xl font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>{kid.total_points}</div>
+                        <div className={`text-6xl font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>{kid.total_points}</div>
                     </div>
 
                     {/* Divider */}
