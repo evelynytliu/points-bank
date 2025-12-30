@@ -1279,12 +1279,12 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
                     </div>
                 </div>
-                <div className={`py-2 px-4 w-full relative flex items-center justify-between gap-6 ${familySettings?.theme === 'doodle'
+                <div className={`py-4 px-6 w-full relative flex items-center justify-end gap-12 ${familySettings?.theme === 'doodle'
                     ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-6'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-6 p-4'}`}>
 
                     {/* Left Side: Points */}
-                    <div className="flex flex-col items-start justify-center min-w-[100px]">
+                    <div className="flex flex-col items-center justify-center min-w-[100px]">
                         <div className={`text-sm ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-1 tracking-widest flex items-center gap-1`}>
                             <Star className="w-4 h-4 fill-current" /> {t.points_label}
                         </div>
@@ -1295,17 +1295,17 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     <div className={`w-0.5 self-stretch ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10 border-l-2 border-dashed border-[#4a4a4a]/20' : 'bg-white/10'}`}></div>
 
                     {/* Right Side: Rewards Info */}
-                    <div className="flex flex-col gap-3 flex-1 justify-center">
+                    <div className="flex flex-col gap-3 justify-center items-end text-right">
                         <div className={`text-xs font-black uppercase tracking-widest opacity-60 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>{t.redeemable_rewards}</div>
                         <div className="space-y-2">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-end gap-3">
                                 <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                     {kid.total_points * (familySettings?.point_to_minutes || 2)}
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.minutes_unit}</span>
                                 </span>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-end gap-3">
                                 <Coins className={`w-5 h-5 text-green-500`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                     {kid.total_points * (familySettings?.point_to_cash || 5)}
