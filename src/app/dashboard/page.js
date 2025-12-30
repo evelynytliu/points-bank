@@ -749,7 +749,7 @@ export default function Dashboard() {
 
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase font-black`}><TrendingUp className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} /> {t.status_overview}</h2>
-                        <div className={`inline-flex flex-wrap items-center p-1.5 rounded-2xl border font-bold gap-2 ${family?.theme === 'doodle' ? 'bg-[#eee] border-[#4a4a4a]' : 'bg-white/5 border-white/10'}`}>
+                        <div className={`flex w-full md:w-auto justify-between md:justify-start flex-wrap items-center p-1.5 rounded-2xl border font-bold gap-2 ${family?.theme === 'doodle' ? 'bg-[#eee] border-[#4a4a4a]' : 'bg-white/5 border-white/10'}`}>
                             {/* Plan Toggles */}
                             <button
                                 onClick={() => setAllocPlan('weekday')}
