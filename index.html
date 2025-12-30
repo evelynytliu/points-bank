@@ -511,6 +511,53 @@
                 font-size: 2rem !important;
             }
         }
+
+        /* === FAQ STYLES === */
+        .faq-item {
+            cursor: pointer;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 15px;
+            border: 2px solid var(--deco);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(255, 138, 128, 0.15);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px !important;
+        }
+
+        .faq-item.active i[data-lucide="chevron-down"] {
+            transform: rotate(180deg);
+        }
+
+        .faq-item i {
+            transition: transform 0.3s ease;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
     </style>
 </head>
 
@@ -911,79 +958,43 @@
                     <h4 style="text-align: center; font-size: 1.3rem; margin-bottom: 2rem; font-weight: 700;">💬 快速解答
                     </h4>
 
-                    <div class="faq-item"
-                        style="cursor: pointer; margin-bottom: 1rem; padding: 1.5rem; background: white; border-radius: 15px; border: 2px solid var(--deco); transition: all 0.3s ease;">
+                    <div class="faq-item">
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
                             <span>📱 需要下載 App 嗎？</span>
                             <i data-lucide="chevron-down" size="20"></i>
                         </div>
-                        <div class="faq-answer"
-                            style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease; margin-top: 0;">
+                        <div class="faq-answer">
                             <p style="margin-top: 1rem; color: #666; line-height: 1.8;">
                                 不需要！這是一個網頁應用，直接用瀏覽器開啟就能使用。可以把網址加到手機桌面，像 App 一樣方便。</p>
                         </div>
                     </div>
 
-                    <div class="faq-item"
-                        style="cursor: pointer; margin-bottom: 1rem; padding: 1.5rem; background: white; border-radius: 15px; border: 2px solid var(--deco); transition: all 0.3s ease;">
+                    <div class="faq-item">
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
                             <span>💰 需要付費嗎？</span>
                             <i data-lucide="chevron-down" size="20"></i>
                         </div>
-                        <div class="faq-answer"
-                            style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease; margin-top: 0;">
+                        <div class="faq-answer">
                             <p style="margin-top: 1rem; color: #666; line-height: 1.8;">
                                 目前完全免費！這是為了幫助更多家庭建立良好的數位使用習慣而打造的工具。</p>
                         </div>
                     </div>
 
-                    <div class="faq-item"
-                        style="cursor: pointer; padding: 1.5rem; background: white; border-radius: 15px; border: 2px solid var(--deco); transition: all 0.3s ease;">
+                    <div class="faq-item">
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
                             <span>🔒 資料安全嗎？</span>
                             <i data-lucide="chevron-down" size="20"></i>
                         </div>
-                        <div class="faq-answer"
-                            style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease; margin-top: 0;">
+                        <div class="faq-answer">
                             <p style="margin-top: 1rem; color: #666; line-height: 1.8;">使用 Supabase
                                 企業級資料庫，所有資料都經過加密。每個家庭的資料完全獨立，只有擁有家庭代碼的成員才能存取。</p>
                         </div>
                     </div>
                 </div>
 
-                <style>
-                    .faq-item:hover {
-                        border-color: var(--accent);
-                        box-shadow: 0 4px 12px rgba(255, 138, 128, 0.15);
-                    }
-
-                    .faq-item.active .faq-answer {
-                        max-height: 200px;
-                    }
-
-                    .faq-item.active i[data-lucide="chevron-down"] {
-                        transform: rotate(180deg);
-                    }
-
-                    .faq-item i {
-                        transition: transform 0.3s ease;
-                    }
-
-                    @keyframes pulse {
-
-                        0%,
-                        100% {
-                            transform: scale(1);
-                        }
-
-                        50% {
-                            transform: scale(1.05);
-                        }
-                    }
-                </style>
             </div>
         </div>
     </section>
