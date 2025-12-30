@@ -704,6 +704,7 @@
                 <li><a href="#system">系統功能</a></li>
                 <li><a href="#demo">體驗 Demo</a></li>
                 <li><a href="#philosophy">教養理念</a></li>
+                <li><a href="#disclaimer">溫馨提醒</a></li>
                 <li><a href="https://points-bank.vercel.app" class="nav-cta">
                         進入系統
                         <i data-lucide="arrow-right" size="16"></i>
@@ -854,7 +855,7 @@
                     核心教養邏輯
                 </div>
                 <p class="section-desc">
-                    這不是用家事或作業來「賺」點數，而是讓孩子練習「今天不玩，存起來換明天玩更久」。核心是延遲滿足的訓練，而非把日常責任變成交易。
+                    不是用家事或作業來「賺」點數，而是讓孩子練習「今天先不玩，時間存起來換更棒的東西」。核心是延遲滿足的訓練，而非把日常責任變成交易。
                 </p>
             </div>
 
@@ -885,8 +886,8 @@
                         <i data-lucide="coins" size="28"></i>
                     </div>
                     <h3>從「時間銀行」學資源配置</h3>
-                    <p>今天省下的 20 分鐘螢幕時間，可以存成點數。50 點可以換週末 1 小時的 Switch 時光，也可以換一次麥當勞，甚至存到 200
-                        點換那個心心念念的樂高。孩子會開始思考：「我真的要現在就看完今天的配額嗎？還是存起來換更想要的東西？」這種「時間也可以儲蓄、也有利息」的概念，正是經濟學的核心——在有限資源中，學會延遲、累積、交換，找到最適配自己需求的方案。
+                    <p>今天省下的 20 分鐘螢幕時間，可以存成點數，存到 200
+                        點就可以換那個心心念念的樂高。孩子會開始思考：「我真的要現在就看完今天的配額嗎？還是存起來換更想要的東西？」這種「時間也可以儲蓄、也有利息」的概念，正是經濟學的核心——在有限資源中，學會延遲、累積、交換，找到最適配自己需求的方案。
                     </p>
                 </div>
             </div>
@@ -972,7 +973,7 @@
                         <h3 style="font-size: 1.3rem; font-weight: 700; margin: 0;">獨特家庭代碼</h3>
                     </div>
                     <p style="color: #666; line-height: 1.8;">
-                        每個家庭擁有唯一的 4 碼分享代碼（如 F4JK）。阿公阿嫲、保母只要輸入代碼，就能加入協同管理，不需複雜的註冊流程。
+                        每個家庭擁有唯一的 4 碼分享代碼（如 F4JK）。阿公阿嬤、保母只要輸入代碼，就能加入協同管理，不需複雜的註冊流程。
                     </p>
                 </div>
 
@@ -1017,86 +1018,207 @@
 
     <!-- INTERACTIVE DEMO SECTION -->
     <section class="section" id="demo"
-        style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 8rem 0; color: white; position: relative; overflow: hidden;">
-        <!-- Background decoration -->
+        style="background: #fdfcf9; padding: 8rem 0; border-top: 2px solid var(--ink); position: relative; overflow: hidden;">
+        <!-- Background Grid Pattern -->
         <div
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background: radial-gradient(circle at 20% 50%, cyan 1px, transparent 1px), radial-gradient(circle at 80% 80%, magenta 1px, transparent 1px); background-size: 50px 50px;">
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.4; background-image: radial-gradient(#d8d0c8 1.2px, transparent 1.2px); background-size: 30px 30px;">
         </div>
 
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="section-header" style="text-align: center; margin-bottom: 4rem;">
-                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 900; color: white;">
-                    🎮 <span
-                        style="background: linear-gradient(135deg, #00e5ff, #ff1493); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">互動體驗</span>
-                    Demo
-                </h2>
-                <p style="font-size: 1.1rem; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto;">
-                    無需註冊，立即體驗系統核心功能。試著幫虛擬孩子調整點數和時間！
-                </p>
-            </div>
-
-            <div
-                style="max-width: 900px; margin: 0 auto; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border: 2px solid rgba(0,229,255,0.2); border-radius: 30px; padding: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
-
-                <!-- Demo Kids List -->
-                <div id="demoKids"></div>
-
-                <!-- Demo Controls -->
-                <div
-                    style="margin-top: 2rem; padding: 2rem; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
-                    <h3
-                        style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; color: #00e5ff; display: flex; align-items: center; gap: 0.5rem;">
-                        <i data-lucide="sliders" size="24"></i>
-                        快速調整
-                    </h3>
+            <div class="section-header"
+                style="text-align: left; margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
+                <div>
+                    <h2
+                        style="font-size: 2.5rem; font-weight: 900; color: var(--ink); font-style: italic; margin: 0; display: flex; align-items: center; gap: 0.8rem;">
+                        <i data-lucide="trending-up" style="color: var(--accent);"></i>
+                        狀態總覽
+                    </h2>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                     <div
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                        <div>
-                            <label
-                                style="display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase;">點數調整</label>
-                            <input type="number" id="demoPoints" placeholder="+10 or -5"
-                                style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,229,255,0.3); padding: 0.8rem; border-radius: 10px; color: white; font-weight: 700; text-align: center;">
-                        </div>
-                        <div>
-                            <label
-                                style="display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase;">分鐘調整</label>
-                            <input type="number" id="demoMinutes" placeholder="+30 or -20"
-                                style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255, 20,147,0.3); padding: 0.8rem; border-radius: 10px; color: white; font-weight: 700; text-align: center;">
-                        </div>
-                        <div>
-                            <label
-                                style="display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase;">原因</label>
-                            <input type="text" id="demoReason" placeholder="例如：做家事獎勵"
-                                style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 10px; color: white; font-weight: 700;">
-                        </div>
+                        style="background: #eee; padding: 5px; border-radius: 18px; display: flex; gap: 5px; border: 2px solid var(--ink);">
+                        <button onclick="setDemoPlan('weekday')" id="btn-weekday"
+                            style="padding: 0.5rem 1.2rem; border-radius: 12px; border: none; font-weight: 900; transition: all 0.3s; cursor: pointer; background: var(--ink); color: white;">平日
+                            (30M)</button>
+                        <button onclick="setDemoPlan('holiday')" id="btn-holiday"
+                            style="padding: 0.5rem 1.2rem; border-radius: 12px; border: none; font-weight: 900; transition: all 0.3s; cursor: pointer; background: transparent; color: #888;">假日
+                            (90M)</button>
                     </div>
-                    <button onclick="applyDemoUpdate()"
-                        style="width: 100%; background: linear-gradient(135deg, #00e5ff, #ff1493); border: none; padding: 1rem; border-radius: 15px; color: white; font-weight: 900; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;">
-                        執行調整 🚀
+                    <button onclick="applyBatchDemoAllocation()"
+                        style="background: #ff8a80; color: white; border: 2px solid var(--ink); padding: 0.8rem 1.5rem; border-radius: 18px; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); transition: all 0.2s;">
+                        <i data-lucide="zap" size="18"></i> 一鍵發放額度
                     </button>
                 </div>
+            </div>
 
-                <!-- Demo Log -->
+            <!-- Demo Kids Grid -->
+            <div id="demoKidsGrid" style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 4rem;">
+                <!-- Cards will be injected by JS -->
+            </div>
+
+            <!-- Admin Control Panel -->
+            <div
+                style="background: white; border: 2px solid var(--ink); border-radius: 40px; padding: 0; overflow: hidden; box-shadow: 10px 10px 0 var(--deco);">
                 <div
-                    style="margin-top: 2rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 20px; max-height: 300px; overflow-y: auto;">
-                    <h4
-                        style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #ff1493; display: flex; align-items: center; gap: 0.5rem;">
-                        <i data-lucide="clock" size="20"></i>
-                        操作記錄
-                    </h4>
-                    <div id="demoLog"></div>
+                    style="background: #fffafa; padding: 1.5rem 2.5rem; border-bottom: 2px solid var(--ink); display: flex; justify-content: space-between; align-items: center;">
+                    <h3
+                        style="font-size: 1.2rem; font-weight: 900; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 0.8rem;">
+                        <i data-lucide="zap" style="color: #ff8a80;"></i>
+                        管理控制台 (批次點數/時間)
+                    </h3>
+                    <i data-lucide="chevron-up" style="color: #888;"></i>
                 </div>
+                <div style="padding: 2.5rem;">
+                    <!-- Kid Selection Pills -->
+                    <div id="demoKidSelection"
+                        style="display: flex; gap: 1rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
+                        <!-- Pills injected by JS -->
+                    </div>
 
-                <div
-                    style="margin-top: 2rem; padding: 1.5rem; background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.2); border-radius: 15px; text-align: center;">
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">
-                        💡 <strong>提示</strong>：這只是 Demo 體驗，數據不會儲存。
-                        <a href="https://points-bank.vercel.app"
-                            style="color: #00e5ff; text-decoration: underline; margin-left: 0.5rem;">進入真實系統 →</a>
-                    </p>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="demo-input-group">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
+                                <i data-lucide="star" size="14"></i> 點數調整
+                            </label>
+                            <input type="number" id="manualDemoPoints" placeholder="例如: +10 / -5"
+                                style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 20px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fff;">
+                        </div>
+                        <div class="demo-input-group">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
+                                <i data-lucide="monitor" size="14"></i> 分鐘調整
+                            </label>
+                            <input type="number" id="manualDemoMinutes" placeholder="例如: +30 / -20"
+                                style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 20px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fff;">
+                        </div>
+                        <div class="demo-input-group">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 900; color: #888; margin-bottom: 0.6rem; text-transform: uppercase;">
+                                <i data-lucide="edit-3" size="14"></i> 說明原因
+                            </label>
+                            <input type="text" id="manualDemoReason" placeholder="例如: 洗碗獎勵"
+                                style="width: 100%; border: 2px solid var(--ink); padding: 1rem; border-radius: 20px; font-weight: 700; text-align: center; font-size: 1.1rem; background: #fff;">
+                        </div>
+                    </div>
+
+                    <button onclick="applyManualDemoUpdate()"
+                        style="width: 100%; background: #444; color: white; border: none; padding: 1.2rem; border-radius: 30px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        執行更新 🚀
+                    </button>
                 </div>
             </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <p style="color: #888; font-size: 0.95rem; font-weight: 500;">
+                    💡 <strong>體驗提示</strong>：這是一個完全仿真的 Demo，數據僅保存在您的瀏覽器中。
+                    <a href="https://points-bank.vercel.app"
+                        style="color: var(--accent); font-weight: 700; text-decoration: underline; margin-left: 0.5rem;">開啟真實系統入口
+                        →</a>
+                </p>
+            </div>
         </div>
+
+        <style>
+            .demo-card {
+                background: white;
+                border: 2px solid var(--ink);
+                border-radius: 40px;
+                padding: 2.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                box-shadow: 10px 10px 0 var(--deco);
+                transition: transform 0.3s;
+            }
+
+            .demo-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .demo-progress-bg {
+                background: #eee;
+                height: 12px;
+                border-radius: 10px;
+                width: 100%;
+                overflow: hidden;
+                border: 1px solid var(--ink);
+            }
+
+            .demo-progress-fill {
+                background: #80cbc4;
+                height: 100%;
+                transition: width 0.5s ease-out;
+            }
+
+            .demo-btn-group {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+            }
+
+            .demo-btn-sm {
+                padding: 0.8rem;
+                border-radius: 15px;
+                border: 2px solid var(--ink);
+                background: #fee;
+                font-weight: 900;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .demo-btn-sm:hover {
+                background: white;
+                transform: scale(1.05);
+            }
+
+            .demo-action-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+
+            .demo-action-btn {
+                padding: 1rem;
+                border-radius: 20px;
+                border: 2px solid var(--ink);
+                font-weight: 900;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .demo-pill {
+                padding: 0.8rem 1.5rem;
+                border-radius: 20px;
+                border: 2px solid var(--ink);
+                font-weight: 900;
+                cursor: pointer;
+                transition: all 0.2s;
+                background: white;
+                color: #444;
+            }
+
+            .demo-pill.selected {
+                background: var(--ink);
+                color: white;
+                box-shadow: 4px 4px 0 var(--accent);
+            }
+
+            @media (max-width: 768px) {
+                .demo-btn-group {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .demo-action-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
     </section>
 
     <!-- PHILOSOPHY SECTION -->
@@ -1153,7 +1275,7 @@
                             爸媽不會「不同調」的秘密
                         </h3>
                         <p>
-                            「媽媽說我還有 20 點，但爸爸說我已經用完了⋯⋯」這種場景是不是很熟悉？雲端即時同步的設計，讓全家人看到的數字永遠一致。不管是爸爸用手機記、媽媽用平板查，或阿嫲在客廳更新，系統
+                            「媽媽說我還有 20 點，但爸爸說我已經用完了⋯⋯」這種場景是不是很熟悉？雲端即時同步的設計，讓全家人看到的數字永遠一致。不管是爸爸用手機記、媽媽用平板查，或阿嬤在客廳更新，系統
                             0.5 秒內就對齊。孩子學到的是：規則是穩定的、可預測的，而不是「看今天誰心情好」。
                         </p>
                     </div>
@@ -1177,6 +1299,69 @@
     </section>
 
     <!-- CTA SECTION -->
+    <!-- DISCLAIMER SECTION -->
+    <section class="section" id="disclaimer" style="background: var(--bg); padding: 4rem 0;">
+        <div class="container">
+            <div class="disclaimer-box"
+                style="max-width: 800px; margin: 0 auto; background: #fffdf9; border: 2px dashed var(--accent); border-radius: 30px; padding: 3rem; position: relative;">
+                <div
+                    style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 0.5rem 2rem; border-radius: 50px; font-weight: 900; letter-spacing: 1px; font-size: 0.9rem;">
+                    溫馨提醒：這是一場全家人的實驗
+                </div>
+                <h3
+                    style="text-align: center; margin-bottom: 2rem; font-weight: 900; color: var(--ink); font-size: 1.8rem; line-height: 1.4;">
+                    沒有「完美」的系統<br>
+                    只有「一致」的陪伴
+                </h3>
+                <div style="font-size: 1.1rem; line-height: 1.9; color: #444;">
+                    <p style="margin-bottom: 2rem; text-align: center;">
+                        Points Bank 是一個輔助工具，但<strong>它並不會自動教出會自律的孩子</strong>。<br>
+                        真正的自律，來自於您與孩子之間穩定的信任，以及全家人對規則的一致守護。
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                        <div
+                            style="display: flex; gap: 1.2rem; align-items: start; background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #fee;">
+                            <i data-lucide="shield-check" style="color: var(--accent); flex-shrink: 0; margin-top: 4px;"
+                                size="24"></i>
+                            <div>
+                                <strong
+                                    style="color: var(--ink); display: block; margin-bottom: 0.4rem;">全家人的一致性</strong>
+                                <span
+                                    style="font-size: 0.95rem; color: #666;">如果媽媽嚴格執行點數制，但爸爸或阿公阿嬤私下「大放送」，系統將會失效。請確保家中所有主要照顧者都達成共識。</span>
+                            </div>
+                        </div>
+                        <div
+                            style="display: flex; gap: 1.2rem; align-items: start; background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #fee;">
+                            <i data-lucide="heart-handshake"
+                                style="color: var(--accent); flex-shrink: 0; margin-top: 4px;" size="24"></i>
+                            <div>
+                                <strong
+                                    style="color: var(--ink); display: block; margin-bottom: 0.4rem;">討論而非命令</strong>
+                                <span
+                                    style="font-size: 0.95rem; color: #666;">建議開始使用前，先與孩子來一場「家庭會議」。討論為什麼要用點數、兌換規則是什麼，讓孩子參與制定，而非單方面被強制執行。</span>
+                            </div>
+                        </div>
+                        <div
+                            style="display: flex; gap: 1.2rem; align-items: start; background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #fee;">
+                            <i data-lucide="refresh-cw" style="color: var(--accent); flex-shrink: 0; margin-top: 4px;"
+                                size="24"></i>
+                            <div>
+                                <strong
+                                    style="color: var(--ink); display: block; margin-bottom: 0.4rem;">動態調整的彈性</strong>
+                                <span
+                                    style="font-size: 0.95rem; color: #666;">規則不是死的。如果發現點數太難賺或太容易換到，請隨時修正。這個系統是為了服務您的生活，而不是讓生活被系統綁架。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p
+                        style="text-align: center; font-style: italic; color: #888; margin-top: 2.5rem; border-top: 1px dashed #eee; padding-top: 1.5rem; font-size: 0.95rem;">
+                        「好的系統是輔助輪，最終目的是為了讓孩子學會自己騎車。」
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="section cta">
         <div class="container">
             <div class="cta-box">
@@ -1279,7 +1464,7 @@
 
         // Add fade-in animation to all feature cards and philosophy items
         document.addEventListener('DOMContentLoaded', () => {
-            const animatedElements = document.querySelectorAll('.feature-card, .philosophy-item, .section-header');
+            const animatedElements = document.querySelectorAll('.feature-card, .philosophy-item, .section-header, .disclaimer-box');
             animatedElements.forEach((el, index) => {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(30px)';
@@ -1316,129 +1501,169 @@
                 });
             }
 
-            // === DEMO FUNCTIONALITY ===
+            // === DOODLE DEMO FUNCTIONALITY ===
             window.demoKids = [
-                { name: '小明', points: 50, minutes: 30 },
-                { name: '小華', points: 75, minutes: 45 }
+                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30 },
+                { id: 'd2', name: 'LUIGI', avatar: '🚀', points: 12, minutes: 30, limit: 30 }
             ];
-            window.demoLogs = [];
+            window.demoPlan = 'weekday';
+            window.demoSelectedIds = ['d1', 'd2'];
 
             function renderDemoKids() {
-                const container = document.getElementById('demoKids');
-                if (!container) return;
+                const grid = document.getElementById('demoKidsGrid');
+                const selection = document.getElementById('demoKidSelection');
+                if (!grid || !selection) return;
 
-                container.innerHTML = demoKids.map((kid, index) => `
-                    <div style="background: rgba(0,0,0,0.2); border: 2px solid rgba(0,229,255,0.3); border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; transition: all 0.3s ease;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <h3 style="font-size: 1.5rem; font-weight: 900; color: #00e5ff; margin: 0;">${kid.name}</h3>
-                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.4); font-weight: 700;">DEMO ${index + 1}</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div style="background: rgba(0,229,255,0.1); padding: 1rem; border-radius: 15px; text-align: center;">
-                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700;">點數</div>
-                                <div id="demo-points-${index}" style="font-size: 2rem; font-weight: 900; color: #00e5ff;">${kid.points}</div>
+                // Render Cards
+                grid.innerHTML = demoKids.map((kid, index) => {
+                    const progress = (kid.minutes / kid.limit) * 100;
+                    const canRedeemMins = Math.floor(kid.points * 2); // 1 point = 2 mins for demo
+                    const canRedeemMoney = Math.floor(kid.points * 5); // 1 point = 5 dollars for demo
+
+                    return `
+                    <div class="demo-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                                <div style="width: 80px; height: 80px; border: 2px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; background: white;">
+                                    ${kid.avatar}
+                                </div>
+                                <h3 style="font-size: 3rem; font-weight: 900; italic: true; color: #444; margin: 0; font-family: 'Outfit', sans-serif;">${kid.name}</h3>
                             </div>
-                            <div style="background: rgba(255,20,147,0.1); padding: 1rem; border-radius: 15px; text-align: center;">
-                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700;">剩餘分鐘</div>
-                                <div id="demo-minutes-${index}" style="font-size: 2rem; font-weight: 900; color: #ff1493;">${kid.minutes}</div>
+                            <div style="background: #fff5e6; border: 2px solid var(--ink); border-radius: 25px; padding: 1.5rem 2rem; position: relative; min-width: 240px; box-shadow: 4px 4px 0 var(--deco);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <div style="font-size: 0.7rem; font-weight: 900; color: #ff8a80; text-transform: uppercase;">點數</div>
+                                        <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; color: #444;">${kid.points}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 0.7rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 0.5rem;">可兌換獎勵</div>
+                                        <div style="font-size: 0.9rem; font-weight: 700; color: #444; margin-bottom: 0.3rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
+                                            <i data-lucide="clock" size="14" style="color: #ff8a80"></i> ${canRedeemMins} 分鐘
+                                        </div>
+                                        <div style="font-size: 0.9rem; font-weight: 700; color: #444; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
+                                            <i data-lucide="coins" size="14" style="color: #80cbc4"></i> ${canRedeemMoney} 元
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="quickAdjust(${index}, 10, 0, '完成作業')" style="width: 100%; margin-top: 1rem; background: rgba(0,229,255,0.2); border: 1px solid rgba(0,229,255,0.4); padding: 0.8rem; border-radius:10px; color: #00e5ff; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                            +10 點數 (快速)
-                        </button>
+
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-weight: 900; color: #ff8a80; font-size: 0.9rem;">
+                                <span>今日剩餘螢幕時間紀錄</span>
+                                <span>${kid.minutes} / ${kid.limit} 分鐘</span>
+                            </div>
+                            <div class="demo-progress-bg">
+                                <div class="demo-progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="demo-btn-group">
+                            <button onclick="adjustDemoKid('${kid.id}', 0, -10, '使用時間')" class="demo-btn-sm" style="background: #fff1f0; color: #f5222d;">-10 分鐘</button>
+                            <button onclick="adjustDemoKid('${kid.id}', 0, -20, '使用時間')" class="demo-btn-sm" style="background: #fff1f0; color: #f5222d;">-20 分鐘</button>
+                            <button onclick="adjustDemoKid('${kid.id}', 0, -30, '使用時間')" class="demo-btn-sm" style="background: #fff1f0; color: #f5222d;">-30 分鐘</button>
+                            <button onclick="adjustDemoCardIndividual('${kid.id}')" class="demo-btn-sm" style="background: white;">自訂</button>
+                        </div>
+
+                        <div class="demo-action-grid">
+                            <button onclick="demoExchangeToPoints('${kid.id}')" class="demo-action-btn" style="background: #eef2f5; color: #444;">
+                                <i data-lucide="monitor" size="18"></i> → <i data-lucide="star" size="18" style="color: #ffb74d"></i> 換成點數
+                            </button>
+                            <button onclick="demoExchangeToTime('${kid.id}')" class="demo-action-btn" style="background: #e6f7f5; color: #444;">
+                                <i data-lucide="star" size="18" style="color: #ffb74d"></i> → <i data-lucide="monitor" size="18"></i> 兌換時間
+                            </button>
+                        </div>
                     </div>
+                `;
+                }).join('');
+
+                // Render Selection Pills
+                selection.innerHTML = demoKids.map(kid => `
+                    <button onclick="toggleDemoKidSelection('${kid.id}')" class="demo-pill ${demoSelectedIds.includes(kid.id) ? 'selected' : ''}">
+                        ${kid.name}
+                    </button>
                 `).join('');
+
                 lucide.createIcons();
             }
 
-            window.quickAdjust = function (kidIndex, points, minutes, reason) {
-                demoKids[kidIndex].points += points;
-                demoKids[kidIndex].minutes += minutes;
-                addDemoLog(demoKids[kidIndex].name, points, minutes, reason);
-                updateDemoDisplay();
+            window.setDemoPlan = function (plan) {
+                demoPlan = plan;
+                const limit = plan === 'weekday' ? 30 : 90;
+                demoKids.forEach(k => { k.limit = limit; k.minutes = limit; });
+
+                document.getElementById('btn-weekday').style.background = plan === 'weekday' ? 'var(--ink)' : 'transparent';
+                document.getElementById('btn-weekday').style.color = plan === 'weekday' ? 'white' : '#888';
+                document.getElementById('btn-holiday').style.background = plan === 'holiday' ? 'var(--ink)' : 'transparent';
+                document.getElementById('btn-holiday').style.color = plan === 'holiday' ? 'white' : '#888';
+
+                renderDemoKids();
             };
 
-            function addDemoLog(name, points, minutes, reason) {
-                const logEntry = {
-                    name,
-                    points,
-                    minutes,
-                    reason,
-                    time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
-                };
-                demoLogs.unshift(logEntry);
-                if (demoLogs.length > 10) demoLogs.pop();
-                renderDemoLog();
-            }
-
-            function renderDemoLog() {
-                const logContainer = document.getElementById('demoLog');
-                if (!logContainer) return;
-
-                if (demoLogs.length === 0) {
-                    logContainer.innerHTML = '<p style="color: rgba(255,255,255,0.3); text-align: center; font-size: 0.9rem;">尚無操作記錄</p>';
-                    return;
-                }
-
-                logContainer.innerHTML = demoLogs.map(log => `
-                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem; border-left: 3px solid ${log.points > 0 ? '#00e5ff' : '#ff1493'};">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="font-weight: 700; color: #00e5ff; font-size: 0.9rem;">${log.name}</span>
-                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.4);">${log.time}</span>
-                        </div>
-                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 0.5rem;">${log.reason}</div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            ${log.points !== 0 ? `<span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 5px; background: ${log.points > 0 ? 'rgba(0,229,255,0.2)' : 'rgba(255,20,147,0.2)'}; color: ${log.points > 0 ? '#00e5ff' : '#ff1493'};">${log.points > 0 ? '+' : ''}${log.points} 點</span>` : ''}
-                            ${log.minutes !== 0 ? `<span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 5px; background: ${log.minutes > 0 ? 'rgba(0,229,255,0.2)' : 'rgba(255,20,147,0.2)'}; color: ${log.minutes > 0 ? '#00e5ff' : '#ff1493'};">${log.minutes > 0 ? '+' : ''}${log.minutes} 分鐘</span>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            function updateDemoDisplay() {
-                demoKids.forEach((kid, index) => {
-                    const pointsEl = document.getElementById(`demo-points-${index}`);
-                    const minutesEl = document.getElementById(`demo-minutes-${index}`);
-                    if (pointsEl) pointsEl.textContent = kid.points;
-                    if (minutesEl) minutesEl.textContent = kid.minutes;
-                });
-            }
-
-            window.applyDemoUpdate = function () {
-                const points = parseInt(document.getElementById('demoPoints').value) || 0;
-                const minutes = parseInt(document.getElementById('demoMinutes').value) || 0;
-                const reason = document.getElementById('demoReason').value || '手動調整';
-
-                if (points === 0 && minutes === 0) {
-                    alert('請輸入點數或分鐘調整值！');
-                    return;
-                }
-
-                // Apply to all demo kids
-                demoKids.forEach((kid, index) => {
-                    kid.points += points;
-                    kid.minutes += minutes;
-                    addDemoLog(kid.name, points, minutes, reason);
-                });
-
-                updateDemoDisplay();
-
-                // Clear inputs
-                document.getElementById('demoPoints').value = '';
-                document.getElementById('demoMinutes').value = '';
-                document.getElementById('demoReason').value = '';
-
-                // Show confetti or animation
-                const btn = event.target;
-                btn.textContent = '✅ 已完成！';
-                setTimeout(() => {
-                    btn.textContent = '執行調整 🚀';
-                }, 1500);
+            window.toggleDemoKidSelection = function (id) {
+                const index = demoSelectedIds.indexOf(id);
+                if (index > -1) demoSelectedIds.splice(index, 1);
+                else demoSelectedIds.push(id);
+                renderDemoKids();
             };
 
-            // Initialize demo
+            window.adjustDemoKid = function (id, pts, mins, reason) {
+                const kid = demoKids.find(k => k.id === id);
+                if (kid) {
+                    kid.points = Math.max(0, kid.points + pts);
+                    kid.minutes = Math.max(0, Math.min(kid.limit, kid.minutes + mins));
+                }
+                renderDemoKids();
+            };
+
+            window.demoExchangeToPoints = function (id) {
+                const kid = demoKids.find(k => k.id === id);
+                if (kid && kid.minutes > 0) {
+                    const minsToConvert = kid.minutes;
+                    kid.points += Math.floor(minsToConvert / 2); // 2 mins = 1 point
+                    kid.minutes = 0;
+                    renderDemoKids();
+                }
+            };
+
+            window.demoExchangeToTime = function (id) {
+                const kid = demoKids.find(k => k.id === id);
+                if (kid && kid.points >= 5) {
+                    kid.points -= 5;
+                    kid.minutes += 10;
+                    renderDemoKids();
+                }
+            };
+
+            window.applyBatchDemoAllocation = function () {
+                const limit = demoPlan === 'weekday' ? 30 : 90;
+                demoKids.forEach(k => k.minutes = limit);
+                renderDemoKids();
+                alert('已將今日額度發放給所有孩子！');
+            };
+
+            window.applyManualDemoUpdate = function () {
+                const pts = parseInt(document.getElementById('manualDemoPoints').value) || 0;
+                const mins = parseInt(document.getElementById('manualDemoMinutes').value) || 0;
+
+                if (demoSelectedIds.length === 0) return alert('請先選擇要更新的孩子');
+
+                demoKids.forEach(k => {
+                    if (demoSelectedIds.includes(k.id)) {
+                        k.points = Math.max(0, k.points + pts);
+                        k.minutes = Math.max(0, Math.min(k.limit, k.minutes + mins));
+                    }
+                });
+
+                document.getElementById('manualDemoPoints').value = '';
+                document.getElementById('manualDemoMinutes').value = '';
+                document.getElementById('manualDemoReason').value = '';
+
+                renderDemoKids();
+            };
+
+            // Initial Render
             renderDemoKids();
-            renderDemoLog();
         });
 
         // === NUMBER COUNTER ANIMATION ===
