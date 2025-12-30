@@ -627,7 +627,27 @@ export default function Dashboard() {
     const handleJoinFamily = async (codeOverride) => {
         const codeToUse = typeof codeOverride === 'string' ? codeOverride : joinCode.trim();
         if (!codeToUse) return alert('請輸入家庭代碼');
-        const { error } = await supabase.rpc('join_family', { target_family_id: codeToUse });
+
+        let targetId = codeToUse;
+
+        // Try to lookup by short_id first
+        const { data: familyByShort, error: searchError } = await supabase
+            .from('families')
+            .select('id')
+            .eq('short_id', codeToUse)
+            .maybeSingle();
+
+        if (familyByShort) {
+            targetId = familyByShort.id;
+        } else {
+            // If not found by short_id, check if it's a valid UUID
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(codeToUse)) {
+                return alert(t.alert_no_family);
+            }
+        }
+
+        const { error } = await supabase.rpc('join_family', { target_family_id: targetId });
 
         if (error) {
             alert(t.alert_join_fail + error.message);
