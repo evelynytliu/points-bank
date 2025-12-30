@@ -1671,11 +1671,11 @@
                     return `
                     <div class="demo-card animate-pop-in" style="animation-delay: ${index * 0.1}s">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                            <div style="display: flex; align-items: center; gap: 1.5rem;">
-                                <div style="width: 80px; height: 80px; border: 2px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; background: white; box-shadow: 4px 4px 0 var(--deco); animation: float 3s ease-in-out infinite;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 60px; height: 60px; min-width: 60px; border: 2px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: white; box-shadow: 3px 3px 0 var(--deco); animation: float 3s ease-in-out infinite;">
                                     ${kid.avatar}
                                 </div>
-                                <h3 style="font-size: 3rem; font-weight: 900; font-style: italic; color: #444; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -2px;">${kid.name}</h3>
+                                <h3 style="font-size: clamp(2rem, 8vw, 3rem); font-weight: 900; font-style: italic; color: #444; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -2px; line-height: 1;">${kid.name}</h3>
                             </div>
                             <div style="background: #fff5e6; border: 2px solid var(--ink); border-radius: 25px; padding: 1.5rem 2rem; position: relative; min-width: 240px; box-shadow: 4px 4px 0 var(--deco); transition: all 0.3s ease;">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
