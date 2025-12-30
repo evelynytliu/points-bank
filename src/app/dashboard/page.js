@@ -1309,19 +1309,24 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                 </div>
             </div>
 
-            <div className="space-y-3 mb-8">
-                <div className="flex justify-between items-end px-1 font-black">
-                    <div className={`flex items-center gap-2 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-bold italic text-sm uppercase leading-none`}><Monitor className="w-5 h-5" /> {t.today_remaining}</div>
-                    <div className={`font-black text-2xl ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.total_minutes} <span className={familySettings?.theme === 'doodle' ? 'text-[#888] text-sm' : 'text-slate-500 text-sm'}>/ {timeLimit} {t.minutes_unit}</span></div>
-                </div>
-                <div className={`bar-wrap ${familySettings?.theme === 'doodle' ? 'bg-[#eee] h-6 border-none' : 'shadow-inner'}`}>
+            <div className="mb-8">
+                <div className={`relative w-full h-11 rounded-2xl overflow-hidden flex items-center justify-center ${familySettings?.theme === 'doodle' ? 'bg-[#eee] border-2 border-[#4a4a4a]' : 'bg-black/40 border border-white/10 shadow-inner'}`}>
+                    {/* Progress Fill */}
                     <div
-                        className={`bar-fill transition-all duration-1000 ${isDanger ? 'danger' : isWarning ? 'warning' : ''} ${familySettings?.theme === 'doodle' ? 'h-full rounded-full border-r-2 border-[#4a4a4a]/20' : ''}`}
+                        className={`bar-fill absolute top-0 left-0 h-full transition-all duration-1000 ${isDanger ? 'danger' : isWarning ? 'warning' : ''} ${familySettings?.theme === 'doodle' ? 'border-r-2 border-[#4a4a4a]/20' : ''}`}
                         style={{
                             width: `${timePercent}%`,
                             background: familySettings?.theme === 'doodle' ? (isDanger ? '#ff8a80' : isWarning ? '#ffd180' : '#88d8b0') : undefined
                         }}
                     />
+
+                    {/* Center Text */}
+                    <div className={`relative z-10 flex items-center gap-2 font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                        <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? '' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
+                        <span className={familySettings?.theme === 'doodle' ? '' : 'drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]'}>
+                            <span className="text-xl">{kid.total_minutes}</span> <span className="text-sm opacity-70">/ {timeLimit}</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
