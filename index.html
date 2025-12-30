@@ -702,6 +702,7 @@
                 <li><a href="#about">為誰設計</a></li>
                 <li><a href="#features">核心邏輯</a></li>
                 <li><a href="#system">系統功能</a></li>
+                <li><a href="#demo">體驗 Demo</a></li>
                 <li><a href="#philosophy">教養理念</a></li>
                 <li><a href="https://points-bank.vercel.app" class="nav-cta">
                         進入系統
@@ -1014,6 +1015,90 @@
         </div>
     </section>
 
+    <!-- INTERACTIVE DEMO SECTION -->
+    <section class="section" id="demo"
+        style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 8rem 0; color: white; position: relative; overflow: hidden;">
+        <!-- Background decoration -->
+        <div
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background: radial-gradient(circle at 20% 50%, cyan 1px, transparent 1px), radial-gradient(circle at 80% 80%, magenta 1px, transparent 1px); background-size: 50px 50px;">
+        </div>
+
+        <div class="container" style="position: relative; z-index: 1;">
+            <div class="section-header" style="text-align: center; margin-bottom: 4rem;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 900; color: white;">
+                    🎮 <span
+                        style="background: linear-gradient(135deg, #00e5ff, #ff1493); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">互動體驗</span>
+                    Demo
+                </h2>
+                <p style="font-size: 1.1rem; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto;">
+                    無需註冊，立即體驗系統核心功能。試著幫虛擬孩子調整點數和時間！
+                </p>
+            </div>
+
+            <div
+                style="max-width: 900px; margin: 0 auto; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border: 2px solid rgba(0,229,255,0.2); border-radius: 30px; padding: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+
+                <!-- Demo Kids List -->
+                <div id="demoKids"></div>
+
+                <!-- Demo Controls -->
+                <div
+                    style="margin-top: 2rem; padding: 2rem; background: rgba(0,0,0,0.3); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h3
+                        style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; color: #00e5ff; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="sliders" size="24"></i>
+                        快速調整
+                    </h3>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label
+                                style="display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase;">點數調整</label>
+                            <input type="number" id="demoPoints" placeholder="+10 or -5"
+                                style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,229,255,0.3); padding: 0.8rem; border-radius: 10px; color: white; font-weight: 700; text-align: center;">
+                        </div>
+                        <div>
+                            <label
+                                style="display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase;">分鐘調整</label>
+                            <input type="number" id="demoMinutes" placeholder="+30 or -20"
+                                style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255, 20,147,0.3); padding: 0.8rem; border-radius: 10px; color: white; font-weight: 700; text-align: center;">
+                        </div>
+                        <div>
+                            <label
+                                style="display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase;">原因</label>
+                            <input type="text" id="demoReason" placeholder="例如：做家事獎勵"
+                                style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 10px; color: white; font-weight: 700;">
+                        </div>
+                    </div>
+                    <button onclick="applyDemoUpdate()"
+                        style="width: 100%; background: linear-gradient(135deg, #00e5ff, #ff1493); border: none; padding: 1rem; border-radius: 15px; color: white; font-weight: 900; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;">
+                        執行調整 🚀
+                    </button>
+                </div>
+
+                <!-- Demo Log -->
+                <div
+                    style="margin-top: 2rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 20px; max-height: 300px; overflow-y: auto;">
+                    <h4
+                        style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #ff1493; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="clock" size="20"></i>
+                        操作記錄
+                    </h4>
+                    <div id="demoLog"></div>
+                </div>
+
+                <div
+                    style="margin-top: 2rem; padding: 1.5rem; background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.2); border-radius: 15px; text-align: center;">
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">
+                        💡 <strong>提示</strong>：這只是 Demo 體驗，數據不會儲存。
+                        <a href="https://points-bank.vercel.app"
+                            style="color: #00e5ff; text-decoration: underline; margin-left: 0.5rem;">進入真實系統 →</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- PHILOSOPHY SECTION -->
     <section class="section philosophy" id="philosophy">
         <div class="container">
@@ -1230,6 +1315,130 @@
                     });
                 });
             }
+
+            // === DEMO FUNCTIONALITY ===
+            window.demoKids = [
+                { name: '小明', points: 50, minutes: 30 },
+                { name: '小華', points: 75, minutes: 45 }
+            ];
+            window.demoLogs = [];
+
+            function renderDemoKids() {
+                const container = document.getElementById('demoKids');
+                if (!container) return;
+
+                container.innerHTML = demoKids.map((kid, index) => `
+                    <div style="background: rgba(0,0,0,0.2); border: 2px solid rgba(0,229,255,0.3); border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; transition: all 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 1.5rem; font-weight: 900; color: #00e5ff; margin: 0;">${kid.name}</h3>
+                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.4); font-weight: 700;">DEMO ${index + 1}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="background: rgba(0,229,255,0.1); padding: 1rem; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700;">點數</div>
+                                <div id="demo-points-${index}" style="font-size: 2rem; font-weight: 900; color: #00e5ff;">${kid.points}</div>
+                            </div>
+                            <div style="background: rgba(255,20,147,0.1); padding: 1rem; border-radius: 15px; text-align: center;">
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 700;">剩餘分鐘</div>
+                                <div id="demo-minutes-${index}" style="font-size: 2rem; font-weight: 900; color: #ff1493;">${kid.minutes}</div>
+                            </div>
+                        </div>
+                        <button onclick="quickAdjust(${index}, 10, 0, '完成作業')" style="width: 100%; margin-top: 1rem; background: rgba(0,229,255,0.2); border: 1px solid rgba(0,229,255,0.4); padding: 0.8rem; border-radius:10px; color: #00e5ff; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                            +10 點數 (快速)
+                        </button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+
+            window.quickAdjust = function (kidIndex, points, minutes, reason) {
+                demoKids[kidIndex].points += points;
+                demoKids[kidIndex].minutes += minutes;
+                addDemoLog(demoKids[kidIndex].name, points, minutes, reason);
+                updateDemoDisplay();
+            };
+
+            function addDemoLog(name, points, minutes, reason) {
+                const logEntry = {
+                    name,
+                    points,
+                    minutes,
+                    reason,
+                    time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
+                };
+                demoLogs.unshift(logEntry);
+                if (demoLogs.length > 10) demoLogs.pop();
+                renderDemoLog();
+            }
+
+            function renderDemoLog() {
+                const logContainer = document.getElementById('demoLog');
+                if (!logContainer) return;
+
+                if (demoLogs.length === 0) {
+                    logContainer.innerHTML = '<p style="color: rgba(255,255,255,0.3); text-align: center; font-size: 0.9rem;">尚無操作記錄</p>';
+                    return;
+                }
+
+                logContainer.innerHTML = demoLogs.map(log => `
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem; border-left: 3px solid ${log.points > 0 ? '#00e5ff' : '#ff1493'};">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 700; color: #00e5ff; font-size: 0.9rem;">${log.name}</span>
+                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.4);">${log.time}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 0.5rem;">${log.reason}</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            ${log.points !== 0 ? `<span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 5px; background: ${log.points > 0 ? 'rgba(0,229,255,0.2)' : 'rgba(255,20,147,0.2)'}; color: ${log.points > 0 ? '#00e5ff' : '#ff1493'};">${log.points > 0 ? '+' : ''}${log.points} 點</span>` : ''}
+                            ${log.minutes !== 0 ? `<span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 5px; background: ${log.minutes > 0 ? 'rgba(0,229,255,0.2)' : 'rgba(255,20,147,0.2)'}; color: ${log.minutes > 0 ? '#00e5ff' : '#ff1493'};">${log.minutes > 0 ? '+' : ''}${log.minutes} 分鐘</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function updateDemoDisplay() {
+                demoKids.forEach((kid, index) => {
+                    const pointsEl = document.getElementById(`demo-points-${index}`);
+                    const minutesEl = document.getElementById(`demo-minutes-${index}`);
+                    if (pointsEl) pointsEl.textContent = kid.points;
+                    if (minutesEl) minutesEl.textContent = kid.minutes;
+                });
+            }
+
+            window.applyDemoUpdate = function () {
+                const points = parseInt(document.getElementById('demoPoints').value) || 0;
+                const minutes = parseInt(document.getElementById('demoMinutes').value) || 0;
+                const reason = document.getElementById('demoReason').value || '手動調整';
+
+                if (points === 0 && minutes === 0) {
+                    alert('請輸入點數或分鐘調整值！');
+                    return;
+                }
+
+                // Apply to all demo kids
+                demoKids.forEach((kid, index) => {
+                    kid.points += points;
+                    kid.minutes += minutes;
+                    addDemoLog(kid.name, points, minutes, reason);
+                });
+
+                updateDemoDisplay();
+
+                // Clear inputs
+                document.getElementById('demoPoints').value = '';
+                document.getElementById('demoMinutes').value = '';
+                document.getElementById('demoReason').value = '';
+
+                // Show confetti or animation
+                const btn = event.target;
+                btn.textContent = '✅ 已完成！';
+                setTimeout(() => {
+                    btn.textContent = '執行調整 🚀';
+                }, 1500);
+            };
+
+            // Initialize demo
+            renderDemoKids();
+            renderDemoLog();
         });
 
         // === NUMBER COUNTER ANIMATION ===
