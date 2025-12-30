@@ -558,10 +558,164 @@
                 transform: scale(1.05);
             }
         }
+
+        /* === NAVIGATION BAR === */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(253, 252, 249, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--ink);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-cta {
+            background: var(--accent);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-cta:hover {
+            background: white;
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 138, 128, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--ink);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translateY(8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translateY(-8px);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                flex-direction: column;
+                background: var(--bg);
+                width: 100%;
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 2px solid var(--ink);
+                transition: left 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-cta {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">
+                <i data-lucide="wallet" size="28"></i>
+                Points Bank
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about">為誰設計</a></li>
+                <li><a href="#features">核心邏輯</a></li>
+                <li><a href="#system">系統功能</a></li>
+                <li><a href="#philosophy">教養理念</a></li>
+                <li><a href="https://points-bank.vercel.app" class="nav-cta">
+                        進入系統
+                        <i data-lucide="arrow-right" size="16"></i>
+                    </a></li>
+            </ul>
+
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
     <!-- HERO SECTION -->
     <section class="hero">
         <svg class="deco" style="top: 8%; left: 3%; width: 100px;" viewBox="0 0 100 100">
@@ -648,7 +802,7 @@
     </section>
 
     <!-- TARGET AUDIENCE INTRO -->
-    <section class="section" style="background: var(--accent-soft); padding: 6rem 0;">
+    <section class="section" id="about" style="background: var(--accent-soft); padding: 6rem 0;">
         <div class="container">
             <div style="max-width: 900px; margin: 0 auto; text-align: center;">
                 <div style="margin-bottom: 2.5rem;">
@@ -688,7 +842,7 @@
     </section>
 
     <!-- FEATURES SECTION -->
-    <section class="section" style="background: white; border-top: 1px solid #f0f0f0;">
+    <section class="section" id="features" style="background: white; border-top: 1px solid #f0f0f0;">
         <div class="container">
             <div class="section-header">
                 <div class="section-badge">
@@ -739,7 +893,7 @@
     </section>
 
     <!-- SYSTEM FEATURES SECTION -->
-    <section class="section" style="background: white; padding: 8rem 0; border-top: 1px solid #f0f0f0;">
+    <section class="section" id="system" style="background: white; padding: 8rem 0; border-top: 1px solid #f0f0f0;">
         <div class="container">
             <div class="section-header">
                 <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 900;">
@@ -861,7 +1015,7 @@
     </section>
 
     <!-- PHILOSOPHY SECTION -->
-    <section class="section philosophy">
+    <section class="section philosophy" id="philosophy">
         <div class="container">
             <div class="philosophy-grid">
                 <div>
@@ -1057,6 +1211,25 @@
                     console.log('FAQ clicked, now active:', this.classList.contains('active'));
                 });
             });
+
+            // === HAMBURGER MENU TOGGLE ===
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    navLinks.classList.toggle('active');
+                });
+
+                // Close menu when clicking on a link
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        navLinks.classList.remove('active');
+                    });
+                });
+            }
         });
 
         // === NUMBER COUNTER ANIMATION ===
