@@ -720,7 +720,7 @@ export default function Dashboard() {
                     {userRole === 'parent' && (
                         <button onClick={() => setShowSettingsModal(true)} className={`flex items-center gap-2 p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'} rounded-2xl border group transition-all text-xs ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
                             <Settings className="w-5 h-5 group-hover:rotate-90 transition-all duration-500" />
-                            <span className="hidden md:inline font-bold">{t.system_member_mgmt}</span>
+                            <span className="hidden md:inline font-bold">{t.settings}</span>
                         </button>
                     )}
                     <button onClick={handleLogout} className={`p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-red-500/20'} rounded-2xl border group transition-all`} title={t.logout}><LogOut className={`w-5 h-5 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} group-hover:text-red-400`} /></button>
@@ -882,7 +882,7 @@ export default function Dashboard() {
                     <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme === 'doodle' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30'} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
                         {/* Sticky Header */}
                         <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'doodle' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md z-10`}>
-                            <h3 className={`text-2xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.system_rules_title}</h3>
+                            <h3 className={`text-2xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.settings}</h3>
                             <button onClick={() => setShowSettingsModal(false)} className={`${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
                         </div>
 
@@ -956,18 +956,32 @@ export default function Dashboard() {
                                             <span className={`pr-3 text-xs font-black ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
                                         </div>
                                     </div>
-                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
-                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.pts_to_time_rate}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                            <span className={`pl-3 text-sm font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1:</span>
-                                            <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
+                                    <div className="space-y-1 text-center col-span-2 md:col-span-1">
+                                        <div className={`flex items-end gap-2 px-1 ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
+                                            <div className="w-[30px] text-center pb-1">{t.pts_to_time_rate?.split(':')[0]?.trim() || 'Points'}</div>
+                                            <div className="w-[10px] text-center pb-1">:</div>
+                                            <div className="flex-1 text-center pb-1">{t.pts_to_time_rate?.split(':')[1]?.trim() || 'Minutes'}</div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
+                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
+                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                                <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
-                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.pts_to_cash_rate}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                            <span className={`pl-3 text-sm font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1:</span>
-                                            <input type="number" step="0.1" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
+                                    <div className="space-y-1 text-center col-span-2 md:col-span-1">
+                                        <div className={`flex items-end gap-2 px-1 ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
+                                            <div className="w-[30px] text-center pb-1">{t.pts_to_cash_rate?.split(':')[0]?.trim() || 'Points'}</div>
+                                            <div className="w-[10px] text-center pb-1">:</div>
+                                            <div className="flex-1 text-center pb-1">{t.pts_to_cash_rate?.split(':')[1]?.trim() || 'Cash'}</div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
+                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
+                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                                <input type="number" step="0.1" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
