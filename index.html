@@ -365,7 +365,7 @@
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
-            padding: 5rem 4rem;
+            padding: clamp(2.5rem, 8vw, 5rem) clamp(1.5rem, 5vw, 4rem);
             background: white;
             border: 2.5px solid var(--ink);
             border-radius: 40px;
@@ -435,7 +435,7 @@
             }
 
             .container {
-                padding: 0 2rem;
+                padding: 0 clamp(1.2rem, 4vw, 2rem);
             }
         }
 
@@ -1419,7 +1419,7 @@
     <section class="section" id="disclaimer" style="background: var(--bg); padding: 4rem 0;">
         <div class="container">
             <div class="disclaimer-box"
-                style="max-width: 800px; margin: 0 auto; background: #fffdf9; border: 2px dashed var(--accent); border-radius: 30px; padding: 3rem; position: relative;">
+                style="max-width: 800px; margin: 0 auto; background: #fffdf9; border: 2px dashed var(--accent); border-radius: 30px; padding: clamp(1.5rem, 5vw, 3rem); position: relative;">
                 <div
                     style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 0.5rem 2rem; border-radius: 50px; font-weight: 900; letter-spacing: 1px; font-size: 0.9rem;">
                     溫馨提醒：這是一場全家人的實驗
