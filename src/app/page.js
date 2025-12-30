@@ -173,7 +173,7 @@ export default function Home() {
         {activeTab === 'parent' ? (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className={`p-6 border rounded-2xl ${theme === 'cyber' ? 'bg-white/[0.02] border-white/5' : 'bg-[#fcfbf9] border-[#4a4a4a] border-dashed border-2'}`}>
-              <p className={`text-base mb-6 leading-relaxed font-medium ${theme === 'cyber' ? 'text-slate-400' : 'text-[#555]'}`}>
+              <p className={`text-lg mb-6 leading-relaxed font-medium ${theme === 'cyber' ? 'text-slate-400' : 'text-[#555]'}`}>
                 {theme === 'cyber' ? t.login_desc : t.doodle_desc}
               </p>
               <button onClick={handleParentLogin} className="btn btn-primary w-full group py-4 font-black shadow-xl">
@@ -187,11 +187,11 @@ export default function Home() {
             {kidStep === 'family' ? (
               <div className="space-y-6">
                 <div className="text-left space-y-1">
-                  <label className={`text-sm font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>{t.step1_title}</label>
+                  <label className={`text-base font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>{t.step1_title}</label>
                   <input
                     type="text"
                     placeholder={t.step1_placeholder}
-                    className={`w-full rounded-2xl p-5 focus:ring-2 outline-none text-center font-bold tracking-[0.2em] text-xl transition-all ${theme === 'cyber'
+                    className={`w-full rounded-2xl p-5 focus:ring-2 outline-none text-center font-bold tracking-[0.2em] text-2xl transition-all ${theme === 'cyber'
                       ? 'bg-black/40 border border-white/10 text-white focus:ring-cyan-500 placeholder:text-slate-700'
                       : 'bg-[#fff] border-2 border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80] placeholder:text-[#ccc] shadow-[4px_4px_0px_#d8c4b6]'
                       } placeholder:text-xs uppercase`}
@@ -207,8 +207,8 @@ export default function Home() {
             ) : kidStep === 'member' ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-base font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
-                  <span className={`text-sm font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step2_title}</span>
+                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-lg font-bold transition-colors`}><ArrowLeft className="w-5 h-5" /> {t.back}</button>
+                  <span className={`text-base font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step2_title}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {familyMembers.map(m => (
@@ -234,8 +234,8 @@ export default function Home() {
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={() => setKidStep('member')} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-base font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
-                  <span className={`text-sm font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step3_title}</span>
+                  <button onClick={() => setKidStep('member')} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-lg font-bold transition-colors`}><ArrowLeft className="w-5 h-5" /> {t.back}</button>
+                  <span className={`text-base font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step3_title}</span>
                 </div>
                 <div className="text-center space-y-4">
                   <div className="text-4xl mb-2">{selectedKid?.avatar || '👶'}</div>
@@ -247,7 +247,7 @@ export default function Home() {
                     pattern="[0-9]*"
                     maxLength={4}
                     placeholder="****"
-                    className={`w-32 rounded-2xl p-4 focus:ring-2 outline-none text-center font-bold tracking-[0.5em] text-2xl transition-all ${theme === 'cyber'
+                    className={`w-40 rounded-2xl p-4 focus:ring-2 outline-none text-center font-bold tracking-[0.5em] text-3xl transition-all ${theme === 'cyber'
                       ? 'bg-black/40 border border-white/10 text-white focus:ring-cyan-500 placeholder:text-slate-700'
                       : 'bg-[#fff] border-2 border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80] placeholder:text-[#ccc] shadow-[4px_4px_0px_#d8c4b6]'
                       }`}
