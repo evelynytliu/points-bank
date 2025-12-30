@@ -135,6 +135,8 @@ const rawTranslations = {
     onboarding_create_btn: ['建立家庭 🚀', 'Create Family 🚀'],
     onboarding_join_title: ['加入現有家庭', 'Join Existing Family'],
     onboarding_join_desc: ['我已經有家庭代碼，我要加入另一半建立的家庭。', 'I have a family code, I want to join an existing family.'],
+    onboarding_join_placeholder: ['輸入家庭代碼', 'Enter Family Code'],
+    onboarding_join_btn: ['加入家庭 🚀', 'Join Family 🚀'],
 
     // Logs Page
     full_logs_title: ['完整異動紀錄', 'Full Transaction Logs'],
