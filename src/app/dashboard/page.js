@@ -731,15 +731,15 @@ export default function Dashboard() {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div className="space-y-1">
-                                    <label className={`text-[10px] font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
+                                    <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
                                     <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-4 rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className={`text-[10px] font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
+                                    <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
                                     <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-4 rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className={`text-[10px] font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
+                                    <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
                                     <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-4 rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
                                 </div>
                             </div>
@@ -753,7 +753,7 @@ export default function Dashboard() {
                             <div className={`flex items-center p-1 rounded-2xl border font-bold ${family?.theme === 'doodle' ? 'bg-[#eee] border-[#4a4a4a]' : 'bg-white/5 border-white/10'}`}>
                                 <button
                                     onClick={() => setAllocPlan('weekday')}
-                                    className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'weekday'
+                                    className={`px-4 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'weekday'
                                         ? (family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white shadow-lg' : 'bg-cyan-500 text-black shadow-lg')
                                         : (family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-400 hover:text-white')
                                         }`}
@@ -762,7 +762,7 @@ export default function Dashboard() {
                                 </button>
                                 <button
                                     onClick={() => setAllocPlan('holiday')}
-                                    className={`px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'holiday'
+                                    className={`px-4 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'holiday'
                                         ? (family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white shadow-lg' : 'bg-purple-500 text-white shadow-lg')
                                         : (family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-400 hover:text-white')
                                         }`}
@@ -908,7 +908,7 @@ export default function Dashboard() {
                             {/* 1. 點數與時間規則 (最常用) */}
                             <section>
                                 <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <div className="space-y-2 text-center col-span-2 md:col-span-1">
                                         <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
                                         <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
@@ -973,7 +973,7 @@ export default function Dashboard() {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex flex-col items-center gap-1 mr-2">
-                                                        <label className={`text-[9px] font-black uppercase tracking-tighter ${family?.theme === 'doodle' ? 'text-slate-400' : 'text-slate-500'}`}>{t.kid_login_pin}</label>
+                                                        <label className={`text-xs font-black uppercase tracking-tighter ${family?.theme === 'doodle' ? 'text-slate-400' : 'text-slate-500'}`}>{t.kid_login_pin}</label>
                                                         {editingKidId === kid.id ? (
                                                             <input
                                                                 type="text"
@@ -1288,13 +1288,13 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
 
                     {/* Left Side: Points */}
                     <div className="flex flex-col items-center justify-center border-r border-[#4a4a4a]/10 pr-4 min-w-[70px]">
-                        <div className={`text-[10px] ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-0.5 relative z-10 tracking-widest`}>{t.points_label}</div>
+                        <div className={`text-xs ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-0.5 relative z-10 tracking-widest`}>{t.points_label}</div>
                         <div className={`text-5xl font-black italic relative z-10 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : ''}`}>{kid.total_points}</div>
                     </div>
 
                     {/* Right Side: Rewards Info */}
                     <div className="flex flex-col gap-1.5 flex-1 relative z-10">
-                        <div className={`text-[8px] font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.redeemable_rewards}</div>
+                        <div className={`text-[10px] font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.redeemable_rewards}</div>
                         <div className="space-y-1">
                             <div className="flex items-center gap-2">
                                 <Clock className={`w-3 h-3 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
@@ -1439,7 +1439,7 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
 
                 {config.type === 'prompt' && config.mode && (
                     <div className={`mb-6 p-3 rounded-xl border text-center animate-in zoom-in duration-300 ${isDoodle ? 'bg-[#fdfbf7] border-[#eee] shadow-inner' : 'bg-white/5 border-white/5 shadow-2xl'}`}>
-                        <div className={`text-[9px] font-black uppercase tracking-widest mb-1 ${isDoodle ? 'text-[#888]' : 'text-slate-500'}`}>{t.preview_convert || '即時換算預覽'}</div>
+                        <div className={`text-xs font-black uppercase tracking-widest mb-1 ${isDoodle ? 'text-[#888]' : 'text-slate-500'}`}>{t.preview_convert || '即時換算預覽'}</div>
                         <div className={`text-sm font-black italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>
                             {(() => {
                                 const val = parseInt(inputValue) || 0;

@@ -152,28 +152,28 @@ export default function Home() {
         <div className={`flex p-1 rounded-xl mb-8 border ${theme === 'cyber' ? 'bg-black/40 border-white/5' : 'bg-[#eee] border-[#4a4a4a] border-2 shadow-[2px_2px_0px_#d8c4b6]'}`}>
           <button
             onClick={() => setActiveTab('parent')}
-            className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'parent'
+            className={`flex-1 py-3.5 rounded-xl text-base font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'parent'
               ? (theme === 'cyber' ? 'bg-white/10 text-white shadow-lg' : 'bg-[#4a4a4a] text-white')
               : (theme === 'cyber' ? 'text-slate-500' : 'text-[#666]')
               }`}
           >
-            <Shield className="w-4 h-4" /> {t.parent}
+            <Shield className="w-5 h-5" /> {t.parent}
           </button>
           <button
             onClick={() => { setActiveTab('kid'); resetKidFlow(); }}
-            className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'kid'
+            className={`flex-1 py-3.5 rounded-xl text-base font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'kid'
               ? (theme === 'cyber' ? 'bg-white/10 text-white shadow-lg' : 'bg-[#4a4a4a] text-white')
               : (theme === 'cyber' ? 'text-slate-500' : 'text-[#666]')
               }`}
           >
-            <UserCheck className="w-4 h-4" /> {t.kid}
+            <UserCheck className="w-5 h-5" /> {t.kid}
           </button>
         </div>
 
         {activeTab === 'parent' ? (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className={`p-6 border rounded-2xl ${theme === 'cyber' ? 'bg-white/[0.02] border-white/5' : 'bg-[#fcfbf9] border-[#4a4a4a] border-dashed border-2'}`}>
-              <p className={`text-sm mb-6 leading-relaxed font-medium ${theme === 'cyber' ? 'text-slate-400' : 'text-[#555]'}`}>
+              <p className={`text-base mb-6 leading-relaxed font-medium ${theme === 'cyber' ? 'text-slate-400' : 'text-[#555]'}`}>
                 {theme === 'cyber' ? t.login_desc : t.doodle_desc}
               </p>
               <button onClick={handleParentLogin} className="btn btn-primary w-full group py-4 font-black shadow-xl">
@@ -187,7 +187,7 @@ export default function Home() {
             {kidStep === 'family' ? (
               <div className="space-y-6">
                 <div className="text-left space-y-1">
-                  <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>{t.step1_title}</label>
+                  <label className={`text-xs font-black uppercase tracking-widest ml-1 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>{t.step1_title}</label>
                   <input
                     type="text"
                     placeholder={t.step1_placeholder}
@@ -207,8 +207,8 @@ export default function Home() {
             ) : kidStep === 'member' ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-xs font-bold transition-colors`}><ArrowLeft className="w-3 h-3" /> {t.back}</button>
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step2_title}</span>
+                  <button onClick={resetKidFlow} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-sm font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
+                  <span className={`text-xs font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step2_title}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {familyMembers.map(m => (
@@ -234,8 +234,8 @@ export default function Home() {
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-2">
-                  <button onClick={() => setKidStep('member')} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-xs font-bold transition-colors`}><ArrowLeft className="w-3 h-3" /> {t.back}</button>
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step3_title}</span>
+                  <button onClick={() => setKidStep('member')} className={`${theme === 'cyber' ? 'text-slate-500 hover:text-white' : 'text-[#555] hover:text-[#2d2d2d]'} flex items-center gap-1 text-sm font-bold transition-colors`}><ArrowLeft className="w-4 h-4" /> {t.back}</button>
+                  <span className={`text-xs font-black uppercase tracking-widest ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.step3_title}</span>
                 </div>
                 <div className="text-center space-y-4">
                   <div className="text-4xl mb-2">{selectedKid?.avatar || '👶'}</div>
@@ -265,8 +265,8 @@ export default function Home() {
         )}
 
         <div className="flex flex-col items-center gap-4 mt-12">
-          <div className={`flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.3em] font-black opacity-40 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>
-            <ShieldCheck className="w-3.5 h-3.5" />
+          <div className={`flex items-center justify-center gap-2 text-xs uppercase tracking-[0.3em] font-black opacity-40 ${theme === 'cyber' ? 'text-slate-500' : 'text-[#555]'}`}>
+            <ShieldCheck className="w-4 h-4" />
             <span>{t.encrypted_storage}</span>
           </div>
 
@@ -280,7 +280,7 @@ export default function Home() {
             </button>
             <button
               onClick={toggleLanguage}
-              className={`p-3 rounded-full transition-all hover:scale-110 border items-center justify-center flex font-black text-xs ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#ff8a80] shadow-[4px_4px_0px_#d8c4b6]'}`}
+              className={`p-3.5 rounded-full transition-all hover:scale-110 border items-center justify-center flex font-black text-sm ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#ff8a80] shadow-[4px_4px_0px_#d8c4b6]'}`}
               title="切換語言 / Switch Language"
             >
               {language === 'zh' ? 'EN' : '中'}
