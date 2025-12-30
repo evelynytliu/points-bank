@@ -16,8 +16,8 @@ export default function Home() {
   const [selectedKid, setSelectedKid] = useState(null);
   const [kidPin, setKidPin] = useState('');
 
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [parentInviteCode, setParentInviteCode] = useState('');
+
+  // Theme & Language
 
   // Theme & Language
   const [theme, setTheme] = useState('doodle');
@@ -65,20 +65,7 @@ export default function Home() {
     });
   };
 
-  const handleJoinFamily = async () => {
-    if (!parentInviteCode.trim()) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      alert(t.alert_google_first);
-      return;
-    }
-    const { error } = await supabase.rpc('join_family', { target_family_id: parentInviteCode });
-    if (error) alert(t.alert_join_fail + error.message);
-    else {
-      alert(t.alert_join_success);
-      router.push('/dashboard');
-    }
-  };
+
 
   // Simplify to one-string family identification
   const findFamily = async () => {
@@ -194,9 +181,6 @@ export default function Home() {
                 {t.login_google}
               </button>
             </div>
-            <button onClick={() => setShowJoinModal(true)} className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-110 ${theme === 'cyber' ? 'text-cyan-400/60 hover:text-cyan-400' : 'text-[#ff8a80]'}`}>
-              {t.have_invite_code}
-            </button>
           </div>
         ) : (
           <div className="space-y-6 min-h-[300px] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -306,29 +290,7 @@ export default function Home() {
       </div>
 
       {/* Join Family Modal */}
-      {showJoinModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
-          <div className={`glass-panel p-10 max-w-sm w-full border ${theme === 'cyber' ? 'border-cyan-500/30' : 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]'}`}>
-            <h3 className={`text-xl font-black mb-6 italic tracking-tight uppercase ${theme === 'cyber' ? 'text-white' : 'text-[#4a4a4a]'}`}>{t.join_family_modal_title}</h3>
-            <div className="space-y-6">
-              <input
-                type="text"
-                placeholder={t.join_family_placeholder}
-                className={`w-full rounded-xl p-4 focus:ring-2 outline-none font-mono text-xs text-center ${theme === 'cyber'
-                  ? 'bg-black/40 border border-white/10 text-white focus:ring-cyan-500'
-                  : 'bg-[#fff] border-2 border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]'
-                  }`}
-                value={parentInviteCode}
-                onChange={e => setParentInviteCode(e.target.value)}
-              />
-              <div className="flex gap-4">
-                <button onClick={() => setShowJoinModal(false)} className="btn btn-ghost flex-1 text-xs">{t.cancel}</button>
-                <button onClick={handleJoinFamily} className="btn btn-primary flex-1 text-xs font-black">{t.join_family}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </main>
   );
 }

@@ -59,6 +59,14 @@ export default function Dashboard() {
     const [minChange, setMinChange] = useState('');
     const [customReason, setCustomReason] = useState('');
 
+    // Onboarding
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [joinCode, setJoinCode] = useState('');
+    const [newFamilyName, setNewFamilyName] = useState('我的家'); // Default name
+    const [familyHistory, setFamilyHistory] = useState([]); // List of visited families
+    const [joinNewFamilyCode, setJoinNewFamilyCode] = useState('');
+    const [showJoinInput, setShowJoinInput] = useState(false);
+
     // 系統設定狀態
     const [tempSettings, setTempSettings] = useState({
         weekday_limit: 50,
@@ -153,16 +161,9 @@ export default function Dashboard() {
                 }
 
                 if (!profileData?.family_id) {
-                    const { data: familyData } = await supabase.from('families').insert({
-                        family_name: `${authUser.email.split('@')[0]} 的家`,
-                        admin_id: authUser.id,
-                        theme: 'cyber'
-                    }).select().single();
-
-                    if (familyData) {
-                        await supabase.from('profiles').update({ family_id: familyData.id }).eq('id', authUser.id);
-                        profileData = { ...profileData, family_id: familyData.id };
-                    }
+                    setShowOnboarding(true);
+                    setLoading(false);
+                    return;
                 }
                 currentProfile = profileData;
                 currentFamilyId = profileData?.family_id;
@@ -195,6 +196,20 @@ export default function Dashboard() {
 
             if (familyData) {
                 setFamily(familyData);
+
+                // Update Family History
+                if (authUser) {
+                    const savedHistory = JSON.parse(localStorage.getItem(`family_history_${authUser.id}`) || '[]');
+                    const filtered = savedHistory.filter(f => f.id !== familyData.id);
+                    const newHistory = [{
+                        id: familyData.id,
+                        name: familyData.family_name,
+                        short_id: familyData.short_id || ''
+                    }, ...filtered].slice(0, 5);
+                    localStorage.setItem(`family_history_${authUser.id}`, JSON.stringify(newHistory));
+                    setFamilyHistory(newHistory);
+                }
+
                 setTempSettings({
                     weekday_limit: familyData.weekday_limit || 50,
                     holiday_limit: familyData.holiday_limit || 90,
@@ -581,6 +596,39 @@ export default function Dashboard() {
         });
     };
 
+    const handleCreateFamily = async () => {
+        if (!newFamilyName.trim()) return alert('請輸入家庭名稱');
+
+        const { data: familyData, error } = await supabase.from('families').insert({
+            family_name: newFamilyName,
+            admin_id: user.id,
+            theme: 'cyber'
+        }).select().single();
+
+        if (error) {
+            alert('建立失敗: ' + error.message);
+        } else if (familyData) {
+            await supabase.from('profiles').update({ family_id: familyData.id }).eq('id', user.id);
+            setShowOnboarding(false);
+            fetchData();
+        }
+    };
+
+    const handleJoinFamily = async (codeOverride) => {
+        const codeToUse = typeof codeOverride === 'string' ? codeOverride : joinCode.trim();
+        if (!codeToUse) return alert('請輸入家庭代碼');
+        const { error } = await supabase.rpc('join_family', { target_family_id: codeToUse });
+
+        if (error) {
+            alert(t.alert_join_fail + error.message);
+        } else {
+            if (typeof codeOverride !== 'string') alert(t.alert_join_success);
+            setShowOnboarding(false);
+            setShowSettingsModal(false);
+            fetchData();
+        }
+    };
+
     const exportLogsToCSV = async () => {
         try {
             const { data: allLogs, error } = await supabase
@@ -807,6 +855,56 @@ export default function Dashboard() {
 
                         {/* Scrollable Content */}
                         <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-10 scroll-smooth">
+                            {/* 0. Family Switcher (New) */}
+                            {familyHistory.length > 0 && (
+                                <section>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.switch_family || '切換家庭'}</h4>
+                                        <button onClick={() => setShowJoinInput(!showJoinInput)} className={`p-1.5 rounded-lg transition-all ${family?.theme === 'doodle' ? 'text-[#888] hover:bg-black/5 hover:text-[#4a4a4a]' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}>
+                                            <Plus className={`w-4 h-4 transition-transform duration-300 ${showJoinInput ? 'rotate-45' : ''}`} />
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {familyHistory.map(hist => (
+                                            <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme === 'doodle' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500') : (family?.theme === 'doodle' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
+                                                <div>
+                                                    <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{hist.name}</div>
+                                                    <div className="text-[10px] opacity-60 font-mono">ID: {hist.short_id}</div>
+                                                </div>
+                                                {hist.id === family?.id ? (
+                                                    <span className={`text-xs font-black px-3 py-1 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'}`}>{t.current_family || '目前'}</span>
+                                                ) : (
+                                                    <button onClick={() => handleJoinFamily(hist.short_id)} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                                                        {t.switch_button || '切換'}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {showJoinInput && (
+                                            <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme === 'doodle' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'}`}>
+                                                <div className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.join_new_family_label || '加入新家庭'}</div>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder={t.join_new_family_placeholder || '輸入家庭代碼'}
+                                                        className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
+                                                        value={joinNewFamilyCode}
+                                                        onChange={e => setJoinNewFamilyCode(e.target.value)}
+                                                    />
+                                                    <button
+                                                        onClick={() => handleJoinFamily(joinNewFamilyCode)}
+                                                        disabled={!joinNewFamilyCode.trim()}
+                                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
+                                                    >
+                                                        {t.join_btn_short || '加入'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            )}
+
                             {/* 1. 點數與時間規則 (最常用) */}
                             <section>
                                 <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
@@ -1075,6 +1173,46 @@ export default function Dashboard() {
                         <div className="flex gap-4">
                             <button onClick={() => setShowAddModal(false)} className={`flex-1 py-4 px-6 rounded-xl font-bold transition-all ${family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-500 hover:text-white'}`}>{t.cancel}</button>
                             <button onClick={addKid} className="btn btn-primary flex-1 font-black shadow-xl">{t.join_member} 🚀</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showOnboarding && (
+                <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-[120] p-6 animate-in fade-in duration-500">
+                    <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Option 1: Create New */}
+                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500'}`}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme === 'doodle' ? 'bg-[#fff5e6]' : 'bg-cyan-500/20 text-cyan-400'}`}>🏠</div>
+                            <div>
+                                <h3 className={`text-2xl font-black mb-2 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_create_title}</h3>
+                                <p className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_create_desc}</p>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder={t.onboarding_family_name_placeholder}
+                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-cyan-500'}`}
+                                value={newFamilyName}
+                                onChange={e => setNewFamilyName(e.target.value)}
+                            />
+                            <button onClick={handleCreateFamily} className="btn btn-primary w-full py-4 text-sm font-black uppercase tracking-widest mt-auto">{t.onboarding_create_btn}</button>
+                        </div>
+
+                        {/* Option 2: Join Existing */}
+                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500'}`}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme === 'doodle' ? 'bg-[#f3e5f5]' : 'bg-purple-500/20 text-purple-400'}`}>🔗</div>
+                            <div>
+                                <h3 className={`text-2xl font-black mb-2 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_join_title}</h3>
+                                <p className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_join_desc}</p>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder={t.onboarding_join_placeholder}
+                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
+                                value={joinCode}
+                                onChange={e => setJoinCode(e.target.value)}
+                            />
+                            <button onClick={() => handleJoinFamily()} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
                         </div>
                     </div>
                 </div>
