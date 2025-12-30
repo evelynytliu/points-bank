@@ -1328,12 +1328,17 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         }}
                     />
 
-                    {/* Center Text */}
+                    {/* Center Text: Current Value */}
                     <div className={`relative z-10 flex items-center gap-2 font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                         <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? '' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
                         <span className={familySettings?.theme === 'doodle' ? '' : 'drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]'}>
-                            <span className="text-xl">{kid.total_minutes}</span> <span className="text-sm opacity-70">/ {timeLimit}</span>
+                            <span className="text-xl">{kid.total_minutes}</span> <span className="text-sm">{t.minutes_unit}</span>
                         </span>
+                    </div>
+
+                    {/* Right Text: Max Limit */}
+                    <div className={`absolute right-4 z-10 flex items-center h-full font-black opacity-50 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                        / {timeLimit}
                     </div>
                 </div>
             </div>
