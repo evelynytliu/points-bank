@@ -429,6 +429,10 @@ export default function Dashboard() {
                 .order('sort_order', { ascending: true })
                 .order('created_at', { ascending: true });
 
+            if (userRole === 'kid' || !authUser) {
+                alert(`DEBUG: Kid Mode Stats\nFamily ID: ${currentFamilyId}\nKids Found: ${kidsData?.length || 0}\nError: ${kidsError?.message || 'None'}`);
+            }
+
             if (kidsError) {
                 console.error('獲取小孩失敗，詳細資訊:', {
                     code: kidsError.code,
