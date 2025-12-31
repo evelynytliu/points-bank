@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target, Gift, Image as ImageIcon, Sparkles, Trophy, Edit2, Upload, Loader2 } from 'lucide-react';
+import { X, Target, Gift, Image as ImageIcon, Sparkles, Trophy, Edit2, Upload, Loader2, Camera } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { supabase } from '@/lib/supabase';
 
 export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDelete, t, theme }) {
     const [isEditing, setIsEditing] = useState(!goal);
@@ -10,6 +11,79 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
     const [targetPoints, setTargetPoints] = useState(goal?.target_points || 100);
     const [imageUrl, setImageUrl] = useState(goal?.image_url || '');
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef(null);
+
+    // Image compression utility
+    const compressImage = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Resize to max 800px width
+                    const scaleSize = MAX_WIDTH / img.width;
+                    const width = scaleSize < 1 ? MAX_WIDTH : img.width;
+                    const height = scaleSize < 1 ? img.height * scaleSize : img.height;
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            resolve(blob);
+                        } else {
+                            reject(new Error('Canvas to Blob failed'));
+                        }
+                    }, 'image/webp', 0.8); // Compress to 80% quality WebP
+                };
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            if (!supabase) throw new Error("Supabase not initialized");
+
+            const compressedBlob = await compressImage(file);
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
+
+            const { data, error } = await supabase.storage
+                .from('wish_goals')
+                .upload(fileName, compressedBlob, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) throw error;
+
+            const { data: publicUrlData } = supabase.storage
+                .from('wish_goals')
+                .getPublicUrl(fileName);
+
+            setImageUrl(publicUrlData.publicUrl);
+        } catch (error) {
+            console.error('Upload failed:', error);
+            alert('Upload failed: ' + error.message);
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
 
     // Reset state when goal changes or modal opens
     useEffect(() => {
@@ -217,18 +291,43 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className={`text-xs font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>圖片網址 (可選)</label>
-                                <div className="flex gap-2">
-                                    <div className="relative flex-1">
+                            <div className="space-y-4">
+                                    <label className={`block text-sm font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
+                                        願望圖片 (可選)
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${theme === 'doodle' ? 'text-[#4a4a4a]/40' : 'text-slate-500'}`}>
+                                                <ImageIcon className="w-5 h-5" />
+                                            </div>
+                                            <input
+                                                type="url"
+                                                value={imageUrl}
+                                                onChange={(e) => setImageUrl(e.target.value)}
+                                                className={`w-full pl-10 pr-4 py-3 rounded-xl outline-none transition-all ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
+                                                placeholder="貼上圖片網址"
+                                            />
+                                        </div>
+                                        
+                                        {/* Hidden File Input */}
                                         <input
-                                            type="text"
-                                            value={imageUrl}
-                                            onChange={e => setImageUrl(e.target.value)}
-                                            placeholder="https://..."
-                                            className={`w-full p-4 pl-12 rounded-xl font-bold text-sm outline-none transition-all ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            accept="image/*"
+                                            className="hidden"
                                         />
-                                        <ImageIcon className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${theme === 'doodle' ? 'text-[#bbb]' : 'text-slate-500'}`} />
+                                        
+                                        {/* Upload Button */}
+                                        <button
+                                            type="button"
+                                            onClick={handleUploadClick}
+                                            disabled={isUploading}
+                                            className={`px-4 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
+                                            title="從裝置上傳"
+                                        >
+                                            {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                                        </button>
                                     </div>
                                 </div>
                                 {imageUrl && (
@@ -269,9 +368,9 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                             </div>
                         </div>
                     )}
-                </div>
-            </motion.div>
         </div>
+            </motion.div >
+        </div >
     );
 }
 
