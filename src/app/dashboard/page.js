@@ -1891,6 +1891,17 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-2'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-2 p-3'}`}>
 
+                    {/* Floating Goal Icon on Line */}
+                    {(goal && !isUpdatingGoal) && (
+                        <div
+                            onClick={(e) => { e.stopPropagation(); setShowGoalModal(true); }}
+                            className={`absolute -top-4 right-4 z-20 px-1.5 py-0.5 rounded-full border cursor-pointer transition-transform hover:scale-110 hover:-rotate-12 ${familySettings?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)]' : 'bg-[#0f172a] border-cyan-500 text-lg shadow-[0_0_8px_rgba(6,182,212,0.5)]'}`}
+                            title={goal.title}
+                        >
+                            🎯
+                        </div>
+                    )}
+
                     {/* Left Side: Points */}
                     <div className="flex flex-col items-start justify-center min-w-[100px]">
                         <div className={`text-sm ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-1 tracking-widest flex items-center gap-1`}>
@@ -1915,9 +1926,8 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                                 <div className={`h-4 w-12 rounded-full ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10' : 'bg-white/10'}`}></div>
                             </div>
                         ) : goal ? (
-                            <div className={`text-xs font-black uppercase tracking-widest opacity-90 flex items-center justify-end gap-1.5 mb-1 max-w-[160px] ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-300'}`}>
-                                <span className="truncate border-b-2 border-transparent group-hover/goal:border-current transition-all" title={goal.title}>{goal.title}</span>
-                                <span className="text-sm animate-[pulse_1.5s_ease-in-out_infinite] scale-110">🎯</span>
+                            <div className={`text-xs font-black uppercase tracking-widest opacity-90 mb-1 max-w-[160px] ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-300'}`}>
+                                <span className="truncate block border-b-2 border-transparent group-hover/goal:border-current transition-all text-right" title={goal.title}>{goal.title}</span>
                             </div>
                         ) : (
                             <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2 mb-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
