@@ -140,6 +140,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [kids, setKids] = useState([]);
     const [goals, setGoals] = useState({}); // Map of kid_id -> goal object
+    const [updatingKidGoalId, setUpdatingKidGoalId] = useState(null);
     const [logs, setLogs] = useState([]);
     const [familyMembers, setFamilyMembers] = useState([]);
     const [userRole, setUserRole] = useState('parent'); // 'parent' or 'kid'
@@ -895,6 +896,7 @@ export default function Dashboard() {
 
     const handleUpdateGoal = async (kidId, goalData) => {
         if (!kidId) return;
+        setUpdatingKidGoalId(kidId);
 
         // Check if goal exists
         const existing = goals[kidId];
@@ -916,12 +918,14 @@ export default function Dashboard() {
         if (error) {
             alert('更新願望失敗: ' + error.message);
         } else {
-            fetchData();
+            await fetchData();
         }
+        setUpdatingKidGoalId(null);
     };
 
     const handleDeleteGoal = async (kidId) => {
         if (!confirm('確定要刪除這個願望目標嗎？')) return;
+        setUpdatingKidGoalId(kidId);
 
         const { error } = await supabase
             .from('wish_goals')
@@ -931,8 +935,9 @@ export default function Dashboard() {
         if (error) {
             alert('刪除失敗: ' + error.message);
         } else {
-            fetchData();
+            await fetchData();
         }
+        setUpdatingKidGoalId(null);
     };
 
     const exportLogsToCSV = async () => {
@@ -1108,6 +1113,7 @@ export default function Dashboard() {
                                 key={kid.id}
                                 kid={kid}
                                 goal={goals[kid.id]}
+                                isUpdatingGoal={updatingKidGoalId === kid.id}
                                 onUpdateGoal={handleUpdateGoal}
                                 onDeleteGoal={handleDeleteGoal}
                                 onUpdate={updateKidAction}
@@ -1794,7 +1800,7 @@ function AnimatedCounter({ value }) {
     return <>{display}</>;
 }
 
-function KidCard({ kid, goal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
+function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
 
     const [showGoalModal, setShowGoalModal] = useState(false);
@@ -1903,7 +1909,12 @@ function KidCard({ kid, goal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, cu
                         onClick={() => setShowGoalModal(true)}
                         className={`flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
                     >
-                        {goal ? (
+                        {isUpdatingGoal ? (
+                            <div className="flex flex-col items-end mb-1 max-w-[140px] animate-pulse">
+                                <div className={`h-4 w-20 rounded-md mb-1 ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/20' : 'bg-white/20'}`}></div>
+                                <span className={`text-[10px] font-black tracking-widest opacity-50 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>UPDATING...</span>
+                            </div>
+                        ) : goal ? (
                             <div className="flex flex-col items-end mb-1 max-w-[140px]">
                                 <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} truncate w-full justify-end`}>
                                     🎯 {goal.title}
