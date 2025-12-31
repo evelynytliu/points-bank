@@ -682,9 +682,9 @@ export default function Dashboard() {
         }
     };
 
-    const handleJoinFamily = async (pinOverride) => {
-        const codeToUse = joinCode.trim();
-        const pinToUse = typeof pinOverride === 'string' ? pinOverride : joinPin.trim();
+    const handleJoinFamily = async (codeIn, pinIn) => {
+        const codeToUse = typeof codeIn === 'string' ? codeIn.trim() : joinCode.trim();
+        const pinToUse = typeof pinIn === 'string' ? pinIn.trim() : joinPin.trim();
 
         if (!codeToUse) return alert('請輸入家庭代碼');
         if (!pinToUse) return alert('請輸入家庭驗證 PIN 碼');
@@ -1012,7 +1012,7 @@ export default function Dashboard() {
                                                         onChange={e => setJoinNewFamilyCode(e.target.value)}
                                                     />
                                                     <button
-                                                        onClick={() => handleJoinFamily(joinNewFamilyCode)}
+                                                        onClick={() => handleJoinFamily(joinNewFamilyCode, '')}
                                                         disabled={!joinNewFamilyCode.trim()}
                                                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
                                                     >
@@ -1481,7 +1481,7 @@ export default function Dashboard() {
                                 />
                                 <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${family?.theme === 'doodle' ? 'text-gray-400' : 'text-gray-500'}`} />
                             </div>
-                            <button onClick={() => handleJoinFamily(joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
+                            <button onClick={() => handleJoinFamily(joinCode, joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
                         </div>
                     </div>
                 </div>

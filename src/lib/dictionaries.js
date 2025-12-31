@@ -114,7 +114,7 @@ const rawTranslations = {
     family_conn_center: ['家庭連線中心 (唯一入口代碼)', 'Family Hub (Access Code)'],
     family_access_code: ['家庭訪問碼', 'Family Access Code'],
     random_generate: ['隨機產生', 'Randomize'],
-    access_code_hint: ['* 請將此代碼交給小孩或是您的另一半家長，這將是進入家庭的唯一代碼。', '* Share this code with kids or other parents. It is the only key to join this family.'],
+    access_code_hint: ['* 請將此代碼交給小孩或是其他家長，這將是進入家庭的唯一代碼。', '* Share this code with kids or other parents. It is the only key to join this family.'],
     security_settings: ['安全性設定', 'Security Settings'],
     enable_parent_pin: ['啟用家長驗證 PIN 碼', 'Enable Parent PIN Verification'],
     parent_pin_desc: ['使用家長登入及開啟家長驗證操作時使用。', 'Used for parent login and verification.'],
@@ -142,7 +142,7 @@ const rawTranslations = {
     onboarding_family_name_placeholder: ['例如: 王小明的家', 'e.g. Smith Family'],
     onboarding_create_btn: ['建立家庭 🚀', 'Create Family 🚀'],
     onboarding_join_title: ['加入現有家庭', 'Join Existing Family'],
-    onboarding_join_desc: ['我已經有家庭代碼，我要加入另一半建立的家庭。', 'I have a family code, I want to join an existing family.'],
+    onboarding_join_desc: ['我已經有家庭代碼，我要加入其他家長建立的家庭。', 'I have a family code, I want to join an existing family.'],
     onboarding_join_placeholder: ['輸入家庭代碼', 'Enter Family Code'],
     onboarding_join_btn: ['加入家庭 🚀', 'Join Family 🚀'],
 
