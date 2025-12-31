@@ -1911,7 +1911,7 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                                 <span className="text-2xl">🎯</span>
                             ) : (
                                 <Plus
-                                    className={`w-6 h-6 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}
+                                    className={`w-6 h-6 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]/60' : 'text-cyan-400/60'}`}
                                     strokeWidth={3}
                                 />
                             )}
