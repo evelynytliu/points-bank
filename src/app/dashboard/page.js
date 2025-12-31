@@ -928,9 +928,20 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 glass-panel p-6 border-cyan-500/10">
-                <div className="flex items-center gap-3">
-                    <Logo className={`${family?.theme === 'doodle' ? '' : 'text-cyan-400'} w-10 h-10`} />
-                    <h1 className={`text-2xl md:text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic tracking-tighter uppercase`}>{t.points_bank} {userRole === 'kid' && <span className={`text-xs ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} px-3 py-1 rounded-full ml-2 non-italic tracking-normal normal-case`}>{t.kid_mode}</span>}</h1>
+                <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
+                    <div className="relative">
+                        <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30'}`}></div>
+                        <Logo className={`${family?.theme === 'doodle' ? '' : 'text-cyan-400'} w-12 h-12 relative z-10 drop-shadow-sm`} />
+                    </div>
+                    <div className="flex flex-col">
+                        <h1 className={`text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
+                            <span className="relative">
+                                {t.points_bank}
+                                <span className={`absolute -bottom-1 left-0 w-full h-3 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-500/20'} -rotate-1 rounded-full -z-10 group-hover:h-full group-hover:bottom-0 transition-all duration-300 mix-blend-multiply`}></span>
+                            </span>
+                            {userRole === 'kid' && <span className={`text-xs ${family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'} px-2 py-1 rounded-lg -rotate-6 shadow-sm border border-white/20 tracking-normal not-italic normal-case`}>{t.kid_mode}</span>}
+                        </h1>
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-3">
@@ -940,13 +951,20 @@ export default function Dashboard() {
                                 setShowSettingsModal(true);
                                 setHighlightSettings(false);
                             }}
-                            className={`flex items-center gap-2 p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'} rounded-2xl border group transition-all text-xs ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} ${highlightSettings ? (family?.theme === 'doodle' ? 'ring-4 ring-[#ff8a80] animate-pulse' : 'ring-4 ring-cyan-500 animate-pulse') : ''}`}
+                            className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme === 'doodle' ? 'bg-white border-[#e0e0e0] hover:border-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border-white/10 hover:bg-cyan-500/20 text-slate-300'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md ${highlightSettings ? (family?.theme === 'doodle' ? 'ring-2 ring-[#ff8a80] border-[#ff8a80]' : 'ring-2 ring-cyan-500 border-cyan-500') : ''}`}
                         >
-                            <Settings className={`w-5 h-5 transition-all duration-500 ${highlightSettings ? 'rotate-180 scale-125 text-[#ff8a80]' : 'group-hover:rotate-90'}`} />
-                            <span className={`hidden md:inline font-bold ${highlightSettings ? 'text-[#ff8a80]' : ''}`}>{t.settings}</span>
+                            <Settings className={`w-4 h-4 transition-transform duration-500 ${highlightSettings ? 'rotate-180 text-[#ff8a80]' : 'group-hover:rotate-90'}`} />
+                            <span className="font-bold text-sm whitespace-nowrap">{t.settings}</span>
                         </button>
                     )}
-                    <button onClick={handleLogout} className={`p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-red-500/20'} rounded-2xl border group transition-all`} title={t.logout}><LogOut className={`w-5 h-5 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} group-hover:text-red-400`} /></button>
+                    <button
+                        onClick={handleLogout}
+                        className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme === 'doodle' ? 'bg-white border-[#e0e0e0] hover:border-[#ff8a80] text-[#4a4a4a] hover:text-[#ff8a80]' : 'bg-white/5 border-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md`}
+                        title={t.logout}
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span className="font-bold text-sm whitespace-nowrap">{t.logout}</span>
+                    </button>
                 </div>
             </header>
 
