@@ -1891,14 +1891,14 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-2'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-2 p-3'}`}>
 
-                    {/* Floating Goal Icon on Line */}
-                    {(goal && !isUpdatingGoal) && (
+                    {/* Floating Goal Icon on Line - Show Target if Set, Plus if Not */}
+                    {!isUpdatingGoal && (
                         <div
                             onClick={(e) => { e.stopPropagation(); setShowGoalModal(true); }}
-                            className="absolute -top-5 right-2 z-20 text-2xl cursor-pointer transition-transform hover:scale-125 animate-[pulse_2s_ease-in-out_infinite]"
-                            title={goal.title}
+                            className={`absolute -top-5 right-2 z-20 text-2xl cursor-pointer transition-transform hover:scale-125 ${goal ? 'animate-[pulse_2s_ease-in-out_infinite]' : 'opacity-20 hover:opacity-80'}`}
+                            title={goal ? goal.title : "設定願望"}
                         >
-                            🎯
+                            {goal ? '🎯' : '➕'}
                         </div>
                     )}
 
