@@ -1895,7 +1895,7 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     {(goal && !isUpdatingGoal) && (
                         <div
                             onClick={(e) => { e.stopPropagation(); setShowGoalModal(true); }}
-                            className={`absolute -top-4 right-4 z-20 px-1.5 py-0.5 rounded-full border cursor-pointer transition-transform hover:scale-110 hover:-rotate-12 ${familySettings?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-xl shadow-[2px_2px_0px_rgba(0,0,0,0.1)]' : 'bg-[#0f172a] border-cyan-500 text-lg shadow-[0_0_8px_rgba(6,182,212,0.5)]'}`}
+                            className="absolute -top-5 right-2 z-20 text-2xl cursor-pointer transition-transform hover:scale-125 animate-[pulse_2s_ease-in-out_infinite]"
                             title={goal.title}
                         >
                             🎯
