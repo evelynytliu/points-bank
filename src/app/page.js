@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { LogIn, Sparkles, ShieldCheck, UserCheck, Shield, ChevronRight, ArrowLeft } from 'lucide-react';
+import { LogIn, Sparkles, ShieldCheck, UserCheck, Shield, ChevronRight, ArrowLeft, Palette, Globe } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import Logo from '@/components/Logo';
 
@@ -267,20 +267,22 @@ export default function Home() {
             <span>{t.encrypted_storage}</span>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={toggleTheme}
-              className={`p-3 rounded-full transition-all hover:rotate-12 border items-center justify-center flex ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 hover:scale-110 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#ff8a80] hover:scale-110 shadow-[4px_4px_0px_#d8c4b6]'}`}
-              title="切換風格 / Switch Theme"
+              className={`px-5 py-2.5 rounded-full transition-all border flex items-center gap-2.5 font-black text-xs tracking-[0.15em] ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#d8c4b6]'}`}
+              title="Change Theme"
             >
-              {theme === 'cyber' ? <Sparkles className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
+              {theme === 'cyber' ? <Sparkles className="w-4 h-4" /> : <Palette className="w-4 h-4" />}
+              <span>STYLE</span>
             </button>
             <button
               onClick={toggleLanguage}
-              className={`p-3.5 rounded-full transition-all hover:scale-110 border items-center justify-center flex font-black text-sm ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#ff8a80] shadow-[4px_4px_0px_#d8c4b6]'}`}
-              title="切換語言 / Switch Language"
+              className={`px-5 py-2.5 rounded-full transition-all border flex items-center gap-2.5 font-black text-xs tracking-[0.15em] ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#d8c4b6]'}`}
+              title="Change Language"
             >
-              {language === 'zh' ? 'EN' : '中'}
+              <Globe className="w-4 h-4" />
+              <span>{language === 'zh' ? 'EN' : '中文'}</span>
             </button>
           </div>
         </div>
