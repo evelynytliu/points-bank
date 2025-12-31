@@ -69,6 +69,7 @@ export default function Dashboard() {
     const [joinNewFamilyCode, setJoinNewFamilyCode] = useState('');
     const [joinNewFamilyPin, setJoinNewFamilyPin] = useState('');
     const [showJoinInput, setShowJoinInput] = useState(false);
+    const [highlightSettings, setHighlightSettings] = useState(false);
 
     // 系統設定狀態
     const [tempSettings, setTempSettings] = useState({
@@ -157,6 +158,13 @@ export default function Dashboard() {
             setTimeout(() => setTourStep(1), 1000);
         }
     }, [kids]);
+
+    const finishTour = () => {
+        setTourStep(0);
+        localStorage.setItem('tour_completed', 'true');
+        setHighlightSettings(true);
+        setTimeout(() => setHighlightSettings(false), 5000);
+    };
 
     // Apply theme class to body
     useEffect(() => {
@@ -808,9 +816,15 @@ export default function Dashboard() {
 
                 <div className="flex flex-wrap items-center justify-center gap-3">
                     {userRole === 'parent' && (
-                        <button onClick={() => setShowSettingsModal(true)} className={`flex items-center gap-2 p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'} rounded-2xl border group transition-all text-xs ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
-                            <Settings className="w-5 h-5 group-hover:rotate-90 transition-all duration-500" />
-                            <span className="hidden md:inline font-bold">{t.settings}</span>
+                        <button
+                            onClick={() => {
+                                setShowSettingsModal(true);
+                                setHighlightSettings(false);
+                            }}
+                            className={`flex items-center gap-2 p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'} rounded-2xl border group transition-all text-xs ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} ${highlightSettings ? (family?.theme === 'doodle' ? 'ring-4 ring-[#ff8a80] animate-pulse' : 'ring-4 ring-cyan-500 animate-pulse') : ''}`}
+                        >
+                            <Settings className={`w-5 h-5 transition-all duration-500 ${highlightSettings ? 'rotate-180 scale-125 text-[#ff8a80]' : 'group-hover:rotate-90'}`} />
+                            <span className={`hidden md:inline font-bold ${highlightSettings ? 'text-[#ff8a80]' : ''}`}>{t.settings}</span>
                         </button>
                     )}
                     <button onClick={handleLogout} className={`p-3 ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] border-[#4a4a4a]' : 'bg-white/5 border-white/5 hover:bg-red-500/20'} rounded-2xl border group transition-all`} title={t.logout}><LogOut className={`w-5 h-5 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} group-hover:text-red-400`} /></button>
@@ -1781,21 +1795,8 @@ function TourOverlay({ step, onNext, onFinish, t, familyTheme }) {
                 </div>
             )}
 
-            {/* Step 2: Join Family Hint */}
+            {/* Step 2: Ratio Hint */}
             {step === 2 && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md pointer-events-auto p-6 animate-in slide-in-from-right-10 duration-300">
-                    <div className={`p-8 rounded-3xl border-2 text-center relative overflow-hidden ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.2)]'}`}>
-                        <h3 className={`text-xl font-black mb-4 uppercase italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>🔗 {t.onboarding_join_title}</h3>
-                        <p className={`mb-8 font-bold leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-300'}`}>{t.tour_step2_msg}</p>
-                        <button onClick={onNext} className={`w-full py-4 rounded-xl font-black uppercase tracking-widest transition-all ${isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#4a4a4a]' : 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.5)]'}`}>
-                            {t.tour_next}
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Step 3: Ratio Hint */}
-            {step === 3 && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md pointer-events-auto p-6 animate-in slide-in-from-right-10 duration-300">
                     <div className={`p-8 rounded-3xl border-2 text-center relative overflow-hidden ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.2)]'}`}>
                         <h3 className={`text-xl font-black mb-4 uppercase italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>⚙️ {t.points_time_rules}</h3>
