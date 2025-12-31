@@ -558,7 +558,7 @@
             }
 
             50% {
-                transform: scale(1.05);
+                transform: scale(1.2) rotate(5deg);
             }
         }
 
@@ -571,8 +571,8 @@
             }
 
             50% {
-                opacity: 0.6;
-                transform: scale(0.92);
+                opacity: 0.4;
+                transform: scale(0.85);
             }
         }
 
@@ -1705,7 +1705,7 @@
 
             // === DOODLE DEMO FUNCTIONALITY ===
             window.demoKids = [
-                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30, goal: { title: 'Switch 遊戲片' } },
+                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30, goal: { title: '樂高城堡' } },
                 { id: 'd2', name: 'LUIGI', avatar: '🚀', points: 12, minutes: 30, limit: 30, goal: null }
             ];
             window.demoPlan = 'weekday';
@@ -1768,12 +1768,33 @@
                                 <!-- Rewards & Goal -->
                                 <div style="text-align: right; position: relative;">
                                     <!-- Goal Icon -->
-                                    <div style="position: absolute; top: -1.6rem; right: -0.5rem; z-index: 10; cursor: pointer; animation: ${kid.goal ? 'pulse 2s ease-in-out infinite' : 'deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'};"
+                                    <div style="position: absolute; top: -1.8rem; right: -0.5rem; z-index: 10; cursor: pointer; display: flex; flex-direction: column; align-items: center;"
                                          title="${kid.goal ? kid.goal.title : '設定願望'}">
-                                        ${kid.goal ?
-                            '<span style="font-size: 1.6rem;">🎯</span>' :
+                                        
+                                        <div style="animation: ${kid.goal ? 'pulse 2s ease-in-out infinite' : 'deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'};">
+                                            ${kid.goal ?
+                            '<span style="font-size: 1.8rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1));">🎯</span>' :
                             '<i data-lucide="plus" size="24" style="color: #4a4a4a; opacity: 0.6; stroke-width: 3;"></i>'
                         }
+                                        </div>
+                                        
+                                        ${kid.goal ? `
+                                            <div style="
+                                                background: var(--ink); 
+                                                color: white; 
+                                                font-size: 0.65rem; 
+                                                padding: 0.1rem 0.4rem; 
+                                                border-radius: 4px; 
+                                                font-weight: 700; 
+                                                white-space: nowrap; 
+                                                margin-top: -2px;
+                                                box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+                                                animation: slideUp 0.5s ease-out forwards;
+                                            ">
+                                                ${kid.goal.title}
+                                            </div>
+                                        ` : ''}
+
                                     </div>
 
                                     <div style="font-size: 0.7rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.05em; opacity: 0.7;">可兌換獎勵</div>
