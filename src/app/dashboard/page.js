@@ -1252,20 +1252,46 @@ export default function Dashboard() {
                                                 {/* Invite Kid */}
                                                 <button
                                                     onClick={() => {
-                                                        const url = 'https://points-bank.vercel.app/';
-                                                        const code = tempSettings.short_id;
-                                                        const msg = `👋 邀請您加入 Points Bank！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n4️⃣ 選擇你的名字並開始使用！`;
+                                                        if (kids.length === 0) {
+                                                            alert('請先新增小孩成員！');
+                                                            return;
+                                                        }
 
                                                         showModal({
-                                                            type: 'confirm',
-                                                            title: '📋 ' + t.invite_kid_msg_title,
-                                                            message: msg,
-                                                            confirmText: t.copy_invite,
-                                                            cancelText: t.cancel,
-                                                            onConfirm: () => {
-                                                                navigator.clipboard.writeText(msg);
-                                                                alert(t.copied);
-                                                            }
+                                                            type: 'alert',
+                                                            title: t.invite_kid_msg_title,
+                                                            message: '請選擇要邀請的孩子：',
+                                                            content: (
+                                                                <div className="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1">
+                                                                    {kids.map(kid => (
+                                                                        <button
+                                                                            key={kid.id}
+                                                                            onClick={() => {
+                                                                                const url = 'https://points-bank.vercel.app/';
+                                                                                const code = tempSettings.short_id;
+                                                                                const msg = `👋 ${kid.name}，邀請你加入 Points Bank！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n4️⃣ 選擇你的名字「${kid.name}」\n5️⃣ 輸入 PIN 碼: ${kid.login_pin || '1234'}`;
+
+                                                                                showModal({
+                                                                                    type: 'confirm',
+                                                                                    title: '📋 ' + t.invite_kid_msg_title,
+                                                                                    message: msg,
+                                                                                    confirmText: t.copy_invite,
+                                                                                    cancelText: t.cancel,
+                                                                                    onConfirm: () => {
+                                                                                        navigator.clipboard.writeText(msg);
+                                                                                        alert(t.copied);
+                                                                                    }
+                                                                                });
+                                                                            }}
+                                                                            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all active:scale-95 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
+                                                                        >
+                                                                            <span className="text-2xl">{kid.avatar || '👶'}</span>
+                                                                            <span className="font-bold text-sm truncate w-full text-center">{kid.name}</span>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            ),
+                                                            confirmText: t.cancel || '取消',
                                                         });
                                                     }}
                                                     className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#ffccbc] text-[#d84315] hover:bg-[#ffab91]' : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'}`}
