@@ -1249,9 +1249,8 @@ export default function Dashboard() {
 
                             {/* 5. 安全與偏好設定 */}
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings} & {t.ui_style_selection}</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Security - PIN */}
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
+                                <div className="space-y-8">
                                     {/* Security - PIN */}
                                     <div className="space-y-6">
                                         {/* Row 1: PIN Input (Masked) + Eye Icon */}
@@ -1334,15 +1333,24 @@ export default function Dashboard() {
 
 
                                     {/* UI Style */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
-                                            <div className="text-sm font-bold mb-1">Cyber Neon</div>
-                                            <div className="text-xs uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
-                                        </button>
-                                        <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
-                                            <div className="text-sm font-bold mb-1">Warm Doodle</div>
-                                            <div className="text-xs uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
-                                        </button>
+                                    <div className="space-y-4">
+                                        <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.ui_style_selection}</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
+                                                <div className="w-12 h-12 rounded-full border-2 border-cyan-500 flex items-center justify-center mb-2 bg-black shadow-[0_0_10px_#06b6d4]">
+                                                    <Zap className="w-6 h-6" />
+                                                </div>
+                                                <div className="text-sm font-bold mb-1">Cyber Neon</div>
+                                                <div className="text-[10px] uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
+                                            </button>
+                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
+                                                <div className="w-12 h-12 rounded-full border-2 border-[#ff8a80] flex items-center justify-center mb-2 bg-white text-[#ff8a80]">
+                                                    <Smile className="w-6 h-6" />
+                                                </div>
+                                                <div className="text-sm font-bold mb-1">Warm Doodle</div>
+                                                <div className="text-[10px] uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </section>
