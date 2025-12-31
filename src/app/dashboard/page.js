@@ -387,11 +387,7 @@ export default function Dashboard() {
 
             // 獲取家庭資訊
             const { data: familyData, error: fError } = await supabase.from('families').select('*').eq('id', currentFamilyId).single();
-            if (fError) {
-                console.error('獲取家庭失敗:', fError);
-                // Temporary Debug Alert
-                if (userRole === 'kid') alert('⚠️ 小孩模式讀取家庭失敗: ' + fError.message + '\n請確認 RLS 設定。');
-            }
+            if (fError) console.error('獲取家庭失敗:', fError);
 
             if (familyData) {
                 setFamily(familyData);
@@ -429,9 +425,6 @@ export default function Dashboard() {
                 .order('sort_order', { ascending: true })
                 .order('created_at', { ascending: true });
 
-            if (userRole === 'kid' || !authUser) {
-                alert(`DEBUG: Kid Mode Stats\nFamily ID: ${currentFamilyId}\nKids Found: ${kidsData?.length || 0}\nError: ${kidsError?.message || 'None'}`);
-            }
 
             if (kidsError) {
                 console.error('獲取小孩失敗，詳細資訊:', {
@@ -440,7 +433,6 @@ export default function Dashboard() {
                     details: kidsError.details,
                     hint: kidsError.hint
                 });
-                if (userRole === 'kid') alert('⚠️ 小孩模式讀取清單失敗: ' + kidsError.message);
                 throw kidsError;
             }
 
