@@ -66,6 +66,7 @@ export default function Dashboard() {
     const [newFamilyName, setNewFamilyName] = useState('我的家'); // Default name
     const [familyHistory, setFamilyHistory] = useState([]); // List of visited families
     const [joinNewFamilyCode, setJoinNewFamilyCode] = useState('');
+    const [joinNewFamilyPin, setJoinNewFamilyPin] = useState('');
     const [showJoinInput, setShowJoinInput] = useState(false);
 
     // 系統設定狀態
@@ -1009,10 +1010,18 @@ export default function Dashboard() {
                                                         value={joinNewFamilyCode}
                                                         onChange={e => setJoinNewFamilyCode(e.target.value)}
                                                     />
+                                                    <input
+                                                        type="password"
+                                                        maxLength={4}
+                                                        placeholder="PIN"
+                                                        className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
+                                                        value={joinNewFamilyPin}
+                                                        onChange={e => setJoinNewFamilyPin(e.target.value.replace(/\D/g, ''))}
+                                                    />
                                                     <button
-                                                        onClick={() => handleJoinFamily(joinNewFamilyCode, '')}
-                                                        disabled={!joinNewFamilyCode.trim()}
-                                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
+                                                        onClick={() => handleJoinFamily(joinNewFamilyCode, joinNewFamilyPin)}
+                                                        disabled={!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim()}
+                                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
                                                     >
                                                         {t.join_btn_short || '加入'}
                                                     </button>
