@@ -292,50 +292,50 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                             </div>
 
                             <div className="space-y-4">
-                                    <label className={`block text-sm font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
-                                        願望圖片 (可選)
-                                    </label>
-                                    <div className="flex gap-2">
-                                        <div className="relative flex-1">
-                                            <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${theme === 'doodle' ? 'text-[#4a4a4a]/40' : 'text-slate-500'}`}>
-                                                <ImageIcon className="w-5 h-5" />
-                                            </div>
-                                            <input
-                                                type="url"
-                                                value={imageUrl}
-                                                onChange={(e) => setImageUrl(e.target.value)}
-                                                className={`w-full pl-10 pr-4 py-3 rounded-xl outline-none transition-all ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
-                                                placeholder="貼上圖片網址"
-                                            />
+                                <label className={`block text-sm font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
+                                    願望圖片 (可選)
+                                </label>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${theme === 'doodle' ? 'text-[#4a4a4a]/40' : 'text-slate-500'}`}>
+                                            <ImageIcon className="w-5 h-5" />
                                         </div>
-                                        
-                                        {/* Hidden File Input */}
                                         <input
-                                            type="file"
-                                            ref={fileInputRef}
-                                            onChange={handleFileChange}
-                                            accept="image/*"
-                                            className="hidden"
+                                            type="url"
+                                            value={imageUrl}
+                                            onChange={(e) => setImageUrl(e.target.value)}
+                                            className={`w-full pl-10 pr-4 py-3 rounded-xl outline-none transition-all ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
+                                            placeholder="貼上圖片網址"
                                         />
-                                        
-                                        {/* Upload Button */}
-                                        <button
-                                            type="button"
-                                            onClick={handleUploadClick}
-                                            disabled={isUploading}
-                                            className={`px-4 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
-                                            title="從裝置上傳"
-                                        >
-                                            {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
-                                        </button>
                                     </div>
+
+                                    {/* Hidden File Input */}
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+
+                                    {/* Upload Button */}
+                                    <button
+                                        type="button"
+                                        onClick={handleUploadClick}
+                                        disabled={isUploading}
+                                        className={`px-4 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
+                                        title="從裝置上傳"
+                                    >
+                                        {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                                    </button>
                                 </div>
-                                {imageUrl && (
-                                    <div className="h-20 w-20 rounded-lg overflow-hidden border mx-auto mt-2">
-                                        <img src={imageUrl} alt="preview" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
-                                    </div>
-                                )}
                             </div>
+                            {imageUrl && (
+                                <div className="h-20 w-20 rounded-lg overflow-hidden border mx-auto mt-2">
+                                    <img src={imageUrl} alt="preview" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                                </div>
+                            )}
+
 
                             <div className="pt-4 flex gap-3">
                                 {goal && (
@@ -368,7 +368,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                             </div>
                         </div>
                     )}
-        </div>
+                </div>
             </motion.div >
         </div >
     );
