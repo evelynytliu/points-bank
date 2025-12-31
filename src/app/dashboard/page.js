@@ -514,7 +514,7 @@ export default function Dashboard() {
     };
 
     const handleBatchUpdate = async () => {
-        if (!checkParentPin()) return;
+        if (!await checkParentPin()) return;
         if (selectedKids.length === 0) return alert('請選擇對象');
         const p = parseInt(ptsChange) || 0;
         const m = parseInt(minChange) || 0;
@@ -692,7 +692,7 @@ export default function Dashboard() {
     const updateKidAction = async (kid, pChange, mChange, reason, actor, shouldFetch = true) => {
         // 如果是減少時間/點數且開啟了家長密碼，則需要檢查
         if (userRole === 'kid' && (pChange > 0 || mChange > 0)) {
-            if (!checkParentPin()) return;
+            if (!await checkParentPin()) return;
         }
 
         // 使用 RPC 執行原子更新與 Log 寫入，解決 Guest 權限問題並防範計算衝突
