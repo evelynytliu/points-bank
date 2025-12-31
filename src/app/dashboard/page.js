@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Reorder, useDragControls } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import Logo from '@/components/Logo';
 import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import { APP_CONFIG } from '@/lib/config';
@@ -928,7 +929,7 @@ export default function Dashboard() {
         <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 glass-panel p-6 border-cyan-500/10">
                 <div className="flex items-center gap-3">
-                    <Monitor className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-8 h-8`} />
+                    <Logo className={`${family?.theme === 'doodle' ? '' : 'text-cyan-400'} w-10 h-10`} />
                     <h1 className={`text-2xl md:text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic tracking-tighter uppercase`}>{t.points_bank} {userRole === 'kid' && <span className={`text-xs ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} px-3 py-1 rounded-full ml-2 non-italic tracking-normal normal-case`}>{t.kid_mode}</span>}</h1>
                 </div>
 

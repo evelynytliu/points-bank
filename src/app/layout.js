@@ -3,6 +3,12 @@ import './globals.css';
 export const metadata = {
   title: 'Points & Screen Time | Cloud Sync',
   description: 'Manage screen time with a visual points system.',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({ children }) {

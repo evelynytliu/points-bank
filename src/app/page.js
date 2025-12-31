@@ -131,12 +131,17 @@ export default function Home() {
       )}
 
       <div className="glass-panel w-full max-w-[480px] p-8 md:p-12 text-center z-10">
-        <div className={`inline-flex items-center justify-center w-16 h-16 mb-6 transition-all duration-500 ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
-          <Sparkles className={`w-8 h-8 ${theme === 'cyber' ? 'text-cyan-400' : 'text-[#ff8a80]'}`} />
+        import Logo from '@/components/Logo';
+
+        // ... existing imports ...
+
+        // In JSX: as replacement for lines 134-141 approx
+        <div className={`inline-flex items-center justify-center w-20 h-20 mb-6 transition-all duration-500 ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
+          <Logo className="w-12 h-12" />
         </div>
 
-        <h1 className="text-4xl font-black mb-6 tracking-tight">
-          <span className={`${theme === 'cyber' ? 'bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent italic pr-2' : 'text-[#4a4a4a]'} uppercase`}>POINTS</span>
+        <h1 className="text-4xl font-black mb-6 tracking-tight flex items-center justify-center gap-2">
+          <span className={`${theme === 'cyber' ? 'bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent italic' : 'text-[#4a4a4a]'} uppercase`}>POINTS</span>
           <span className={theme === 'cyber' ? 'text-cyan-400 italic' : 'text-[#ff8a80]'}> Bank</span>
         </h1>
 
