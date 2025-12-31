@@ -5,7 +5,7 @@ const rawTranslations = {
     parent: ['家長管理', 'Parent'],
     kid: ['小孩專區', 'Kid Area'],
     login_desc: ['使用 Google 帳號登入後即可管理規則與進度。', 'Login with Google to manage rules and progress.'],
-    doodle_desc: ['登入家長帳號，開始這段溫馨的管教旅程。', 'Log in to start this warm parenting journey.'],
+    doodle_desc: ['登入家長帳號，開始這段溫馨的育兒旅程。', 'Log in to start this warm parenting journey.'],
     login_google: ['GOOGLE 帳號登入', 'LOGIN WITH GOOGLE'],
     have_invite_code: ['我有家庭邀請碼', 'I have an invite code'],
     step1_title: ['第一步：輸入家庭代碼', 'Step 1: Enter Family Code'],
