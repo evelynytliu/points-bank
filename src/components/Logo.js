@@ -5,7 +5,7 @@ export default function Logo({ className = "w-10 h-10" }) {
         <img
             src="/logo.png"
             alt="Points Bank Logo"
-            className={`object-contain ${className}`}
+            className={`object-contain rounded-full ${className}`}
         />
     );
 }
