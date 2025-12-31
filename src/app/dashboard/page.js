@@ -1895,9 +1895,18 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     {!isUpdatingGoal && (
                         <div
                             onClick={(e) => { e.stopPropagation(); setShowGoalModal(true); }}
-                            className={`absolute -top-5 right-2 z-20 cursor-pointer transition-all ${goal ? 'animate-[pulse_2s_ease-in-out_infinite] hover:scale-125' : 'animate-deep-pulse hover:animate-none hover:opacity-100 hover:scale-125'}`}
+                            className={`absolute -top-5 right-2 z-20 cursor-pointer transition-all ${goal ? 'animate-[pulse_2s_ease-in-out_infinite] hover:scale-125' : 'custom-deep-pulse hover:animate-none hover:opacity-100 hover:scale-125'}`}
                             title={goal ? goal.title : "設定願望"}
                         >
+                            <style>{`
+                                @keyframes deep-pulse {
+                                    0%, 100% { opacity: 1; transform: scale(1); }
+                                    50% { opacity: 0.2; transform: scale(0.85); }
+                                }
+                                .custom-deep-pulse {
+                                    animation: deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                                }
+                            `}</style>
                             {goal ? (
                                 <span className="text-2xl">🎯</span>
                             ) : (
