@@ -119,6 +119,8 @@ const rawTranslations = {
     family_conn_center: ['家庭連線中心 (唯一入口代碼)', 'Family Hub (Access Code)'],
     invite_parent_btn: ['邀請其他家長', 'Invite Other Parent'],
     invite_msg_title: ['邀請家長加入', 'Invite Parent'],
+    invite_kid_btn: ['邀請孩子', 'Invite Kid'],
+    invite_kid_msg_title: ['邀請孩子加入', 'Invite Kid'],
     family_access_code: ['家庭訪問碼 (可自訂)', 'Family Access Code (Customizable)'],
     copy_invite: ['複製邀請訊息', 'Copy Invite'],
     random_generate: ['隨機產生', 'Randomize'],

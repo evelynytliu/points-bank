@@ -1219,30 +1219,58 @@ export default function Dashboard() {
                                             <div className="flex items-center gap-2">
                                                 <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
                                             </div>
-                                            <button
-                                                onClick={() => {
-                                                    const url = 'https://points-bank.vercel.app/';
-                                                    const code = tempSettings.short_id;
-                                                    const pin = tempSettings.use_parent_pin ? tempSettings.parent_pin : '(未啟用 PIN)';
-                                                    const msg = `👋 邀請您加入 Points Bank 家庭！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n${tempSettings.use_parent_pin ? `4️⃣ 家長 PIN 碼: ${pin}` : ''}`;
+                                            <div className="flex items-center gap-2">
+                                                {/* Invite Parent */}
+                                                <button
+                                                    onClick={() => {
+                                                        const url = 'https://points-bank.vercel.app/';
+                                                        const code = tempSettings.short_id;
+                                                        const pin = tempSettings.use_parent_pin ? tempSettings.parent_pin : '(未啟用 PIN)';
+                                                        const msg = `👋 邀請您加入 Points Bank 家庭！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n${tempSettings.use_parent_pin ? `4️⃣ 家長 PIN 碼: ${pin}` : ''}`;
 
-                                                    showModal({
-                                                        type: 'confirm',
-                                                        title: '📋 ' + t.invite_msg_title,
-                                                        message: msg,
-                                                        confirmText: t.copy_invite, // Custom button text
-                                                        cancelText: t.cancel,
-                                                        onConfirm: () => {
-                                                            navigator.clipboard.writeText(msg);
-                                                            alert(t.copied);
-                                                        }
-                                                    });
-                                                }}
-                                                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
-                                            >
-                                                <Share2 className="w-3.5 h-3.5" />
-                                                {t.invite_parent_btn}
-                                            </button>
+                                                        showModal({
+                                                            type: 'confirm',
+                                                            title: '📋 ' + t.invite_msg_title,
+                                                            message: msg,
+                                                            confirmText: t.copy_invite,
+                                                            cancelText: t.cancel,
+                                                            onConfirm: () => {
+                                                                navigator.clipboard.writeText(msg);
+                                                                alert(t.copied);
+                                                            }
+                                                        });
+                                                    }}
+                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
+                                                >
+                                                    <Share2 className="w-3.5 h-3.5" />
+                                                    {t.invite_parent_btn}
+                                                </button>
+
+                                                {/* Invite Kid */}
+                                                <button
+                                                    onClick={() => {
+                                                        const url = 'https://points-bank.vercel.app/';
+                                                        const code = tempSettings.short_id;
+                                                        const msg = `👋 邀請您加入 Points Bank！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n4️⃣ 選擇你的名字並開始使用！`;
+
+                                                        showModal({
+                                                            type: 'confirm',
+                                                            title: '📋 ' + t.invite_kid_msg_title,
+                                                            message: msg,
+                                                            confirmText: t.copy_invite,
+                                                            cancelText: t.cancel,
+                                                            onConfirm: () => {
+                                                                navigator.clipboard.writeText(msg);
+                                                                alert(t.copied);
+                                                            }
+                                                        });
+                                                    }}
+                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#ffccbc] text-[#d84315] hover:bg-[#ffab91]' : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'}`}
+                                                >
+                                                    <UserPlus className="w-3.5 h-3.5" />
+                                                    {t.invite_kid_btn}
+                                                </button>
+                                            </div>
                                         </div>
                                         <div className="relative flex items-center">
                                             <input
