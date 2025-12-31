@@ -927,17 +927,41 @@ export default function Dashboard() {
         if (!confirm('確定要刪除這個願望目標嗎？')) return;
         setUpdatingKidGoalId(kidId);
 
-        const { error } = await supabase
-            .from('wish_goals')
-            .delete()
-            .eq('kid_id', kidId);
+        try {
+            // 1. Get image info before deleting
+            const { data: goals } = await supabase
+                .from('wish_goals')
+                .select('image_url')
+                .eq('kid_id', kidId)
+                .limit(1);
 
-        if (error) {
-            alert('刪除失敗: ' + error.message);
-        } else {
+            const goal = goals?.[0];
+
+            // 2. Delete database record
+            const { error } = await supabase
+                .from('wish_goals')
+                .delete()
+                .eq('kid_id', kidId);
+
+            if (error) throw error;
+
+            // 3. If record deleted successfully, clean up storage
+            if (goal?.image_url && goal.image_url.includes('wish_goals')) {
+                const fileName = goal.image_url.split('wish_goals/').pop();
+                if (fileName) {
+                    await supabase.storage
+                        .from('wish_goals')
+                        .remove([fileName]);
+                }
+            }
+
             await fetchData();
+        } catch (error) {
+            console.error('Error deleting goal:', error);
+            alert('刪除失敗: ' + error.message);
+        } finally {
+            setUpdatingKidGoalId(null);
         }
-        setUpdatingKidGoalId(null);
     };
 
     const exportLogsToCSV = async () => {
