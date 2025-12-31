@@ -6,6 +6,7 @@ import { Reorder } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
+import { APP_CONFIG } from '@/lib/config';
 
 const AVATARS = [
     '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', '🐷', '🐯',
@@ -978,7 +979,8 @@ export default function Dashboard() {
                         {/* Scrollable Content */}
                         <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-10 scroll-smooth">
                             {/* 0. Family Switcher (New) */}
-                            {familyHistory.length > 0 && (
+                            {/* 0. Family Switcher (New) */}
+                            {APP_CONFIG.ENABLE_FAMILY_SWITCHING && familyHistory.length > 0 && (
                                 <section>
                                     <div className="flex items-center justify-between mb-4">
                                         <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.switch_family || '切換家庭'}</h4>
