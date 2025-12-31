@@ -863,52 +863,36 @@ export default function Dashboard() {
                                     <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
                                 </div>
                             </div>
+
+                            {/* Preset Buttons for Time Allocation */}
+                            <div className="flex gap-2 mb-6 justify-center">
+                                <button
+                                    onClick={() => {
+                                        if (selectedKids.length === 0) setSelectedKids(kids.map(k => k.id));
+                                        setMinChange(family?.weekday_limit || 0);
+                                        setCustomReason(t.weekday_alloc_reason || '平日分配');
+                                    }}
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#4a4a4a] border border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                                >
+                                    🏢 {t.weekday} ({family?.weekday_limit}m)
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (selectedKids.length === 0) setSelectedKids(kids.map(k => k.id));
+                                        setMinChange(family?.holiday_limit || 0);
+                                        setCustomReason(t.holiday_alloc_reason || '假日分配');
+                                    }}
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#ff8a80] border border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10'}`}
+                                >
+                                    🏖️ {t.holiday} ({family?.holiday_limit}m)
+                                </button>
+                            </div>
+
                             <button onClick={handleBatchUpdate} className="btn btn-primary w-full !py-4 text-sm font-black uppercase tracking-widest shadow-xl">{t.execute_update}</button>
                         </div>
                     </div>
 
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase font-black`}><TrendingUp className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} /> {t.status_overview}</h2>
-                        <div className={`flex w-full md:w-auto justify-between md:justify-start flex-wrap items-center p-1.5 rounded-2xl border font-bold gap-2 ${family?.theme === 'doodle' ? 'bg-[#eee] border-[#4a4a4a]' : 'bg-white/5 border-white/10'}`}>
-                            {/* Plan Toggles */}
-                            <button
-                                onClick={() => setAllocPlan('weekday')}
-                                className={`px-3 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'weekday'
-                                    ? (family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white shadow-md' : 'bg-cyan-500 text-black shadow-lg')
-                                    : (family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-400 hover:text-white')
-                                    }`}
-                            >
-                                🏢 {t.weekday} ({family?.weekday_limit}m)
-                            </button>
-                            <button
-                                onClick={() => setAllocPlan('holiday')}
-                                className={`px-3 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${allocPlan === 'holiday'
-                                    ? (family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white shadow-md' : 'bg-purple-500 text-white shadow-lg')
-                                    : (family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-400 hover:text-white')
-                                    }`}
-                            >
-                                🏖️ {t.holiday} ({family?.holiday_limit}m)
-                            </button>
-
-                            {/* Divider */}
-                            <div className={`w-px h-5 mx-1 ${family?.theme === 'doodle' ? 'bg-[#ccc]' : 'bg-white/10'}`}></div>
-
-                            {/* Allocate Action */}
-                            <button
-                                onClick={batchAllocate}
-                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm hover:scale-105 active:scale-95 ${family?.theme === 'doodle'
-                                    ? 'bg-white text-[#ff8a80] border border-[#ff8a80] hover:bg-[#ff8a80] hover:text-white'
-                                    : 'bg-white/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500 hover:text-black'
-                                    }`}
-                                title={t.one_click_allocate}
-                            >
-                                <Zap className="w-4 h-4" />
-                                <span className="hidden sm:inline">{t.one_click_allocate}</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-8">
+                    <div className="grid grid-cols-1 gap-8 mt-8">
                         {kids.map(kid => (
                             <KidCard
                                 key={kid.id}

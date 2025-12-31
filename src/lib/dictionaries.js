@@ -133,6 +133,8 @@ const rawTranslations = {
     switch_family: ['切換其他家庭', 'Switch Family'],
     current_family: ['目前', 'Current'],
     switch_button: ['切換', 'Switch'],
+    weekday_alloc_reason: ['平日分配', 'Weekday Alloc'],
+    holiday_alloc_reason: ['假日分配', 'Holiday Alloc'],
     join_new_family_label: ['加入新家庭', 'Join New Family'],
     join_new_family_placeholder: ['輸入家庭代碼', 'Enter Family Code'],
     join_btn_short: ['加入', 'Join'],
