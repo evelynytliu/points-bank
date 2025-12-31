@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { LogIn, Sparkles, ShieldCheck, UserCheck, Shield, ChevronRight, ArrowLeft } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
+import Logo from '@/components/Logo';
 
 export default function Home() {
   const router = useRouter();
@@ -131,11 +132,6 @@ export default function Home() {
       )}
 
       <div className="glass-panel w-full max-w-[480px] p-8 md:p-12 text-center z-10">
-        import Logo from '@/components/Logo';
-
-        // ... existing imports ...
-
-        // In JSX: as replacement for lines 134-141 approx
         <div className={`inline-flex items-center justify-center w-20 h-20 mb-6 transition-all duration-500 ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
           <Logo className="w-12 h-12" />
         </div>
