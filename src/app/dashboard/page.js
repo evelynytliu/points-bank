@@ -1046,33 +1046,40 @@ export default function Dashboard() {
                 <div className="lg:col-span-4 space-y-8">
                     <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
                     <div className={`glass-panel p-6 ${family?.theme === 'doodle' ? 'border-[#4a4a4a]' : 'border-pink-500/5'} min-h-[500px]`}>
-                        {logs.map(log => (
-                            <li key={log.id} className={`p-4 rounded-xl ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5'} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme === 'doodle' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20'}`}>
-                                <div className="flex justify-between items-start">
-                                    <div className="flex flex-col">
-                                        <span className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
-                                        <span className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
+                        {logs.length === 0 ? (
+                            <div className={`flex flex-col items-center justify-center h-[450px] text-center ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-600'}`}>
+                                <History className="w-12 h-12 mb-4 opacity-50" />
+                                <p className="text-lg font-bold">{t.no_logs_found}</p>
+                            </div>
+                        ) : (
+                            logs.map(log => (
+                                <li key={log.id} className={`p-4 rounded-xl ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5'} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme === 'doodle' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20'}`}>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <span className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
+                                            <span className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
+                                        </div>
+                                        {userRole === 'parent' && (
+                                            <button
+                                                onClick={() => deleteLog(log.id)}
+                                                className={`p-1.5 rounded-lg ${family?.theme === 'doodle' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-white/5'} transition-all`}
+                                                title="刪除此筆紀錄"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
                                     </div>
-                                    {userRole === 'parent' && (
-                                        <button
-                                            onClick={() => deleteLog(log.id)}
-                                            className={`p-1.5 rounded-lg ${family?.theme === 'doodle' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-white/5'} transition-all`}
-                                            title="刪除此筆紀錄"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    )}
-                                </div>
-                                <div className={`text-base ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-300'} font-medium`}>{log.reason || '調整'}</div>
-                                <div className="flex justify-between items-center mt-1">
-                                    <div className="flex gap-2">
-                                        {log.points_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} 點</span>}
-                                        {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme === 'doodle' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
+                                    <div className={`text-base ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-300'} font-medium`}>{log.reason || '調整'}</div>
+                                    <div className="flex justify-between items-center mt-1">
+                                        <div className="flex gap-2">
+                                            {log.points_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} 點</span>}
+                                            {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme === 'doodle' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
+                                        </div>
+                                        <div className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
                                     </div>
-                                    <div className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
-                                </div>
-                            </li>
-                        ))}
+                                </li>
+                            ))
+                        )}
                     </div>
                     <button
                         onClick={() => router.push('/logs')}
