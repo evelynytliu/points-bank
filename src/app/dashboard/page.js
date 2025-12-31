@@ -62,6 +62,7 @@ export default function Dashboard() {
     // Onboarding
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [joinCode, setJoinCode] = useState('');
+    const [joinPin, setJoinPin] = useState('');
     const [newFamilyName, setNewFamilyName] = useState('我的家'); // Default name
     const [familyHistory, setFamilyHistory] = useState([]); // List of visited families
     const [joinNewFamilyCode, setJoinNewFamilyCode] = useState('');
