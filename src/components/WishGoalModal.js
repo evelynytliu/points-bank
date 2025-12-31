@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target, Gift, Image as ImageIcon, Sparkles, Trophy, Edit2, Upload } from 'lucide-react';
+import { X, Target, Gift, Image as ImageIcon, Sparkles, Trophy, Edit2, Upload, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDelete, t, theme }) {
@@ -9,6 +9,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
     const [title, setTitle] = useState(goal?.title || '');
     const [targetPoints, setTargetPoints] = useState(goal?.target_points || 100);
     const [imageUrl, setImageUrl] = useState(goal?.image_url || '');
+    const [isSaving, setIsSaving] = useState(false);
 
     // Reset state when goal changes or modal opens
     useEffect(() => {
@@ -17,6 +18,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
             setTargetPoints(goal?.target_points || 100);
             setImageUrl(goal?.image_url || '');
             setIsEditing(!goal);
+            setIsSaving(false);
         }
     }, [isOpen, goal]);
 
@@ -26,16 +28,24 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
     const isCompleted = kid.total_points >= (goal?.target_points || Infinity);
     const remaining = Math.max(0, (goal?.target_points || 0) - kid.total_points);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!title.trim()) return alert('請輸入願望名稱');
         if (targetPoints <= 0) return alert('目標點數必須大於 0');
 
-        onSave({
-            title,
-            target_points: parseInt(targetPoints),
-            image_url: imageUrl
-        });
-        setIsEditing(false);
+        setIsSaving(true);
+        try {
+            await onSave({
+                title,
+                target_points: parseInt(targetPoints),
+                image_url: imageUrl
+            });
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Save failed", error);
+            // Alert is handled in parent, but we should ensure we stop loading
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const triggerConfetti = () => {
@@ -78,7 +88,8 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className={`absolute top-4 right-4 z-20 p-2 rounded-full transition-all ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#ff8a80] hover:text-white' : 'bg-black/50 text-white hover:bg-white/20'}`}
+                    disabled={isSaving}
+                    className={`absolute top-4 right-4 z-20 p-2 rounded-full transition-all ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#ff8a80] hover:text-white' : 'bg-black/50 text-white hover:bg-white/20'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -225,16 +236,29 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                 {goal && (
                                     <button
                                         onClick={() => setIsEditing(false)}
-                                        className={`px-6 py-3 rounded-xl font-bold ${theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5'}`}
+                                        disabled={isSaving}
+                                        className={`px-6 py-3 rounded-xl font-bold ${theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         取消
                                     </button>
                                 )}
                                 <button
                                     onClick={handleSave}
-                                    className={`flex-1 py-3 px-6 rounded-xl font-black shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#333]' : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'}`}
+                                    disabled={isSaving}
+                                    className={`flex-1 py-3 px-6 rounded-xl font-black shadow-lg transition-transform flex items-center justify-center gap-2
+                                        ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#333]' : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'}
+                                        ${isSaving ? 'opacity-70 cursor-not-allowed scale-100' : 'active:scale-95'}
+                                    `}
                                 >
-                                    <SaveIcon className="w-4 h-4" /> 儲存設定
+                                    {isSaving ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" /> 處理中...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <SaveIcon className="w-4 h-4" /> 儲存設定
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
