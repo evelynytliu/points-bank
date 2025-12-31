@@ -927,7 +927,7 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
-            <header className="flex flex-col md:flex-row justify-between items-center gap-4 glass-panel p-6 border-cyan-500/10">
+            <header className="flex flex-col md:flex-row justify-between items-center gap-4 py-6">
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
                         <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30'}`}></div>
