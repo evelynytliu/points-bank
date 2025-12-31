@@ -1228,8 +1228,15 @@ export default function Dashboard() {
                                                     onClick={() => {
                                                         const url = 'https://points-bank.vercel.app/';
                                                         const code = tempSettings.short_id;
-                                                        const pin = tempSettings.use_parent_pin ? tempSettings.parent_pin : '(未啟用 PIN)';
-                                                        const msg = `👋 邀請您加入 Points Bank 家庭！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n${tempSettings.use_parent_pin ? `4️⃣ 家長 PIN 碼: ${pin}` : ''}`;
+
+                                                        let msg = t.invite_parent_msg_template;
+                                                        const pinSection = tempSettings.use_parent_pin
+                                                            ? t.invite_parent_pin_section.replace('{pin}', tempSettings.parent_pin)
+                                                            : '';
+
+                                                        msg = msg.replace('{url}', url)
+                                                            .replace('{code}', code)
+                                                            .replace('{pin_section}', pinSection);
 
                                                         showModal({
                                                             type: 'confirm',
@@ -1253,14 +1260,14 @@ export default function Dashboard() {
                                                 <button
                                                     onClick={() => {
                                                         if (kids.length === 0) {
-                                                            alert('請先新增小孩成員！');
+                                                            alert(t.no_kids_alert);
                                                             return;
                                                         }
 
                                                         showModal({
                                                             type: 'alert',
                                                             title: t.invite_kid_msg_title,
-                                                            message: '請選擇要邀請的孩子：',
+                                                            message: t.select_kid_invite,
                                                             content: (
                                                                 <div className="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1">
                                                                     {kids.map(kid => (
@@ -1269,7 +1276,11 @@ export default function Dashboard() {
                                                                             onClick={() => {
                                                                                 const url = 'https://points-bank.vercel.app/';
                                                                                 const code = tempSettings.short_id;
-                                                                                const msg = `👋 ${kid.name}，邀請你加入 Points Bank！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n4️⃣ 選擇你的名字「${kid.name}」\n5️⃣ 輸入 PIN 碼: ${kid.login_pin || '1234'}`;
+                                                                                let msg = t.invite_kid_msg_template;
+                                                                                msg = msg.replace('{url}', url)
+                                                                                    .replace('{code}', code)
+                                                                                    .replace(/{name}/g, kid.name)
+                                                                                    .replace('{pin}', kid.login_pin || '1234');
 
                                                                                 showModal({
                                                                                     type: 'confirm',
