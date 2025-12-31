@@ -157,45 +157,45 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className={`relative w-full max-w-md overflow-hidden rounded-3xl ${theme === 'doodle' ? 'bg-[#fffbf0] border-4 border-[#4a4a4a] shadow-[8px_8px_0px_#4a4a4a]' : 'bg-[#0f172a] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)]'}`}
+                className={`relative w-full max-w-sm overflow-hidden rounded-3xl ${theme === 'doodle' ? 'bg-[#fffbf0] border-4 border-[#4a4a4a] shadow-[8px_8px_0px_#4a4a4a]' : 'bg-[#0f172a] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)]'}`}
             >
                 {/* Close Button */}
                 <button
                     onClick={onClose}
                     disabled={isSaving}
-                    className={`absolute top-4 right-4 z-20 p-2 rounded-full transition-all ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#ff8a80] hover:text-white' : 'bg-black/50 text-white hover:bg-white/20'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`absolute top-3 right-3 z-20 p-2 rounded-full transition-all ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#ff8a80] hover:text-white' : 'bg-black/50 text-white hover:bg-white/20'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     <X className="w-5 h-5" />
                 </button>
 
                 {/* Content */}
-                <div className="p-8 pb-10">
+                <div className="p-6">
                     {/* Header */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-5">
                         <motion.div
-                            initial={{ y: -20, opacity: 0 }}
+                            initial={{ y: -10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 text-3xl shadow-lg ${theme === 'doodle' ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a]' : 'bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-cyan-500/50'}`}
+                            className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-2 text-2xl shadow-lg ${theme === 'doodle' ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a]' : 'bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-cyan-500/50'}`}
                         >
                             {isCompleted ? '🏆' : '🎯'}
                         </motion.div>
-                        <h2 className={`text-3xl font-black uppercase tracking-tight ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                        <h2 className={`text-xl font-black uppercase tracking-tight ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                             {isEditing ? (goal ? '編輯願望' : '設定新願望') : '願望進度'}
                         </h2>
                     </div>
 
                     {!isEditing ? (
                         /* View Mode */
-                        <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-4">
                             {/* Target Content */}
                             <div>
-                                <div className={`relative w-full rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'} ${imageUrl ? 'shadow-sm flex items-center justify-center bg-black/5' : 'aspect-square flex items-center justify-center p-6'}`}>
+                                <div className={`relative w-full rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'} ${imageUrl ? 'shadow-sm flex items-center justify-center bg-black/5' : 'aspect-[4/3] flex items-center justify-center p-4'}`}>
                                     {imageUrl ? (
-                                        <img src={imageUrl} alt={title} className="max-w-full max-h-[350px] w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105" />
+                                        <img src={imageUrl} alt={title} className="max-w-full max-h-[200px] w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105" />
                                     ) : (
                                         <div className="relative z-10 flex flex-col items-center justify-center text-center w-full h-full">
-                                            <Gift className={`w-24 h-24 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 opacity-5 pointer-events-none ${theme === 'doodle' ? 'text-black' : 'text-white'}`} />
-                                            <h3 className={`text-3xl font-black uppercase tracking-tight leading-tight break-words max-w-full relative z-10 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                            <Gift className={`w-16 h-16 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 opacity-5 pointer-events-none ${theme === 'doodle' ? 'text-black' : 'text-white'}`} />
+                                            <h3 className={`text-2xl font-black uppercase tracking-tight leading-tight break-words max-w-full relative z-10 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                                 {title}
                                             </h3>
                                         </div>
@@ -204,23 +204,23 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
 
                                 {/* External Title for Image Mode */}
                                 {imageUrl && (
-                                    <h3 className={`text-2xl font-black uppercase tracking-tight text-center mt-5 mb-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                    <h3 className={`text-lg font-black uppercase tracking-tight text-center mt-3 mb-1 line-clamp-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                         {title}
                                     </h3>
                                 )}
                             </div>
 
                             {/* Progress Bar */}
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-end px-2">
-                                    <span className={`font-black text-2xl ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}>
-                                        {kid.total_points} <span className="text-sm opacity-60">pts</span>
+                            <div className="space-y-1">
+                                <div className="flex justify-between items-end px-1">
+                                    <span className={`font-black text-xl ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}>
+                                        {kid.total_points} <span className="text-xs opacity-60">pts</span>
                                     </span>
-                                    <span className={`font-bold text-sm ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                        目標: {targetPoints} pts
+                                    <span className={`font-bold text-xs ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
+                                        目標: {targetPoints}
                                     </span>
                                 </div>
-                                <div className={`h-8 w-full rounded-full overflow-hidden p-1 ${theme === 'doodle' ? 'bg-[#eee] border-2 border-[#4a4a4a]' : 'bg-white/5 border border-white/10'}`}>
+                                <div className={`h-6 w-full rounded-full overflow-hidden p-1 ${theme === 'doodle' ? 'bg-[#eee] border-2 border-[#4a4a4a]' : 'bg-white/5 border border-white/10'}`}>
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${progress}%` }}
@@ -230,34 +230,34 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                         <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
                                     </motion.div>
                                 </div>
-                                <div className="text-center mt-2">
+                                <div className="text-center mt-1">
                                     {isCompleted ? (
                                         <motion.div
-                                            animate={{ scale: [1, 1.1, 1] }}
+                                            animate={{ scale: [1, 1.05, 1] }}
                                             transition={{ repeat: Infinity, duration: 2 }}
-                                            className={`font-black text-xl ${theme === 'doodle' ? 'text-green-500' : 'text-green-400'}`}
+                                            className={`font-black text-lg ${theme === 'doodle' ? 'text-green-500' : 'text-green-400'}`}
                                         >
-                                            🎉 目標達成！你可以兌換這個獎勵了！
+                                            🎉 目標達成！
                                         </motion.div>
                                     ) : (
-                                        <div className={`font-bold ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                            加油！還差 <span className={`${theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} text-lg mx-1`}>{remaining}</span> 點
+                                        <div className={`font-bold text-sm ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
+                                            加油！還差 <span className={`${theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} text-base mx-1`}>{remaining}</span> 點
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="flex gap-3 pt-4 border-t border-dashed border-white/10">
+                            <div className="flex gap-2 pt-3 border-t border-dashed border-white/10">
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className={`flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/5 text-white hover:bg-white/10'}`}
+                                    className={`flex-1 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/5 text-white hover:bg-white/10'}`}
                                 >
-                                    <Edit2 className="w-4 h-4" /> 編輯目標
+                                    <Edit2 className="w-3.5 h-3.5" /> 編輯
                                 </button>
                                 {goal && (
                                     <button
                                         onClick={onDelete}
-                                        className={`px-4 py-3 rounded-xl font-bold transition-all ${theme === 'doodle' ? 'text-red-400 hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/10'}`}
+                                        className={`px-3 py-2 rounded-xl font-bold transition-all text-sm ${theme === 'doodle' ? 'text-red-400 hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/10'}`}
                                     >
                                         刪除
                                     </button>
@@ -266,50 +266,49 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                         </div>
                     ) : (
                         /* Edit Mode */
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className={`text-xs font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>願望名稱</label>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>願望名稱</label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={e => setTitle(e.target.value)}
-                                    placeholder="例如：樂高城堡、Switch 遊戲..."
-                                    className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
+                                    placeholder="例如：樂高城堡..."
+                                    className={`w-full p-3 rounded-xl font-bold outline-none transition-all text-sm ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className={`text-xs font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>目標點數</label>
+                            <div className="space-y-1">
+                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>目標點數</label>
                                 <div className="relative">
                                     <input
                                         type="number"
                                         value={targetPoints}
                                         onChange={e => setTargetPoints(parseFloat(e.target.value) || 0)}
-                                        className={`w-full p-4 pl-12 rounded-xl font-black text-xl outline-none transition-all ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
+                                        className={`w-full p-3 pl-10 rounded-xl font-black text-lg outline-none transition-all ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
                                     />
-                                    <Target className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${theme === 'doodle' ? 'text-[#bbb]' : 'text-slate-500'}`} />
+                                    <Target className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${theme === 'doodle' ? 'text-[#bbb]' : 'text-slate-500'}`} />
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
-                                <label className={`block text-sm font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
-                                    願望圖片 (可選)
+                            <div className="space-y-2">
+                                <label className={`block text-xs font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
+                                    願望圖片
                                 </label>
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
                                         <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${theme === 'doodle' ? 'text-[#4a4a4a]/40' : 'text-slate-500'}`}>
-                                            <ImageIcon className="w-5 h-5" />
+                                            <ImageIcon className="w-4 h-4" />
                                         </div>
                                         <input
                                             type="url"
                                             value={imageUrl}
                                             onChange={(e) => setImageUrl(e.target.value)}
-                                            className={`w-full pl-10 pr-4 py-3 rounded-xl outline-none transition-all ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
+                                            className={`w-full pl-9 pr-3 py-2.5 rounded-xl outline-none transition-all text-sm ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
                                             placeholder="貼上圖片網址"
                                         />
                                     </div>
 
-                                    {/* Hidden File Input */}
                                     <input
                                         type="file"
                                         ref={fileInputRef}
@@ -318,31 +317,30 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                         className="hidden"
                                     />
 
-                                    {/* Upload Button */}
                                     <button
                                         type="button"
                                         onClick={handleUploadClick}
                                         disabled={isUploading}
-                                        className={`px-4 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
+                                        className={`px-3 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
                                         title="從裝置上傳"
                                     >
-                                        {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                                        {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
                             {imageUrl && (
-                                <div className="h-20 w-20 rounded-lg overflow-hidden border mx-auto mt-2">
+                                <div className="h-14 w-14 rounded-lg overflow-hidden border mx-auto mt-1">
                                     <img src={imageUrl} alt="preview" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
                                 </div>
                             )}
 
 
-                            <div className="pt-4 flex gap-3">
+                            <div className="pt-2 flex gap-2">
                                 {goal && (
                                     <button
                                         onClick={() => setIsEditing(false)}
                                         disabled={isSaving}
-                                        className={`px-6 py-3 rounded-xl font-bold ${theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2.5 rounded-xl font-bold text-sm ${theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         取消
                                     </button>
@@ -350,18 +348,18 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className={`flex-1 py-3 px-6 rounded-xl font-black shadow-lg transition-transform flex items-center justify-center gap-2
+                                    className={`flex-1 py-2.5 px-4 rounded-xl font-black shadow-lg transition-transform flex items-center justify-center gap-2 text-sm
                                         ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#333]' : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'}
                                         ${isSaving ? 'opacity-70 cursor-not-allowed scale-100' : 'active:scale-95'}
                                     `}
                                 >
                                     {isSaving ? (
                                         <>
-                                            <Loader2 className="w-4 h-4 animate-spin" /> 處理中...
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                         </>
                                     ) : (
                                         <>
-                                            <SaveIcon className="w-4 h-4" /> 儲存設定
+                                            <SaveIcon className="w-3.5 h-3.5" /> 儲存
                                         </>
                                     )}
                                 </button>
