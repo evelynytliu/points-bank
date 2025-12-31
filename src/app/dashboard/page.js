@@ -1095,6 +1095,7 @@ export default function Dashboard() {
 
                             <section>
                                 <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.kids_mgmt}</h4>
+                                <div className={`text-xs ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} opacity-60 mb-3`}>{t.kid_sort_hint}</div>
                                 <Reorder.Group axis="y" values={kids} onReorder={handleReorderKids} className="space-y-3 mb-4">
                                     {kids.map(kid => (
                                         <Reorder.Item

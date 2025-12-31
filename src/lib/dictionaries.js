@@ -53,6 +53,7 @@ const rawTranslations = {
 
     // Settings / Data
     kids_mgmt: ['小孩帳號管理', 'Child Accounts'],
+    kid_sort_hint: ['您可以拖曳調整排序，此設定僅在您的裝置上生效。', 'Drag to reorder. This setting only applies to you locally.'],
     parent_team_center: ['家長與管理員成員', 'Parents & Admins'],
     members_section: ['成員管理', 'Members'],
     admin_label: ['🔑 管理員 (Admin)', '🔑 Admin'],
