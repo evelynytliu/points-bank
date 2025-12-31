@@ -1766,45 +1766,25 @@
                                 <div class="demo-dashed-divider"></div>
 
                                 <!-- Rewards & Goal -->
-                                <div style="text-align: right; position: relative;">
-                                    <!-- Goal Icon -->
-                                    <div style="position: absolute; top: -1.8rem; right: -0.5rem; z-index: 10; cursor: pointer; display: flex; flex-direction: column; align-items: center;"
-                                         title="${kid.goal ? kid.goal.title : '設定願望'}">
-                                        
-                                        <div style="animation: ${kid.goal ? 'pulse 2s ease-in-out infinite' : 'deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'};">
-                                            ${kid.goal ?
-                            '<span style="font-size: 1.8rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1));">🎯</span>' :
-                            '<i data-lucide="plus" size="24" style="color: #4a4a4a; opacity: 0.6; stroke-width: 3;"></i>'
-                        }
+                                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem;">
+                                    ${kid.goal ? `
+                                        <div style="display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.2rem;" title="${kid.goal.title}">
+                                           <span style="font-weight: 900; color: var(--ink); font-size: 0.9rem;">${kid.goal.title}</span>
+                                           <span style="font-size: 1.2rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1)); animation: pulse 2s ease-in-out infinite;">🎯</span>
                                         </div>
-                                        
-                                        ${kid.goal ? `
-                                            <div style="
-                                                background: var(--ink); 
-                                                color: white; 
-                                                font-size: 0.65rem; 
-                                                padding: 0.1rem 0.4rem; 
-                                                border-radius: 4px; 
-                                                font-weight: 700; 
-                                                white-space: nowrap; 
-                                                margin-top: -2px;
-                                                box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
-                                                animation: slideUp 0.5s ease-out forwards;
-                                            ">
-                                                ${kid.goal.title}
-                                            </div>
-                                        ` : ''}
-
-                                    </div>
-
-                                    <div style="font-size: 0.7rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.05em; opacity: 0.7;">可兌換獎勵</div>
+                                    ` : `
+                                        <div style="font-size: 0.8rem; color: #888; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.3rem;">
+                                            未設定願望 <i data-lucide="plus-circle" size="14"></i>
+                                        </div>
+                                    `}
+                                    
                                     <div style="font-size: 1.1rem; font-weight: 900; font-style: italic; color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
                                         <i data-lucide="monitor" size="16" style="color: var(--accent)"></i> 
                                         <span id="demo-redeem-mins-${kid.id}">${canRedeemMins}</span> <span style="font-size: 0.7rem; font-style: normal; opacity: 0.6;">分鐘</span>
                                     </div>
                                     <div style="font-size: 1.1rem; font-weight: 900; font-style: italic; color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
                                         <i data-lucide="coins" size="16" style="color: #4caf50"></i> 
-                                        <span id="demo-redeem-money-${kid.id}">${canRedeemMoney}</span> <span style="font-size: 0.7rem; font-style: normal; opacity: 0.6;">元</span>
+                                        <span id="demo-redeem-money-${kid.id}">${canRedeemMoney}</span> <span style="font-size: 0.7rem; font-style: normal; opacity: 0.6;">$</span>
                                     </div>
                                 </div>
                             </div>
@@ -1817,7 +1797,7 @@
                                 
                                 <div style="position: relative; z-index: 2; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink);">
                                     <i data-lucide="monitor" size="16"></i> 
-                                    <span style="font-size: 1.1rem;"><span id="demo-mins-${kid.id}">${kid.minutes}</span> <span style="font-size: 0.8rem">MINS</span></span>
+                                    <span style="font-size: 1.1rem;"><span id="demo-mins-${kid.id}">${kid.minutes}</span> <span style="font-size: 0.8rem">分鐘</span></span>
                                 </div>
                                 <div style="position: absolute; right: 1rem; z-index: 2; font-weight: 900; color: var(--ink); opacity: 0.4;">
                                     / ${kid.limit}

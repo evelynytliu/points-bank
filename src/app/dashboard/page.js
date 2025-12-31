@@ -6,7 +6,7 @@ import { Reorder, useDragControls } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Logo from '@/components/Logo';
 import WishGoalModal from '@/components/WishGoalModal';
-import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock, Rocket } from 'lucide-react';
+import { LogOut, Plus, PlusCircle, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import { APP_CONFIG } from '@/lib/config';
 
@@ -1128,7 +1128,7 @@ export default function Dashboard() {
                             </div>
 
                             <button onClick={handleBatchUpdate} className="btn btn-primary w-full !py-6 text-xl font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-2">
-                                {t.execute_update} <Rocket className="w-6 h-6" />
+                                {t.execute_update} 🚀
                             </button>
                         </div>
                     </div>
@@ -1930,66 +1930,42 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     </div>
 
                     {/* Divider */}
-                    <div className={`w-0.5 self-stretch ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10 border-l-2 border-dashed border-[#4a4a4a]/20' : 'bg-white/10'}`}></div>
+                    <div className={`h-16 w-0 border-l-2 border-dashed self-center mx-2 ${familySettings?.theme === 'doodle' ? 'border-[#4a4a4a]/20' : 'border-white/10'}`}></div>
 
                     {/* Right Side: Rewards Info + Goal Trigger */}
                     <div
                         onClick={() => setShowGoalModal(true)}
-                        className={`relative flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
+                        className={`flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
                     >
-                        {!isUpdatingGoal && (
-                            <>
-                                <style>{`
-                                @keyframes deep-pulse {
-                                    0%, 100% { opacity: 1; transform: scale(1); }
-                                    50% { opacity: 0.6; transform: scale(0.92); }
-                                }
-                                .custom-deep-pulse {
-                                    animation: deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                                }
-                            `}</style>
-                                <div
-                                    className={`absolute -top-7 -right-1 z-20 cursor-pointer transition-all ${goal ? 'animate-[pulse_2s_ease-in-out_infinite] group-hover/goal:scale-125' : 'custom-deep-pulse group-hover/goal:animate-none group-hover/goal:opacity-100 group-hover/goal:scale-125'}`}
-                                    title={goal ? goal.title : "設定願望"}
-                                >
-                                    {goal ? (
-                                        <span className="text-2xl">🎯</span>
-                                    ) : (
-                                        <Plus
-                                            className={`w-6 h-6 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]/60' : 'text-cyan-400/60'}`}
-                                            strokeWidth={3}
-                                        />
-                                    )}
-                                </div>
-                            </>
-                        )}
                         {isUpdatingGoal ? (
                             <div className="flex items-center justify-end mb-1 w-full animate-pulse gap-2">
                                 <span className={`text-[10px] font-black tracking-widest opacity-40 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>UPDATING</span>
                                 <div className={`h-4 w-12 rounded-full ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10' : 'bg-white/10'}`}></div>
                             </div>
                         ) : goal ? (
-                            <div className={`text-xs font-black uppercase tracking-widest opacity-90 mb-1 max-w-[160px] ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-300'}`}>
-                                <span className="truncate block border-b-2 border-transparent group-hover/goal:border-current transition-all text-right" title={goal.title}>{goal.title}</span>
+                            <div className="flex items-center justify-end gap-2 mb-1" title={goal.title}>
+                                <span className={`text-sm font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{goal.title}</span>
+                                <span className="text-xl animate-[pulse_2s_ease-in-out_infinite] filter drop-shadow-sm">🎯</span>
                             </div>
                         ) : (
-                            <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2 mb-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
-                                {t.redeemable_rewards}
+                            <div className={`text-xs font-bold mb-1 flex items-center justify-end gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
+                                {t.wish_setup_new || '設定願望'} <PlusCircle className="w-3.5 h-3.5" />
                             </div>
                         )}
-                        <div className="space-y-1">
-                            <div className="flex items-center justify-end gap-3">
+
+                        <div className="flex flex-col items-end gap-0.5">
+                            <div className="flex items-center justify-end gap-2">
                                 <Monitor className={`w-4 h-4 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
-                                <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                <span className={`text-lg font-black italic flex items-baseline gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                     <AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} />
-                                    <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.minutes_unit}</span>
+                                    <span className="text-[10px] font-bold not-italic opacity-60">{t.minutes_unit}</span>
                                 </span>
                             </div>
-                            <div className="flex items-center justify-end gap-3">
+                            <div className="flex items-center justify-end gap-2">
                                 <Coins className={`w-4 h-4 text-green-500`} />
-                                <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                <span className={`text-lg font-black italic flex items-baseline gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                     <AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} />
-                                    <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.cash_unit}</span>
+                                    <span className="text-[10px] font-bold not-italic opacity-60">{t.cash_unit}</span>
                                 </span>
                             </div>
                         </div>

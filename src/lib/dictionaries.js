@@ -33,7 +33,7 @@ const rawTranslations = {
     points_bank: ['Points Bank', 'Points Bank'],
     kid_mode: ['小孩模式', 'Kid Mode'],
     settings: ['設定', 'Settings'],
-    admin_console: ['管理控制台 (批次點數/時間)', 'Admin Console (Batch Points/Time)'],
+    admin_console: ['管理控制台', 'Admin Console'],
     points_adjust: ['點數調整', 'Points Adjust'],
     minutes_adjust: ['分鐘調整', 'Minutes Adjust'],
     reason_desc: ['說明原因', 'Note'],
