@@ -78,7 +78,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
             setImageUrl(publicUrlData.publicUrl);
         } catch (error) {
             console.error('Upload failed:', error);
-            alert('Upload failed: ' + error.message);
+            alert(t.alert_upload_failed + error.message);
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -103,8 +103,8 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
     const remaining = Math.max(0, (goal?.target_points || 0) - kid.total_points);
 
     const handleSave = async () => {
-        if (!title.trim()) return alert('請輸入願望名稱');
-        if (targetPoints <= 0) return alert('目標點數必須大於 0');
+        if (!title.trim()) return alert(t.alert_enter_wish_name);
+        if (targetPoints <= 0) return alert(t.alert_target_points_greater_zero);
 
         setIsSaving(true);
         try {
@@ -180,7 +180,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                             {isCompleted ? '🏆' : '🎯'}
                         </motion.div>
                         <h2 className={`text-xl font-black uppercase tracking-tight ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                            {isEditing ? (goal ? '編輯願望' : '設定新願望') : '願望進度'}
+                            {isEditing ? (goal ? t.wish_edit : t.wish_setup_new) : t.wish_progress}
                         </h2>
                     </div>
 
@@ -214,10 +214,10 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                             <div className="space-y-1">
                                 <div className="flex justify-between items-end px-1">
                                     <span className={`font-black text-xl ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}>
-                                        {kid.total_points} <span className="text-xs opacity-60">pts</span>
+                                        {kid.total_points} <span className="text-xs opacity-60">{t.pts}</span>
                                     </span>
                                     <span className={`font-bold text-xs ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                        目標: {targetPoints}
+                                        {t.goal_label} {targetPoints}
                                     </span>
                                 </div>
                                 <div className={`h-6 w-full rounded-full overflow-hidden p-1 ${theme === 'doodle' ? 'bg-[#eee] border-2 border-[#4a4a4a]' : 'bg-white/5 border border-white/10'}`}>
@@ -237,11 +237,11 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                             transition={{ repeat: Infinity, duration: 2 }}
                                             className={`font-black text-lg ${theme === 'doodle' ? 'text-green-500' : 'text-green-400'}`}
                                         >
-                                            🎉 目標達成！
+                                            {t.wish_completed}
                                         </motion.div>
                                     ) : (
                                         <div className={`font-bold text-sm ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                            加油！還差 <span className={`${theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} text-base mx-1`}>{remaining}</span> 點
+                                            {t.wish_remaining_prefix} <span className={`${theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} text-base mx-1`}>{remaining}</span> {t.wish_remaining_suffix}
                                         </div>
                                     )}
                                 </div>
@@ -252,14 +252,14 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                     onClick={() => setIsEditing(true)}
                                     className={`flex-1 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/5 text-white hover:bg-white/10'}`}
                                 >
-                                    <Edit2 className="w-3.5 h-3.5" /> 編輯
+                                    <Edit2 className="w-3.5 h-3.5" /> {t.wish_edit_btn}
                                 </button>
                                 {goal && (
                                     <button
                                         onClick={onDelete}
                                         className={`px-3 py-2 rounded-xl font-bold transition-all text-sm ${theme === 'doodle' ? 'text-red-400 hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/10'}`}
                                     >
-                                        刪除
+                                        {t.delete}
                                     </button>
                                 )}
                             </div>
@@ -268,18 +268,18 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                         /* Edit Mode */
                         <div className="space-y-4">
                             <div className="space-y-1">
-                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>願望名稱</label>
+                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.wish_name_label}</label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={e => setTitle(e.target.value)}
-                                    placeholder="例如：樂高城堡..."
+                                    placeholder={t.wish_name_placeholder}
                                     className={`w-full p-3 rounded-xl font-bold outline-none transition-all text-sm ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>目標點數</label>
+                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.target_points_label}</label>
                                 <div className="relative">
                                     <input
                                         type="number"
@@ -293,7 +293,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
 
                             <div className="space-y-2">
                                 <label className={`block text-xs font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
-                                    願望圖片
+                                    {t.wish_image_label}
                                 </label>
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
@@ -305,7 +305,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                             value={imageUrl}
                                             onChange={(e) => setImageUrl(e.target.value)}
                                             className={`w-full pl-9 pr-3 py-2.5 rounded-xl outline-none transition-all text-sm ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
-                                            placeholder="貼上圖片網址"
+                                            placeholder={t.wish_image_placeholder}
                                         />
                                     </div>
 
@@ -322,7 +322,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                         onClick={handleUploadClick}
                                         disabled={isUploading}
                                         className={`px-3 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
-                                        title="從裝置上傳"
+                                        title={t.upload_from_device}
                                     >
                                         {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                                     </button>
@@ -342,7 +342,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                         disabled={isSaving}
                                         className={`px-4 py-2.5 rounded-xl font-bold text-sm ${theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
-                                        取消
+                                        {t.cancel}
                                     </button>
                                 )}
                                 <button
@@ -359,7 +359,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                         </>
                                     ) : (
                                         <>
-                                            <SaveIcon className="w-3.5 h-3.5" /> 儲存
+                                            <SaveIcon className="w-3.5 h-3.5" /> {t.save}
                                         </>
                                     )}
                                 </button>

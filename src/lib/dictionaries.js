@@ -200,6 +200,27 @@ const rawTranslations = {
     install_ios_chrome_1: ['1. 點擊右上角網址列的分享按鈕', '1. Tap Share icon in address bar'],
     install_ios_chrome_2: ['2. 捲動或點選「更多(...)」', "2. Scroll or tap 'More (...)'"],
     install_ios_chrome_3: ['3. 點選「加入主畫面」', '3. Tap "Add to Home Screen"'],
+
+    // Wish Goal
+    wish_edit: ['編輯願望', 'Edit Wish'],
+    wish_setup_new: ['設定新願望', 'New Wish'],
+    wish_progress: ['願望進度', 'Wish Progress'],
+    goal_label: ['目標:', 'Goal:'],
+    pts: ['pts', 'pts'],
+    wish_completed: ['🎉 目標達成！', '🎉 Goal Reached!'],
+    wish_remaining_prefix: ['加油！還差', 'Go! Only'],
+    wish_remaining_suffix: ['點', 'pts left'],
+    wish_edit_btn: ['編輯', 'Edit'],
+    delete: ['刪除', 'Delete'],
+    wish_name_label: ['願望名稱', 'Wish Name'],
+    wish_name_placeholder: ['例如：樂高城堡...', 'e.g. Lego Castle...'],
+    target_points_label: ['目標點數', 'Target Points'],
+    wish_image_label: ['願望圖片', 'Wish Image'],
+    wish_image_placeholder: ['貼上圖片網址', 'Paste image URL'],
+    upload_from_device: ['從裝置上傳', 'Upload from device'],
+    alert_enter_wish_name: ['請輸入願望名稱', 'Please enter wish name'],
+    alert_target_points_greater_zero: ['目標點數必須大於 0', 'Target points must be > 0'],
+    alert_upload_failed: ['上傳失敗: ', 'Upload failed: '],
 };
 
 // Helper to generate dictionaries
