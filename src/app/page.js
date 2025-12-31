@@ -132,8 +132,8 @@ export default function Home() {
       )}
 
       <div className="glass-panel w-full max-w-[480px] p-8 md:p-12 text-center z-10">
-        <div className={`inline-flex items-center justify-center w-20 h-20 mb-6 transition-all duration-500 ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
-          <Logo className="w-12 h-12" />
+        <div className={`inline-flex items-center justify-center w-28 h-28 mb-6 transition-all duration-500 ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
+          <Logo className="w-20 h-20" />
         </div>
 
         <h1 className="text-4xl font-black mb-6 tracking-tight flex items-center justify-center gap-2">
