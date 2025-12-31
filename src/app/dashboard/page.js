@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Reorder, useDragControls } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Logo from '@/components/Logo';
+import WishGoalModal from '@/components/WishGoalModal';
 import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import { APP_CONFIG } from '@/lib/config';
@@ -138,6 +139,7 @@ export default function Dashboard() {
     const [family, setFamily] = useState(null);
     const [loading, setLoading] = useState(true);
     const [kids, setKids] = useState([]);
+    const [goals, setGoals] = useState({}); // Map of kid_id -> goal object
     const [logs, setLogs] = useState([]);
     const [familyMembers, setFamilyMembers] = useState([]);
     const [userRole, setUserRole] = useState('parent'); // 'parent' or 'kid'
@@ -469,6 +471,21 @@ export default function Dashboard() {
             }
 
             setKids(finalKids);
+
+            // Fetch Wish Goals
+            if (finalKids.length > 0) {
+                const kidIds = finalKids.map(k => k.id);
+                const { data: goalsData } = await supabase
+                    .from('wish_goals')
+                    .select('*')
+                    .in('kid_id', kidIds);
+
+                if (goalsData) {
+                    const goalsMap = {};
+                    goalsData.forEach(g => goalsMap[g.kid_id] = g);
+                    setGoals(goalsMap);
+                }
+            }
 
             // 獲取日誌
             const { data: logsData, error: lError } = await supabase
@@ -876,6 +893,48 @@ export default function Dashboard() {
         }
     };
 
+    const handleUpdateGoal = async (kidId, goalData) => {
+        if (!kidId) return;
+
+        // Check if goal exists
+        const existing = goals[kidId];
+
+        let error;
+        if (existing) {
+            const { error: err } = await supabase
+                .from('wish_goals')
+                .update({ ...goalData })
+                .eq('kid_id', kidId);
+            error = err;
+        } else {
+            const { error: err } = await supabase
+                .from('wish_goals')
+                .insert({ ...goalData, kid_id: kidId });
+            error = err;
+        }
+
+        if (error) {
+            alert('更新願望失敗: ' + error.message);
+        } else {
+            fetchData();
+        }
+    };
+
+    const handleDeleteGoal = async (kidId) => {
+        if (!confirm('確定要刪除這個願望目標嗎？')) return;
+
+        const { error } = await supabase
+            .from('wish_goals')
+            .delete()
+            .eq('kid_id', kidId);
+
+        if (error) {
+            alert('刪除失敗: ' + error.message);
+        } else {
+            fetchData();
+        }
+    };
+
     const exportLogsToCSV = async () => {
         try {
             const { data: allLogs, error } = await supabase
@@ -1048,6 +1107,9 @@ export default function Dashboard() {
                             <KidCard
                                 key={kid.id}
                                 kid={kid}
+                                goal={goals[kid.id]}
+                                onUpdateGoal={handleUpdateGoal}
+                                onDeleteGoal={handleDeleteGoal}
                                 onUpdate={updateKidAction}
                                 onDelete={deleteKid}
                                 currentLimit={allocPlan === 'weekday' ? family?.weekday_limit : family?.holiday_limit}
@@ -1732,8 +1794,10 @@ function AnimatedCounter({ value }) {
     return <>{display}</>;
 }
 
-function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
+function KidCard({ kid, goal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
+
+    const [showGoalModal, setShowGoalModal] = useState(false);
 
     // Visual states to control animation timing
     const [isInView, setIsInView] = useState(false);
@@ -1834,9 +1898,15 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     {/* Divider */}
                     <div className={`w-0.5 self-stretch ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10 border-l-2 border-dashed border-[#4a4a4a]/20' : 'bg-white/10'}`}></div>
 
-                    {/* Right Side: Rewards Info */}
-                    <div className="flex flex-col gap-3 justify-center items-end text-right whitespace-nowrap">
-                        <div className={`text-xs font-black uppercase tracking-widest opacity-60 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>{t.redeemable_rewards}</div>
+                    {/* Right Side: Rewards Info + Goal Trigger */}
+                    <div
+                        onClick={() => setShowGoalModal(true)}
+                        className={`flex flex-col gap-3 justify-center items-end text-right whitespace-nowrap cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
+                    >
+                        <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
+                            {goal ? '🎯 ' + goal.title : t.redeemable_rewards}
+                            {goal && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-400 text-white animate-pulse">GOAL</span>}
+                        </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-end gap-3">
                                 <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
@@ -1974,6 +2044,17 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     <Star className="w-5 h-5 text-orange-400" /> ➔ <Monitor className="w-5 h-5" />
                 </button>
             </div>
+
+            <WishGoalModal
+                isOpen={showGoalModal}
+                onClose={() => setShowGoalModal(false)}
+                kid={kid}
+                goal={goal}
+                onSave={(data) => onUpdateGoal(kid.id, data)}
+                onDelete={() => onDeleteGoal(kid.id)}
+                t={t}
+                theme={familySettings?.theme}
+            />
         </div >
     );
 }
