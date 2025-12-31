@@ -931,7 +931,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
                         <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30'}`}></div>
-                        <Logo className={`${family?.theme === 'doodle' ? '' : 'text-cyan-400'} w-12 h-12 relative z-10 drop-shadow-sm`} />
+                        <Logo className={`${family?.theme === 'doodle' ? '' : 'text-cyan-400'} w-12 h-12 relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-125`} />
                     </div>
                     <div className="flex flex-col">
                         <h1 className={`text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
