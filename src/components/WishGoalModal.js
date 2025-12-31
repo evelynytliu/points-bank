@@ -115,9 +115,9 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                         <div className="flex flex-col gap-6">
                             {/* Target Content */}
                             <div>
-                                <div className={`relative w-full rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'} ${imageUrl ? 'aspect-video shadow-sm' : 'aspect-video flex items-center justify-center p-6'}`}>
+                                <div className={`relative w-full rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'} ${imageUrl ? 'shadow-sm flex items-center justify-center bg-black/5' : 'aspect-square flex items-center justify-center p-6'}`}>
                                     {imageUrl ? (
-                                        <img src={imageUrl} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                        <img src={imageUrl} alt={title} className="max-w-full max-h-[350px] w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105" />
                                     ) : (
                                         <div className="relative z-10 flex flex-col items-center justify-center text-center w-full h-full">
                                             <Gift className={`w-24 h-24 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 opacity-5 pointer-events-none ${theme === 'doodle' ? 'text-black' : 'text-white'}`} />
