@@ -1910,16 +1910,14 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                         className={`flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
                     >
                         {isUpdatingGoal ? (
-                            <div className="flex flex-col items-end mb-1 max-w-[140px] animate-pulse">
-                                <div className={`h-4 w-20 rounded-md mb-1 ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/20' : 'bg-white/20'}`}></div>
-                                <span className={`text-[10px] font-black tracking-widest opacity-50 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>UPDATING...</span>
+                            <div className="flex items-center justify-end mb-1 w-full animate-pulse gap-2">
+                                <span className={`text-[10px] font-black tracking-widest opacity-40 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>UPDATING</span>
+                                <div className={`h-4 w-12 rounded-full ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10' : 'bg-white/10'}`}></div>
                             </div>
                         ) : goal ? (
-                            <div className="flex flex-col items-end mb-1 max-w-[140px]">
-                                <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} truncate w-full justify-end`}>
-                                    🎯 {goal.title}
-                                </div>
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-400 text-white animate-pulse shadow-sm scale-90 origin-right">GOAL</span>
+                            <div className={`text-xs font-black uppercase tracking-widest opacity-90 flex items-center justify-end gap-1.5 mb-1 max-w-[160px] ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-300'}`}>
+                                <span className="truncate border-b-2 border-transparent group-hover/goal:border-current transition-all" title={goal.title}>{goal.title}</span>
+                                <span className="text-sm animate-[pulse_1.5s_ease-in-out_infinite] scale-110">🎯</span>
                             </div>
                         ) : (
                             <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2 mb-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
