@@ -1063,7 +1063,7 @@ export default function Dashboard() {
 
                 <div className="lg:col-span-4 space-y-8">
                     <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
-                    <div className={`glass-panel p-6 ${family?.theme === 'doodle' ? 'border-[#4a4a4a]' : 'border-pink-500/5'} min-h-[500px]`}>
+                    <div className="min-h-[500px]">
                         {logs.length === 0 ? (
                             <div className={`flex flex-col items-center justify-center h-[450px] text-center ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-600'}`}>
                                 <History className="w-12 h-12 mb-4 opacity-50" />
