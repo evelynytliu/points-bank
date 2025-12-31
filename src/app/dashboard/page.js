@@ -6,7 +6,7 @@ import { Reorder, useDragControls } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Logo from '@/components/Logo';
 import WishGoalModal from '@/components/WishGoalModal';
-import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock } from 'lucide-react';
+import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock, Rocket } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import { APP_CONFIG } from '@/lib/config';
 
