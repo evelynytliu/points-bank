@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Reorder } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2 } from 'lucide-react';
+import { LogOut, Plus, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 
 const AVATARS = [
@@ -96,6 +96,8 @@ export default function Dashboard() {
     const [isChrome, setIsChrome] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [dismissedInstallPrompt, setDismissedInstallPrompt] = useState(false);
+    const [isPinVisible, setIsPinVisible] = useState(false);
 
     useEffect(() => {
         setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
@@ -103,6 +105,7 @@ export default function Dashboard() {
         setIsIOS(/iphone|ipad|ipod/.test(userAgent));
         setIsChrome(/crios/.test(userAgent));
         setIsMobile(/android|iphone|ipad|ipod/.test(userAgent));
+        setDismissedInstallPrompt(localStorage.getItem('dismissed_install_prompt') === 'true');
 
         const handleBeforeInstallPrompt = (e) => {
             e.preventDefault();
@@ -112,6 +115,11 @@ export default function Dashboard() {
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     }, []);
+
+    const dismissInstallPrompt = () => {
+        setDismissedInstallPrompt(true);
+        localStorage.setItem('dismissed_install_prompt', 'true');
+    };
 
     const handleInstallClick = async () => {
         if (deferredPrompt) {
@@ -673,37 +681,66 @@ export default function Dashboard() {
         }
     };
 
-    const handleJoinFamily = async (codeOverride) => {
-        const codeToUse = typeof codeOverride === 'string' ? codeOverride : joinCode.trim();
+    const handleJoinFamily = async (pinOverride) => {
+        const codeToUse = joinCode.trim();
+        const pinToUse = typeof pinOverride === 'string' ? pinOverride : joinPin.trim();
+
         if (!codeToUse) return alert('請輸入家庭代碼');
+        if (!pinToUse) return alert('請輸入家庭驗證 PIN 碼');
 
         let targetId = codeToUse;
+        let targetFamily = null;
 
-        // Try to lookup by short_id first
+        // 1. Try to lookup by short_id first
         const { data: familyByShort, error: searchError } = await supabase
             .from('families')
-            .select('id')
+            .select('*')
             .eq('short_id', codeToUse)
             .maybeSingle();
 
         if (familyByShort) {
             targetId = familyByShort.id;
+            targetFamily = familyByShort;
         } else {
-            // If not found by short_id, check if it's a valid UUID
+            // 2. If not found by short_id, check if it's a valid UUID
             const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            if (!uuidRegex.test(codeToUse)) {
+            if (uuidRegex.test(codeToUse)) {
+                // If ID is valid UUID, fetch family to check PIN
+                const { data: familyById } = await supabase
+                    .from('families')
+                    .select('*')
+                    .eq('id', codeToUse)
+                    .maybeSingle();
+                if (familyById) {
+                    targetId = familyById.id;
+                    targetFamily = familyById;
+                }
+            } else {
                 return alert(t.alert_no_family);
             }
         }
 
+        if (!targetFamily) return alert(t.alert_no_family);
+
+        // 3. Check PIN
+        if (targetFamily.use_parent_pin && targetFamily.parent_pin) {
+            if (pinToUse !== targetFamily.parent_pin) {
+                return alert('PIN 碼錯誤！加入家庭失敗。');
+            }
+        }
+
+        // 4. Join
         const { error } = await supabase.rpc('join_family', { target_family_id: targetId });
 
         if (error) {
             alert(t.alert_join_fail + error.message);
         } else {
-            if (typeof codeOverride !== 'string') alert(t.alert_join_success);
+            alert(t.alert_join_success);
             setShowOnboarding(false);
             setShowSettingsModal(false);
+            // Clear inputs
+            setJoinCode('');
+            setJoinPin('');
             fetchData();
         }
     };
@@ -1037,7 +1074,7 @@ export default function Dashboard() {
                             </section>
 
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_members_mgmt}</h4>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.kids_mgmt}</h4>
                                 <Reorder.Group axis="y" values={kids} onReorder={handleReorderKids} className="space-y-3 mb-4">
                                     {kids.map(kid => (
                                         <Reorder.Item
@@ -1131,24 +1168,176 @@ export default function Dashboard() {
                                 </button>
                             </section>
 
-                            {/* 3. 風格選擇 */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* 3. 家庭邀請碼 */}
+                                <section className={`p-4 md:p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
+                                    <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center flex-wrap gap-2">
+                                            <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
+                                            <button
+                                                onClick={() => {
+                                                    const randomCode = `FAMILY${Math.floor(1000 + Math.random() * 9000)}`;
+                                                    setTempSettings({ ...tempSettings, short_id: randomCode });
+                                                }}
+                                                className={`text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-all flex items-center gap-1`}
+                                            >
+                                                <span className="text-xs">🎲</span> {t.random_generate}
+                                            </button>
+                                        </div>
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="text"
+                                                className={`w-full flex-1 ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-3 md:p-4 pr-12 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                value={tempSettings.short_id}
+                                                onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
+                                                placeholder="例如: FAMILY123"
+                                            />
+                                            <button
+                                                onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }}
+                                                className={`absolute right-2 p-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'text-[#ccc] hover:text-[#4a4a4a] hover:bg-black/5' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
+                                                title={t.copy_code || 'Copy'}
+                                            >
+                                                <Copy className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-slate-500 italic opacity-60">{t.access_code_hint}</p>
+                                    </div>
+                                </section>
+
+                                {/* 4. 家長與管理員 */}
+                                <section>
+                                    <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
+                                    <div className="space-y-3">
+                                        {familyMembers.map(m => (
+                                            <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-8 h-8 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
+                                                    <div>
+                                                        <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
+                                                        <div className={`text-[10px] ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} font-black`}>{m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
+                                                    </div>
+                                                </div>
+                                                {m.id !== family.admin_id && m.id !== user.id && (
+                                                    <button onClick={() => kickMember(m.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            </div>
+
+                            {/* 5. 安全與偏好設定 */}
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.ui_style_selection}</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
-                                        <div className="text-sm font-bold mb-1">Cyber Neon</div>
-                                        <div className="text-xs uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
-                                    </button>
-                                    <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
-                                        <div className="text-sm font-bold mb-1">Warm Doodle</div>
-                                        <div className="text-xs uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
-                                    </button>
+                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings} & {t.ui_style_selection}</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Security - PIN */}
+                                    {/* Security - PIN */}
+                                    <div className="space-y-6">
+                                        {/* Row 1: PIN Input (Masked) + Eye Icon */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
+                                            </div>
+                                            <div className="relative">
+                                                <input
+                                                    type={isPinVisible ? "text" : "password"}
+                                                    maxLength={4}
+                                                    placeholder={t.four_digit_pin}
+                                                    className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
+                                                    value={tempSettings.parent_pin}
+                                                    onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })}
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        if (isPinVisible) {
+                                                            setIsPinVisible(false);
+                                                        } else {
+                                                            // Enhance: Use number words for challenge
+                                                            const numsZh = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖', '拾'];
+                                                            const numsEn = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+                                                            const isZh = language === 'zh';
+                                                            const n1 = Math.floor(Math.random() * 5) + 1; // 1-5
+                                                            const n2 = Math.floor(Math.random() * 5) + 1; // 1-5
+                                                            const op = Math.random() > 0.5 ? '+' : '-';
+
+                                                            // Ensure result is positive for subtraction
+                                                            const [a, b] = (op === '-' && n1 < n2) ? [n2, n1] : [n1, n2];
+
+                                                            const qText = isZh
+                                                                ? `${numsZh[a]} ${op === '+' ? '加' : '減'} ${numsZh[b]} = ?`
+                                                                : `${numsEn[a]} ${op === '+' ? 'plus' : 'minus'} ${numsEn[b]} = ?`;
+                                                            const ans = op === '+' ? a + b : a - b;
+
+                                                            showModal({
+                                                                type: 'prompt',
+                                                                title: t.show_pin,
+                                                                message: `${t.verify_math}\n\n${qText}`,
+                                                                onConfirm: (val) => {
+                                                                    if (parseInt(val) === ans) {
+                                                                        setIsPinVisible(true);
+                                                                    } else {
+                                                                        alert(t.math_error);
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }}
+                                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${family?.theme === 'doodle' ? 'hover:bg-gray-100 text-gray-400' : 'hover:bg-white/10 text-slate-500'}`}
+                                                >
+                                                    {isPinVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5 opacity-70" />}
+                                                </button>
+                                            </div>
+                                            <div className={`text-xs text-center ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_sub}</div>
+                                        </div>
+
+                                        {/* Row 2: Enable Toggle */}
+                                        <div className="space-y-2">
+                                            <div className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white' : 'bg-black/40'} rounded-2xl border ${family?.theme === 'doodle' ? 'border-[#eee]' : 'border-white/5'}`}>
+                                                <div className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
+                                                <button
+                                                    onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
+                                                    className={`w-16 h-8 rounded-full transition-all relative flex items-center shadow-inner shrink-0 ${tempSettings.use_parent_pin
+                                                        ? (family?.theme === 'doodle' ? 'bg-orange-400' : 'bg-cyan-500')
+                                                        : (family?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10')
+                                                        }`}
+                                                >
+                                                    <div className={`text-[10px] font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
+                                                        {tempSettings.use_parent_pin ? 'ON' : 'OFF'}
+                                                    </div>
+                                                    <div className={`w-6 h-6 bg-white rounded-full transition-all shadow-md z-10 transform ${tempSettings.use_parent_pin ? 'translate-x-9' : 'translate-x-1'}`} />
+                                                </button>
+                                            </div>
+                                            <div className={`text-xs text-center ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.enable_pin_sub}</div>
+                                        </div>
+                                    </div>
+
+
+                                    {/* UI Style */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
+                                            <div className="text-sm font-bold mb-1">Cyber Neon</div>
+                                            <div className="text-xs uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
+                                        </button>
+                                        <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`p-4 rounded-2xl border-2 transition-all text-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
+                                            <div className="text-sm font-bold mb-1">Warm Doodle</div>
+                                            <div className="text-xs uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
+                                        </button>
+                                    </div>
                                 </div>
                             </section>
 
-                            {/* 4. Install App (Mobile Only) */}
-                            {isMobile && !isStandalone && (deferredPrompt || isIOS) && (
-                                <section>
+                            {/* 6. Install App (Mobile Only) */}
+                            {isMobile && !isStandalone && (deferredPrompt || isIOS) && !dismissedInstallPrompt && (
+                                <section className="relative group">
+                                    <button
+                                        onClick={dismissInstallPrompt}
+                                        className={`absolute top-0 right-0 p-2 rounded-full z-10 opacity-50 hover:opacity-100 transition-all ${family?.theme === 'doodle' ? 'text-[#4a4a4a] hover:bg-black/5' : 'text-white hover:bg-white/10'}`}
+                                        title={t.dismiss || 'Dismiss'}
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+
                                     <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
                                     <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme === 'doodle' ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20'}`}>
                                         <div className="text-center md:text-left">
@@ -1168,79 +1357,6 @@ export default function Dashboard() {
                                     </div>
                                 </section>
                             )}
-
-                            {/* 4. 連線與代碼 (標準化) */}
-                            <section className={`p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
-                                        <button
-                                            onClick={() => {
-                                                const randomCode = `FAMILY${Math.floor(1000 + Math.random() * 9000)}`;
-                                                setTempSettings({ ...tempSettings, short_id: randomCode });
-                                            }}
-                                            className={`text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-all flex items-center gap-1`}
-                                        >
-                                            <span className="text-xs">🎲</span> {t.random_generate}
-                                        </button>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <input type="text" className={`flex-1 ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-4 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`} value={tempSettings.short_id} onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })} placeholder="例如: FAMILY123" />
-                                        <button onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }} className={`p-4 rounded-2xl ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400'} border hover:bg-cyan-500/10 hover:text-cyan-400 shadow-sm transition-all`}><Copy className="w-5 h-5" /></button>
-                                    </div>
-                                    <p className="text-xs text-slate-500 italic opacity-60">{t.access_code_hint}</p>
-                                </div>
-                            </section>
-
-                            {/* 5. 安全保護 */}
-                            <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white' : 'bg-black/40'} rounded-2xl border ${family?.theme === 'doodle' ? 'border-[#eee]' : 'border-white/5'}`}>
-                                        <div className="space-y-0.5">
-                                            <div className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
-                                            <div className={`text-xs ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_desc}</div>
-                                        </div>
-                                        <button
-                                            onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
-                                            className={`w-14 h-7 rounded-full transition-all relative flex items-center px-1 shadow-inner ${tempSettings.use_parent_pin
-                                                ? (family?.theme === 'doodle' ? 'bg-orange-400' : 'bg-cyan-500')
-                                                : (family?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10')
-                                                }`}
-                                        >
-                                            <div className={`text-xs font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
-                                                {tempSettings.use_parent_pin ? 'ON' : 'OFF'}
-                                            </div>
-                                            <div className={`w-5 h-5 bg-white rounded-full transition-all shadow-md z-10 transform ${tempSettings.use_parent_pin ? 'translate-x-7' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <input type="text" maxLength={4} placeholder={t.four_digit_pin} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'} p-4 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80]`} value={tempSettings.parent_pin} onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })} />
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* 6. 家長管理團隊 */}
-                            <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
-                                <div className="space-y-3">
-                                    {familyMembers.map(m => (
-                                        <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
-                                                <div>
-                                                    <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
-                                                    <div className={`text-[10px] ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} font-black`}>{m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
-                                                </div>
-                                            </div>
-                                            {m.id !== family.admin_id && m.id !== user.id && (
-                                                <button onClick={() => kickMember(m.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
 
                             {/* 7. 資料重設與匯出 */}
                             <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5'}`}>
@@ -1353,7 +1469,18 @@ export default function Dashboard() {
                                 value={joinCode}
                                 onChange={e => setJoinCode(e.target.value)}
                             />
-                            <button onClick={() => handleJoinFamily()} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    maxLength={4}
+                                    placeholder={t.four_digit_pin}
+                                    className={`w-full p-4 rounded-xl font-bold font-mono outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
+                                    value={joinPin}
+                                    onChange={e => setJoinPin(e.target.value.replace(/\D/g, ''))}
+                                />
+                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${family?.theme === 'doodle' ? 'text-gray-400' : 'text-gray-500'}`} />
+                            </div>
+                            <button onClick={() => handleJoinFamily(joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
                         </div>
                     </div>
                 </div>
