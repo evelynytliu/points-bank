@@ -1049,7 +1049,7 @@
                         <h3 style="font-size: 1.3rem; font-weight: 700; margin: 0;">雙主題風格切換</h3>
                     </div>
                     <p style="color: #666; line-height: 1.8;">
-                        提供「Cyber 霓虹」和「Warm 手繪」兩種視覺風格，讓每個家庭選擇最符合自己品味的介面。切換即時生效，全家裝置同步。
+                        提供「Cyber 霓虹」和「Warm 手繪」兩種視覺風格，讓每個家庭選擇喜歡的介面。切換即時生效，全家裝置同步。
                     </p>
                 </div>
             </div>
@@ -1693,7 +1693,7 @@
 
             // === DOODLE DEMO FUNCTIONALITY ===
             window.demoKids = [
-                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30, goal: { title: '樂高城堡' } },
+                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30, goal: { title: '樂高城堡', target_points: 100 } },
                 { id: 'd2', name: 'LUIGI', avatar: '🚀', points: 12, minutes: 30, limit: 30, goal: null }
             ];
             window.demoPlan = 'weekday';
@@ -1756,9 +1756,14 @@
                                 <!-- Rewards & Goal -->
                                 <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem;">
                                     ${kid.goal ? `
-                                        <div style="display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.2rem;" title="${kid.goal.title}">
-                                           <span style="font-size: 1.2rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1)); animation: pulse 2s ease-in-out infinite;">🎯</span>
-                                           <span style="font-weight: 900; color: var(--ink); font-size: 0.9rem;">${kid.goal.title}</span>
+                                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; margin-bottom: 0.2rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.3rem;" title="${kid.goal.title}">
+                                               <span style="font-size: 1.2rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1)); animation: pulse 2s ease-in-out infinite;">🎯</span>
+                                               <span style="font-weight: 900; color: var(--ink); font-size: 0.9rem;">${kid.goal.title}</span>
+                                            </div>
+                                            <div style="width: 60px; height: 5px; background: rgba(0,0,0,0.05); border-radius: 999px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1);">
+                                                <div style="height: 100%; width: ${Math.min(100, (kid.points / (kid.goal.target_points || 1)) * 100)}%; background: #ff8a80; border-radius: 999px; transition: width 0.5s ease;"></div>
+                                            </div>
                                         </div>
                                     ` : `
                                         <div style="font-size: 0.8rem; color: #888; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.3rem;">

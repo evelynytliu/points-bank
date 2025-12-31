@@ -1943,9 +1943,17 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                                 <div className={`h-4 w-12 rounded-full ${familySettings?.theme === 'doodle' ? 'bg-[#4a4a4a]/10' : 'bg-white/10'}`}></div>
                             </div>
                         ) : goal ? (
-                            <div className="flex items-center justify-end gap-2 mb-1" title={goal.title}>
-                                <span className="text-xl animate-[pulse_2s_ease-in-out_infinite] filter drop-shadow-sm">🎯</span>
-                                <span className={`text-sm font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{goal.title}</span>
+                            <div className="flex flex-col items-end gap-1 mb-1">
+                                <div className="flex items-center justify-end gap-2" title={goal.title}>
+                                    <span className="text-xl animate-[pulse_2s_ease-in-out_infinite] filter drop-shadow-sm">🎯</span>
+                                    <span className={`text-sm font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{goal.title}</span>
+                                </div>
+                                <div className={`w-20 h-1.5 rounded-full overflow-hidden ${familySettings?.theme === 'doodle' ? 'bg-[#eee] border border-[#4a4a4a]/20' : 'bg-white/10'}`}>
+                                    <div
+                                        className={`h-full rounded-full transition-all duration-1000 ${familySettings?.theme === 'doodle' ? 'bg-[#ff8a80]' : 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.5)]'}`}
+                                        style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }}
+                                    />
+                                </div>
                             </div>
                         ) : (
                             <div className={`text-xs font-bold mb-1 flex items-center justify-end gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
