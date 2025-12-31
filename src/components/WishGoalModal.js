@@ -113,21 +113,27 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                     {!isEditing ? (
                         /* View Mode */
                         <div className="flex flex-col gap-6">
-                            {/* Target Image */}
-                            <div className={`relative aspect-video rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'}`}>
-                                {imageUrl ? (
-                                    <img src={imageUrl} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                ) : (
-                                    <div className="flex items-center justify-center w-full h-full opacity-30">
-                                        <Gift className="w-20 h-20" />
-                                    </div>
-                                )}
-                                {/* Floating Title Badge */}
-                                <div className="absolute bottom-4 left-4 right-4 text-center">
-                                    <span className={`inline-block px-4 py-2 rounded-xl font-bold text-lg shadow-lg backdrop-blur-md ${theme === 'doodle' ? 'bg-white/90 text-[#4a4a4a] border-2 border-[#4a4a4a]' : 'bg-black/60 text-white border border-white/20'}`}>
-                                        {title}
-                                    </span>
+                            {/* Target Content */}
+                            <div>
+                                <div className={`relative w-full rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'} ${imageUrl ? 'aspect-video shadow-sm' : 'aspect-video flex items-center justify-center p-6'}`}>
+                                    {imageUrl ? (
+                                        <img src={imageUrl} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                    ) : (
+                                        <div className="relative z-10 flex flex-col items-center justify-center text-center w-full h-full">
+                                            <Gift className={`w-24 h-24 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 opacity-5 pointer-events-none ${theme === 'doodle' ? 'text-black' : 'text-white'}`} />
+                                            <h3 className={`text-3xl font-black uppercase tracking-tight leading-tight break-words max-w-full relative z-10 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                                {title}
+                                            </h3>
+                                        </div>
+                                    )}
                                 </div>
+
+                                {/* External Title for Image Mode */}
+                                {imageUrl && (
+                                    <h3 className={`text-2xl font-black uppercase tracking-tight text-center mt-5 mb-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                        {title}
+                                    </h3>
+                                )}
                             </div>
 
                             {/* Progress Bar */}
