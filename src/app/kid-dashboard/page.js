@@ -11,6 +11,14 @@ export default function KidDashboard() {
     const [family, setFamily] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const fetchData = async (id, familyId) => {
+        const { data: k } = await supabase.from('kids').select('*').eq('id', id).single();
+        const { data: f } = await supabase.from('families').select('*').eq('id', familyId).single();
+        if (k) setKidData(k);
+        if (f) setFamily(f);
+        setLoading(false);
+    };
+
     useEffect(() => {
         const session = localStorage.getItem('kid_session');
         if (!session) {
@@ -40,14 +48,6 @@ export default function KidDashboard() {
             supabase.removeChannel(channel);
         };
     }, []);
-
-    const fetchData = async (id, familyId) => {
-        const { data: k } = await supabase.from('kids').select('*').eq('id', id).single();
-        const { data: f } = await supabase.from('families').select('*').eq('id', familyId).single();
-        if (k) setKidData(k);
-        if (f) setFamily(f);
-        setLoading(false);
-    };
 
     const updateSelf = async (pChange, mChange, defReason) => {
         const reason = prompt('請輸入原因（選填）:', defReason);

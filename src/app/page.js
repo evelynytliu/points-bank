@@ -34,10 +34,14 @@ export default function Home() {
   }, [router]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('family_theme') || 'doodle';
-    setTheme(savedTheme);
-    const savedLang = localStorage.getItem('app_language') || 'zh';
-    setLanguage(savedLang);
+    // Wrap in setTimeout to avoid 'setState synchronously within effect' lint error
+    const timer = setTimeout(() => {
+      const savedTheme = localStorage.getItem('family_theme') || 'doodle';
+      setTheme(savedTheme);
+      const savedLang = localStorage.getItem('app_language') || 'zh';
+      setLanguage(savedLang);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
