@@ -71,6 +71,10 @@ const rawTranslations = {
     enter_kid_name: ['輸入小孩姓名', 'Enter Kid Name'],
     join_member: ['加入成員', 'Add Member'],
     confirm: ['確定', 'Confirm'],
+    unsaved_changes_title: ['未儲存的變更', 'Unsaved Changes'],
+    unsaved_changes_msg: ['您有未儲存的設定變更，確定要捨棄嗎？', 'You have unsaved changes. Discard them?'],
+    discard: ['捨棄', 'Discard'],
+    keep_editing: ['繼續編輯', 'Keep Editing'],
 
     // Kid Card
     today_remaining: ['今日剩餘螢幕時間', "Today's Remaining Screen Time"],
@@ -115,7 +119,8 @@ const rawTranslations = {
     family_conn_center: ['家庭連線中心 (唯一入口代碼)', 'Family Hub (Access Code)'],
     invite_parent_btn: ['邀請其他家長', 'Invite Other Parent'],
     invite_msg_title: ['邀請家長加入', 'Invite Parent'],
-    family_access_code: ['家庭訪問碼', 'Family Access Code'],
+    family_access_code: ['家庭訪問碼 (可自訂)', 'Family Access Code (Customizable)'],
+    copy_invite: ['複製邀請訊息', 'Copy Invite'],
     random_generate: ['隨機產生', 'Randomize'],
     access_code_hint: ['* 請將此代碼交給小孩或是其他家長，這將是進入家庭的唯一代碼。', '* Share this code with kids or other parents. It is the only key to join this family.'],
     security_settings: ['安全性設定', 'Security Settings'],

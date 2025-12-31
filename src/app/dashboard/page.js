@@ -971,7 +971,30 @@ export default function Dashboard() {
                         {/* Sticky Header */}
                         <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'doodle' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md z-10`}>
                             <h3 className={`text-2xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.settings}</h3>
-                            <button onClick={() => setShowSettingsModal(false)} className={`${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
+                            <button onClick={() => {
+                                const isChanged =
+                                    tempSettings.weekday_limit !== family.weekday_limit ||
+                                    tempSettings.holiday_limit !== family.holiday_limit ||
+                                    tempSettings.point_to_minutes !== family.point_to_minutes ||
+                                    tempSettings.point_to_cash !== family.point_to_cash ||
+                                    tempSettings.parent_pin !== family.parent_pin ||
+                                    tempSettings.use_parent_pin !== family.use_parent_pin ||
+                                    tempSettings.short_id !== family.short_id ||
+                                    tempSettings.theme !== family.theme;
+
+                                if (isChanged) {
+                                    showModal({
+                                        type: 'confirm',
+                                        title: t.unsaved_changes_title,
+                                        message: t.unsaved_changes_msg,
+                                        confirmText: t.discard,
+                                        cancelText: t.keep_editing,
+                                        onConfirm: () => setShowSettingsModal(false)
+                                    });
+                                } else {
+                                    setShowSettingsModal(false);
+                                }
+                            }} className={`${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
                         </div>
 
                         {/* Scrollable Content */}
@@ -1195,43 +1218,30 @@ export default function Dashboard() {
                                         <div className="flex justify-between items-center flex-wrap gap-2">
                                             <div className="flex items-center gap-2">
                                                 <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
-                                                <button
-                                                    onClick={() => {
-                                                        const url = window.location.origin;
-                                                        const code = tempSettings.short_id;
-                                                        const pin = tempSettings.use_parent_pin ? tempSettings.parent_pin : '(未啟用 PIN)';
-                                                        const msg = `👋 邀請您加入 Points Bank 家庭！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n${tempSettings.use_parent_pin ? `4️⃣ 家長 PIN 碼: ${pin}` : ''}`;
-
-                                                        showModal({
-                                                            title: t.invite_msg_title,
-                                                            message: msg,
-                                                            type: 'confirm', // Use confirm to show 'Copy' button effectively as Confirm action or just Alert
-                                                            // Actually let's use a custom modal content if possible, or just putting it in message is fine.
-                                                            // Let's use 'alert' but with a "Copy Invite" button if I can... 
-                                                            // My showModal implementation uses 'onConfirm'. I can use it to Copy.
-                                                            type: 'confirm',
-                                                            title: '📋 ' + t.invite_msg_title,
-                                                            message: msg,
-                                                            onConfirm: () => {
-                                                                navigator.clipboard.writeText(msg);
-                                                                alert(t.copied);
-                                                            }
-                                                        });
-                                                    }}
-                                                    className={`ml-1 p-1.5 rounded-lg transition-all ${family?.theme === 'doodle' ? 'text-blue-500 bg-blue-50 hover:bg-blue-100' : 'text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20'}`}
-                                                    title={t.invite_parent_btn}
-                                                >
-                                                    <Share2 className="w-4 h-4" />
-                                                </button>
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    const randomCode = `FAMILY${Math.floor(1000 + Math.random() * 9000)}`;
-                                                    setTempSettings({ ...tempSettings, short_id: randomCode });
+                                                    const url = 'https://points-bank.vercel.app/';
+                                                    const code = tempSettings.short_id;
+                                                    const pin = tempSettings.use_parent_pin ? tempSettings.parent_pin : '(未啟用 PIN)';
+                                                    const msg = `👋 邀請您加入 Points Bank 家庭！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n${tempSettings.use_parent_pin ? `4️⃣ 家長 PIN 碼: ${pin}` : ''}`;
+
+                                                    showModal({
+                                                        type: 'confirm',
+                                                        title: '📋 ' + t.invite_msg_title,
+                                                        message: msg,
+                                                        confirmText: t.copy_invite, // Custom button text
+                                                        cancelText: t.cancel,
+                                                        onConfirm: () => {
+                                                            navigator.clipboard.writeText(msg);
+                                                            alert(t.copied);
+                                                        }
+                                                    });
                                                 }}
-                                                className={`text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-all flex items-center gap-1`}
+                                                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
                                             >
-                                                <span className="text-xs">🎲</span> {t.random_generate}
+                                                <Share2 className="w-3.5 h-3.5" />
+                                                {t.invite_parent_btn}
                                             </button>
                                         </div>
                                         <div className="relative flex items-center">
@@ -1447,11 +1457,7 @@ export default function Dashboard() {
             <TourOverlay
                 step={tourStep}
                 onNext={() => setTourStep(prev => prev + 1)}
-                onFinish={() => {
-                    setTourStep(0);
-                    localStorage.setItem('tour_completed', 'true');
-                    setShowSettingsModal(true); // Open settings to encourage action
-                }}
+                onFinish={finishTour}
                 t={t}
                 familyTheme={family?.theme}
             />
@@ -1916,10 +1922,10 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
                         <button onClick={() => {
                             if (config.onCancel) config.onCancel();
                             onClose();
-                        }} className={`flex-1 py-3 text-xs font-bold rounded-xl border transition-all ${isDoodle ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-black/5' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>{t.cancel || '取消'}</button>
+                        }} className={`flex-1 py-3 text-xs font-bold rounded-xl border transition-all ${isDoodle ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-black/5' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>{config.cancelText || t.cancel || '取消'}</button>
                     )}
                     <button onClick={() => config.onConfirm(inputValue)} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg ${isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400 font-black'}`}>
-                        {t.confirm || '確定'}
+                        {config.confirmText || t.confirm || '確定'}
                     </button>
                 </div>
             </div>
