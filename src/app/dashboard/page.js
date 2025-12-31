@@ -1104,14 +1104,14 @@ export default function Dashboard() {
                             </div>
 
                             {/* Preset Buttons for Time Allocation */}
-                            <div className="flex gap-2 mb-6 justify-center">
+                            <div className="flex gap-4 mb-6 justify-center">
                                 <button
                                     onClick={() => {
                                         if (selectedKids.length === 0) setSelectedKids(kids.map(k => k.id));
                                         setMinChange(family?.weekday_limit || 0);
                                         setCustomReason(t.weekday_alloc_reason || '平日分配');
                                     }}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#4a4a4a] border border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                                 >
                                     🏢 {t.weekday} ({family?.weekday_limit}m)
                                 </button>
@@ -1121,13 +1121,15 @@ export default function Dashboard() {
                                         setMinChange(family?.holiday_limit || 0);
                                         setCustomReason(t.holiday_alloc_reason || '假日分配');
                                     }}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#ff8a80] border border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10'}`}
+                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10'}`}
                                 >
                                     🏖️ {t.holiday} ({family?.holiday_limit}m)
                                 </button>
                             </div>
 
-                            <button onClick={handleBatchUpdate} className="btn btn-primary w-full !py-4 text-sm font-black uppercase tracking-widest shadow-xl">{t.execute_update}</button>
+                            <button onClick={handleBatchUpdate} className="btn btn-primary w-full !py-6 text-xl font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-2">
+                                {t.execute_update} <Rocket className="w-6 h-6" />
+                            </button>
                         </div>
                     </div>
 
