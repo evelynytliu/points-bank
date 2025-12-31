@@ -64,7 +64,7 @@ const rawTranslations = {
     clear_history_desc: ['保留點數與時間，僅刪除日誌', 'Keep points/time, delete logs only'],
     reset_family_data: ['徹底重設家庭資料 (歸零)', 'Reset Family Data (Zero Out)'],
     reset_family_desc: ['清空紀錄並歸零，但會保留小孩名單', 'Clear logs/stats to 0, but keep kid profiles'],
-    save_changes: ['儲存所有變更並立即生效', 'Save All Changes'],
+    save_changes: ['儲存所有變更', 'Save All Changes'],
     add_member: ['新增成員', 'Add Member'],
     click_to_change_avatar: ['點擊更換頭像', 'Click to Change Avatar'],
     enter_kid_name: ['輸入小孩姓名', 'Enter Kid Name'],

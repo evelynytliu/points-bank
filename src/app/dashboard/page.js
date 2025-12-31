@@ -741,6 +741,9 @@ export default function Dashboard() {
             // Clear inputs
             setJoinCode('');
             setJoinPin('');
+            setJoinNewFamilyCode('');
+            setJoinNewFamilyPin('');
+            setShowJoinInput(false);
             fetchData();
         }
     };
