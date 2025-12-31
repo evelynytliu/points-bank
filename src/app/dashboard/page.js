@@ -693,14 +693,9 @@ export default function Dashboard() {
         let targetFamily = null;
 
         // 1. Try to lookup by short_id first
-        console.log("Searching for family with code:", codeToUse);
         const { data: familyByShort, error: searchError } = await supabase
-            .from('families')
-            .select('*')
-            .eq('short_id', codeToUse)
+            .rpc('get_family_by_code', { lookup_code: codeToUse })
             .maybeSingle();
-
-        console.log("Search result:", familyByShort, "Error:", searchError);
 
         if (familyByShort) {
             targetId = familyByShort.id;
