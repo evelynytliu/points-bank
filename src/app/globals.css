@@ -162,3 +162,18 @@ h4 {
     background: linear-gradient(to right, #ef4444, #b91c1c);
   }
 }
+
+@keyframes deep-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+}
+
+.animate-deep-pulse {
+  animation: deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
