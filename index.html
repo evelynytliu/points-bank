@@ -562,6 +562,20 @@
             }
         }
 
+        @keyframes deep-pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(0.92);
+            }
+        }
+
         /* === NAVIGATION BAR === */
         .navbar {
             position: sticky;
@@ -954,6 +968,19 @@
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; margin-bottom: 4rem;">
+                <!-- 視覺化願望清單 -->
+                <div style="background: var(--bg); padding: 2.5rem; border-radius: 25px; border: 2px solid var(--ink);">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div
+                            style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #fff5f3, #ffe8e3); display: flex; align-items: center; justify-content: center; color: var(--accent);">
+                            <i data-lucide="image" size="24"></i>
+                        </div>
+                        <h3 style="font-size: 1.3rem; font-weight: 700; margin: 0;">願望視覺化管理</h3>
+                    </div>
+                    <p style="color: #666; line-height: 1.8;">
+                        讓獎勵具象化！支援<strong>拍照上傳願望目標</strong>（如樂高、Switch），系統會自動將照片雲端同步。孩子每天看著想要的東西進度一點點增加，內在驅動力比任何說教都有效。
+                    </p>
+                </div>
                 <!-- 彈性配額設定 -->
                 <div style="background: var(--bg); padding: 2.5rem; border-radius: 25px; border: 2px solid var(--ink);">
                     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
@@ -1678,8 +1705,8 @@
 
             // === DOODLE DEMO FUNCTIONALITY ===
             window.demoKids = [
-                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30 },
-                { id: 'd2', name: 'LUIGI', avatar: '🚀', points: 12, minutes: 30, limit: 30 }
+                { id: 'd1', name: 'MARIO', avatar: '⚡', points: 58, minutes: 30, limit: 30, goal: { title: 'Switch 遊戲片' } },
+                { id: 'd2', name: 'LUIGI', avatar: '🚀', points: 12, minutes: 30, limit: 30, goal: null }
             ];
             window.demoPlan = 'weekday';
             window.demoSelectedIds = ['d1', 'd2'];
@@ -1738,8 +1765,17 @@
                                 <!-- Vertical Divider -->
                                 <div class="demo-dashed-divider"></div>
 
-                                <!-- Rewards -->
-                                <div style="text-align: right;">
+                                <!-- Rewards & Goal -->
+                                <div style="text-align: right; position: relative;">
+                                    <!-- Goal Icon -->
+                                    <div style="position: absolute; top: -1.6rem; right: -0.5rem; z-index: 10; cursor: pointer; animation: ${kid.goal ? 'pulse 2s ease-in-out infinite' : 'deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'};"
+                                         title="${kid.goal ? kid.goal.title : '設定願望'}">
+                                        ${kid.goal ?
+                            '<span style="font-size: 1.6rem;">🎯</span>' :
+                            '<i data-lucide="plus" size="24" style="color: #4a4a4a; opacity: 0.6; stroke-width: 3;"></i>'
+                        }
+                                    </div>
+
                                     <div style="font-size: 0.7rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 0.3rem; letter-spacing: 0.05em; opacity: 0.7;">可兌換獎勵</div>
                                     <div style="font-size: 1.1rem; font-weight: 900; font-style: italic; color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;">
                                         <i data-lucide="monitor" size="16" style="color: var(--accent)"></i> 
