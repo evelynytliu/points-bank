@@ -162,9 +162,16 @@ const rawTranslations = {
     install_app: ['安裝應用程式', 'Install App'],
     install_app_desc: ['將此網頁加到主畫面，享受全螢幕體驗。', 'Add to home screen for full screen experience.'],
     add_to_home_btn: ['加到主畫面', 'Add to Home Screen'],
-    install_ios_title: ['加入主畫面 (iOS)', 'Add to Home Screen (iOS)'],
-    install_ios_step1: ['1. 點擊瀏覽器下方的分享按鈕', '1. Tap the Share button'],
-    install_ios_step2: ['2. 點選「加入主畫面」選項', '2. Tap "Add to Home Screen"'],
+    // iOS Specific Instructions
+    install_ios_safari_title: ['加入主畫面 (Safari)', 'Add to Home Screen (Safari)'],
+    install_ios_safari_1: ['1. 點擊瀏覽器下方的分享按鈕', '1. Tap the Share button at bottom'],
+    install_ios_safari_2: ['2. 往下滑動選單', '2. Scroll down the menu'],
+    install_ios_safari_3: ['3. 點選「加入主畫面」', '3. Tap "Add to Home Screen"'],
+
+    install_ios_chrome_title: ['加入主畫面 (Chrome)', 'Add to Home Screen (Chrome)'],
+    install_ios_chrome_1: ['1. 點擊右上角網址列的分享按鈕', '1. Tap Share icon in address bar'],
+    install_ios_chrome_2: ['2. 捲動或點選「更多(...)」', "2. Scroll or tap 'More (...)'"],
+    install_ios_chrome_3: ['3. 點選「加入主畫面」', '3. Tap "Add to Home Screen"'],
 };
 
 // Helper to generate dictionaries

@@ -93,6 +93,7 @@ export default function Dashboard() {
     // PWA Install Prompt State
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isIOS, setIsIOS] = useState(false);
+    const [isChrome, setIsChrome] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -100,6 +101,7 @@ export default function Dashboard() {
         setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
         const userAgent = window.navigator.userAgent.toLowerCase();
         setIsIOS(/iphone|ipad|ipod/.test(userAgent));
+        setIsChrome(/crios/.test(userAgent));
         setIsMobile(/android|iphone|ipad|ipod/.test(userAgent));
 
         const handleBeforeInstallPrompt = (e) => {
@@ -119,9 +121,19 @@ export default function Dashboard() {
                 setDeferredPrompt(null);
             }
         } else if (isIOS) {
+            const steps = isChrome ? [
+                t.install_ios_chrome_1,
+                t.install_ios_chrome_2,
+                t.install_ios_chrome_3
+            ] : [
+                t.install_ios_safari_1,
+                t.install_ios_safari_2,
+                t.install_ios_safari_3
+            ];
+
             showModal({
-                title: t.install_ios_title,
-                message: `${t.install_ios_step1}\n${t.install_ios_step2}`,
+                title: isChrome ? t.install_ios_chrome_title : t.install_ios_safari_title,
+                message: steps.join('\n'),
                 type: 'alert'
             });
         }
@@ -1676,7 +1688,7 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
                 {!isDoodle && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />}
 
                 <h3 className={`text-xl font-black italic mb-2 uppercase tracking-tight ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>{config.title}</h3>
-                <p className={`text-sm font-medium mb-6 leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-400'}`}>{config.message}</p>
+                <p className={`text-sm font-medium mb-6 leading-relaxed whitespace-pre-line ${isDoodle ? 'text-[#666]' : 'text-slate-400'}`}>{config.message}</p>
 
                 {config.type === 'prompt' && (
                     <div className="relative mb-6">
