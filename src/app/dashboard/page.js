@@ -1737,6 +1737,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
 
     // Visual states to control animation timing
     const [isInView, setIsInView] = useState(false);
+    const [isReady, setIsReady] = useState(false);
     const [visualPoints, setVisualPoints] = useState(kid.total_points);
     const [visualMinutes, setVisualMinutes] = useState(kid.total_minutes);
     const prevPointsRef = useRef(kid.total_points);
@@ -1754,9 +1755,19 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
         return () => observer.disconnect();
     }, []);
 
-    // Sync visual state when in view
+    // Delay ready state
     useEffect(() => {
-        if (!isInView) return;
+        if (isInView) {
+            const timer = setTimeout(() => setIsReady(true), 500);
+            return () => clearTimeout(timer);
+        } else {
+            setIsReady(false);
+        }
+    }, [isInView]);
+
+    // Sync visual state when ready
+    useEffect(() => {
+        if (!isReady) return;
 
         // Check for points update
         if (visualPoints !== kid.total_points) {
@@ -1787,7 +1798,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
             setVisualMinutes(kid.total_minutes);
         }
 
-    }, [kid.total_points, kid.total_minutes, isInView, familySettings?.theme, visualPoints, visualMinutes]);
+    }, [kid.total_points, kid.total_minutes, isReady, familySettings?.theme, visualPoints, visualMinutes]);
 
     const timePercent = Math.min(100, (visualMinutes / timeLimit) * 100);
     const isWarning = timePercent > 0 && timePercent <= 30;
