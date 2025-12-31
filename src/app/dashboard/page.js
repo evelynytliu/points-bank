@@ -1188,7 +1188,7 @@ export default function Dashboard() {
                                 </button>
                             </section>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-6">
                                 {/* 3. 家庭邀請碼 */}
                                 <section className={`p-4 md:p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
                                     <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
