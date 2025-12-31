@@ -113,6 +113,8 @@ const rawTranslations = {
     ui_style_cyber: ['', ''],
     ui_style_doodle: ['', ''],
     family_conn_center: ['家庭連線中心 (唯一入口代碼)', 'Family Hub (Access Code)'],
+    invite_parent_btn: ['邀請其他家長', 'Invite Other Parent'],
+    invite_msg_title: ['邀請家長加入', 'Invite Parent'],
     family_access_code: ['家庭訪問碼', 'Family Access Code'],
     random_generate: ['隨機產生', 'Randomize'],
     access_code_hint: ['* 請將此代碼交給小孩或是其他家長，這將是進入家庭的唯一代碼。', '* Share this code with kids or other parents. It is the only key to join this family.'],

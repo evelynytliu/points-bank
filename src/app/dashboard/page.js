@@ -1193,7 +1193,37 @@ export default function Dashboard() {
                                     <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-center flex-wrap gap-2">
-                                            <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
+                                            <div className="flex items-center gap-2">
+                                                <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
+                                                <button
+                                                    onClick={() => {
+                                                        const url = window.location.origin;
+                                                        const code = tempSettings.short_id;
+                                                        const pin = tempSettings.use_parent_pin ? tempSettings.parent_pin : '(未啟用 PIN)';
+                                                        const msg = `👋 邀請您加入 Points Bank 家庭！\n\n1️⃣ 點擊連結登入: ${url}\n2️⃣ 選擇「加入現有家庭」\n3️⃣ 輸入家庭代碼: ${code}\n${tempSettings.use_parent_pin ? `4️⃣ 家長 PIN 碼: ${pin}` : ''}`;
+
+                                                        showModal({
+                                                            title: t.invite_msg_title,
+                                                            message: msg,
+                                                            type: 'confirm', // Use confirm to show 'Copy' button effectively as Confirm action or just Alert
+                                                            // Actually let's use a custom modal content if possible, or just putting it in message is fine.
+                                                            // Let's use 'alert' but with a "Copy Invite" button if I can... 
+                                                            // My showModal implementation uses 'onConfirm'. I can use it to Copy.
+                                                            type: 'confirm',
+                                                            title: '📋 ' + t.invite_msg_title,
+                                                            message: msg,
+                                                            onConfirm: () => {
+                                                                navigator.clipboard.writeText(msg);
+                                                                alert(t.copied);
+                                                            }
+                                                        });
+                                                    }}
+                                                    className={`ml-1 p-1.5 rounded-lg transition-all ${family?.theme === 'doodle' ? 'text-blue-500 bg-blue-50 hover:bg-blue-100' : 'text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20'}`}
+                                                    title={t.invite_parent_btn}
+                                                >
+                                                    <Share2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                             <button
                                                 onClick={() => {
                                                     const randomCode = `FAMILY${Math.floor(1000 + Math.random() * 9000)}`;
