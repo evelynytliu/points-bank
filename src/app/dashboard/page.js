@@ -1944,12 +1944,12 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                             </div>
                         ) : goal ? (
                             <div className="flex items-center justify-end gap-2 mb-1" title={goal.title}>
-                                <span className={`text-sm font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{goal.title}</span>
                                 <span className="text-xl animate-[pulse_2s_ease-in-out_infinite] filter drop-shadow-sm">🎯</span>
+                                <span className={`text-sm font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{goal.title}</span>
                             </div>
                         ) : (
                             <div className={`text-xs font-bold mb-1 flex items-center justify-end gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                {t.wish_setup_new || '設定願望'} <PlusCircle className="w-3.5 h-3.5" />
+                                <PlusCircle className="w-3.5 h-3.5" /> {t.wish_setup_new || '設定願望'}
                             </div>
                         )}
 
