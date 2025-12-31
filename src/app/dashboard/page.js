@@ -1891,32 +1891,7 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-2'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-2 p-3'}`}>
 
-                    {/* Floating Goal Icon on Line - Show Target if Set, Plus if Not */}
-                    {!isUpdatingGoal && (
-                        <div
-                            onClick={(e) => { e.stopPropagation(); setShowGoalModal(true); }}
-                            className={`absolute -top-5 right-2 z-20 cursor-pointer transition-all ${goal ? 'animate-[pulse_2s_ease-in-out_infinite] hover:scale-125' : 'custom-deep-pulse hover:animate-none hover:opacity-100 hover:scale-125'}`}
-                            title={goal ? goal.title : "設定願望"}
-                        >
-                            <style>{`
-                                @keyframes deep-pulse {
-                                    0%, 100% { opacity: 1; transform: scale(1); }
-                                    50% { opacity: 0.6; transform: scale(0.92); }
-                                }
-                                .custom-deep-pulse {
-                                    animation: deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                                }
-                            `}</style>
-                            {goal ? (
-                                <span className="text-2xl">🎯</span>
-                            ) : (
-                                <Plus
-                                    className={`w-6 h-6 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]/60' : 'text-cyan-400/60'}`}
-                                    strokeWidth={3}
-                                />
-                            )}
-                        </div>
-                    )}
+
 
                     {/* Left Side: Points */}
                     <div className="flex flex-col items-start justify-center min-w-[100px]">
@@ -1934,8 +1909,34 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     {/* Right Side: Rewards Info + Goal Trigger */}
                     <div
                         onClick={() => setShowGoalModal(true)}
-                        className={`flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
+                        className={`relative flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
                     >
+                        {!isUpdatingGoal && (
+                            <>
+                                <style>{`
+                                @keyframes deep-pulse {
+                                    0%, 100% { opacity: 1; transform: scale(1); }
+                                    50% { opacity: 0.6; transform: scale(0.92); }
+                                }
+                                .custom-deep-pulse {
+                                    animation: deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                                }
+                            `}</style>
+                                <div
+                                    className={`absolute -top-7 -right-1 z-20 cursor-pointer transition-all ${goal ? 'animate-[pulse_2s_ease-in-out_infinite] group-hover/goal:scale-125' : 'custom-deep-pulse group-hover/goal:animate-none group-hover/goal:opacity-100 group-hover/goal:scale-125'}`}
+                                    title={goal ? goal.title : "設定願望"}
+                                >
+                                    {goal ? (
+                                        <span className="text-2xl">🎯</span>
+                                    ) : (
+                                        <Plus
+                                            className={`w-6 h-6 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]/60' : 'text-cyan-400/60'}`}
+                                            strokeWidth={3}
+                                        />
+                                    )}
+                                </div>
+                            </>
+                        )}
                         {isUpdatingGoal ? (
                             <div className="flex items-center justify-end mb-1 w-full animate-pulse gap-2">
                                 <span className={`text-[10px] font-black tracking-widest opacity-40 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>UPDATING</span>
