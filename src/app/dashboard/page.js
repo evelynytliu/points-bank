@@ -387,7 +387,11 @@ export default function Dashboard() {
 
             // 獲取家庭資訊
             const { data: familyData, error: fError } = await supabase.from('families').select('*').eq('id', currentFamilyId).single();
-            if (fError) console.error('獲取家庭失敗:', fError);
+            if (fError) {
+                console.error('獲取家庭失敗:', fError);
+                // Temporary Debug Alert
+                if (userRole === 'kid') alert('⚠️ 小孩模式讀取家庭失敗: ' + fError.message + '\n請確認 RLS 設定。');
+            }
 
             if (familyData) {
                 setFamily(familyData);
@@ -432,6 +436,7 @@ export default function Dashboard() {
                     details: kidsError.details,
                     hint: kidsError.hint
                 });
+                if (userRole === 'kid') alert('⚠️ 小孩模式讀取清單失敗: ' + kidsError.message);
                 throw kidsError;
             }
 
