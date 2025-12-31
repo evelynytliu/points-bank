@@ -88,7 +88,11 @@ export default function Home() {
       return alert(t.alert_no_kids);
     }
 
-    setFamilyMembers(kids);
+    // Important: Inject family_id back into kid objects because the RPC might not return it
+    // This ensures dashboard has the correct family context
+    const kidsWithFamily = kids.map(k => ({ ...k, family_id: familyId }));
+
+    setFamilyMembers(kidsWithFamily);
     setKidStep('member');
   };
 
