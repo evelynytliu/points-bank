@@ -1881,9 +1881,9 @@ function KidCard({ kid, goal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, cu
                         <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
                     </div>
                 </div>
-                <div className={`py-4 px-6 w-full md:w-fit md:ml-auto relative flex items-center justify-between md:justify-end gap-6 ${familySettings?.theme === 'doodle'
-                    ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-6'
-                    : 'bg-white/5 rounded-2xl border border-white/5 my-6 p-4'}`}>
+                <div className={`py-2 px-6 w-full md:w-fit md:ml-auto relative flex items-center justify-between md:justify-end gap-4 ${familySettings?.theme === 'doodle'
+                    ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-2'
+                    : 'bg-white/5 rounded-2xl border border-white/5 my-2 p-3'}`}>
 
                     {/* Left Side: Points */}
                     <div className="flex flex-col items-start justify-center min-w-[100px]">
@@ -1901,22 +1901,30 @@ function KidCard({ kid, goal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, cu
                     {/* Right Side: Rewards Info + Goal Trigger */}
                     <div
                         onClick={() => setShowGoalModal(true)}
-                        className={`flex flex-col gap-3 justify-center items-end text-right whitespace-nowrap cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
+                        className={`flex flex-col gap-1 justify-center items-end text-right cursor-pointer hover:scale-105 active:scale-95 transition-transform group/goal`}
                     >
-                        <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
-                            {goal ? '🎯 ' + goal.title : t.redeemable_rewards}
-                            {goal && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-400 text-white animate-pulse">GOAL</span>}
-                        </div>
-                        <div className="space-y-2">
+                        {goal ? (
+                            <div className="flex flex-col items-end mb-1 max-w-[140px]">
+                                <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} truncate w-full justify-end`}>
+                                    🎯 {goal.title}
+                                </div>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-400 text-white animate-pulse shadow-sm scale-90 origin-right">GOAL</span>
+                            </div>
+                        ) : (
+                            <div className={`text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2 mb-1 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
+                                {t.redeemable_rewards}
+                            </div>
+                        )}
+                        <div className="space-y-1">
                             <div className="flex items-center justify-end gap-3">
-                                <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
+                                <Monitor className={`w-4 h-4 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                     <AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} />
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.minutes_unit}</span>
                                 </span>
                             </div>
                             <div className="flex items-center justify-end gap-3">
-                                <Coins className={`w-5 h-5 text-green-500`} />
+                                <Coins className={`w-4 h-4 text-green-500`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                                     <AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} />
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.cash_unit}</span>
