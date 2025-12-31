@@ -157,6 +157,14 @@ const rawTranslations = {
     tour_step3_msg: ['預設的 點數：時間：現金 比例是1：2：5，可以在設定中調整。', 'The default Points:Time:Cash ratio is 1:2:5, which can be adjusted in Settings.'],
     tour_next: ['下一步', 'Next'],
     tour_finish: ['知道了', 'Got it'],
+
+    // Install App
+    install_app: ['安裝應用程式', 'Install App'],
+    install_app_desc: ['將此網頁加到主畫面，享受全螢幕體驗。', 'Add to home screen for full screen experience.'],
+    add_to_home_btn: ['加到主畫面', 'Add to Home Screen'],
+    install_ios_title: ['加入主畫面 (iOS)', 'Add to Home Screen (iOS)'],
+    install_ios_step1: ['1. 點擊瀏覽器下方的分享按鈕', '1. Tap the Share button'],
+    install_ios_step2: ['2. 點選「加入主畫面」選項', '2. Tap "Add to Home Screen"'],
 };
 
 // Helper to generate dictionaries

@@ -90,6 +90,43 @@ export default function Dashboard() {
 
     const [tourStep, setTourStep] = useState(0);
 
+    // PWA Install Prompt State
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isIOS, setIsIOS] = useState(false);
+    const [isStandalone, setIsStandalone] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        setIsIOS(/iphone|ipad|ipod/.test(userAgent));
+        setIsMobile(/android|iphone|ipad|ipod/.test(userAgent));
+
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                setDeferredPrompt(null);
+            }
+        } else if (isIOS) {
+            showModal({
+                title: t.install_ios_title,
+                message: `${t.install_ios_step1}\n${t.install_ios_step2}`,
+                type: 'alert'
+            });
+        }
+    };
+
     // Initial check for tour
     useEffect(() => {
         if (kids && kids.length === 0 && !localStorage.getItem('tour_completed')) {
@@ -1096,6 +1133,29 @@ export default function Dashboard() {
                                     </button>
                                 </div>
                             </section>
+
+                            {/* 4. Install App (Mobile Only) */}
+                            {isMobile && !isStandalone && (deferredPrompt || isIOS) && (
+                                <section>
+                                    <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
+                                    <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme === 'doodle' ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20'}`}>
+                                        <div className="text-center md:text-left">
+                                            <h5 className={`font-black text-lg mb-1 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.install_app}</h5>
+                                            <p className={`text-xs opacity-70 mb-0 max-w-xs ${family?.theme === 'doodle' ? 'text-[#666]' : 'text-slate-400'}`}>{t.install_app_desc}</p>
+                                        </div>
+                                        <button
+                                            onClick={handleInstallClick}
+                                            className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme === 'doodle'
+                                                ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:bg-[#ff8a80] hover:border-[#ff8a80]'
+                                                : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
+                                                }`}
+                                        >
+                                            <Download className="w-5 h-5" />
+                                            {t.add_to_home_btn}
+                                        </button>
+                                    </div>
+                                </section>
+                            )}
 
                             {/* 4. 連線與代碼 (標準化) */}
                             <section className={`p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
