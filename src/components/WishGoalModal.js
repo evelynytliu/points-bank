@@ -20,7 +20,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
         }
     }, [isOpen, goal]);
 
-    if (!isOpen) return null;
+
 
     const progress = Math.min(100, Math.max(0, (kid.total_points / (goal?.target_points || 1)) * 100));
     const isCompleted = kid.total_points >= (goal?.target_points || Infinity);
@@ -64,6 +64,8 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
             triggerConfetti();
         }
     }, [isCompleted, isEditing, isOpen]);
+
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
