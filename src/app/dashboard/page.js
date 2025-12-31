@@ -996,7 +996,14 @@ export default function Dashboard() {
                                                 {hist.id === family?.id ? (
                                                     <span className={`text-xs font-black px-3 py-1 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'}`}>{t.current_family || '目前'}</span>
                                                 ) : (
-                                                    <button onClick={() => handleJoinFamily(hist.short_id)} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                                                    <button onClick={() => {
+                                                        showModal({
+                                                            type: 'prompt',
+                                                            title: '輸入 PIN 碼',
+                                                            message: `請輸入「${hist.name}」的家庭 PIN 碼：`,
+                                                            onConfirm: (val) => handleJoinFamily(hist.short_id, val)
+                                                        });
+                                                    }} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
                                                         {t.switch_button || '切換'}
                                                     </button>
                                                 )}
