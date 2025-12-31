@@ -182,6 +182,9 @@ export default function Dashboard() {
             unit: config.unit || '',
             rate: config.rate,
             mode: config.mode,
+            confirmText: config.confirmText,
+            cancelText: config.cancelText,
+            content: config.content,
             onConfirm: (val) => {
                 config.onConfirm && config.onConfirm(val);
                 setModal(prev => ({ ...prev, isOpen: false }));
@@ -1894,6 +1897,7 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
 
                 <h3 className={`text-xl font-black italic mb-2 uppercase tracking-tight ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>{config.title}</h3>
                 <p className={`text-sm font-medium mb-6 leading-relaxed whitespace-pre-line ${isDoodle ? 'text-[#666]' : 'text-slate-400'}`}>{config.message}</p>
+                {config.content && <div className="mb-6 w-full">{config.content}</div>}
 
                 {config.type === 'prompt' && (
                     <div className="relative mb-6">
