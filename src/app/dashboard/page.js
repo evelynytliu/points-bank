@@ -1023,7 +1023,7 @@ export default function Dashboard() {
                     </div>
                     <div className="flex flex-col">
                         <h1 className={`text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
-                            <span className="relative">
+                            <span className="relative pr-2">
                                 {t.points_bank}
                                 <span className={`absolute -bottom-1 left-0 w-full h-3 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-500/20'} -rotate-1 rounded-full -z-10 group-hover:h-full group-hover:bottom-0 transition-all duration-300 mix-blend-multiply`}></span>
                             </span>
