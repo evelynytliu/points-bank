@@ -72,18 +72,8 @@ export default function Home() {
     const code = inviteCode.trim().toUpperCase();
     if (!code) return;
 
-    // 判斷是否為 UUID 格式 (避免 type error)
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(code);
-
-    let query = supabase.from('families').select('id');
-
-    if (isUuid) {
-      query = query.eq('id', code);
-    } else {
-      query = query.eq('short_id', code);
-    }
-
-    const { data: families, error: fError } = await query;
+    // Use RPC for secure family lookup (requires supabase_security.sql to be run)
+    const { data: families, error: fError } = await supabase.rpc('api_find_family', { code });
 
     if (fError || !families || !families.length) {
       return alert(t.alert_no_family);
@@ -91,10 +81,8 @@ export default function Home() {
 
     const familyId = families[0].id;
 
-    const { data: kids, error: kError } = await supabase
-      .from('kids')
-      .select('*')
-      .eq('family_id', familyId);
+    // Use RPC for secure kids lookup
+    const { data: kids, error: kError } = await supabase.rpc('api_get_family_kids', { target_family_id: familyId });
 
     if (kError || !kids.length) {
       return alert(t.alert_no_kids);

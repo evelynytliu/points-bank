@@ -1201,7 +1201,7 @@ export default function Dashboard() {
 
             <TourOverlay
                 step={tourStep}
-                onNext={() => setTourStep(2)}
+                onNext={() => setTourStep(prev => prev + 1)}
                 onFinish={() => {
                     setTourStep(0);
                     localStorage.setItem('tour_completed', 'true');
@@ -1575,6 +1575,19 @@ function TourOverlay({ step, onNext, onFinish, t, familyTheme }) {
                     <div className={`p-8 rounded-3xl border-2 text-center relative overflow-hidden ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.2)]'}`}>
                         <h3 className={`text-xl font-black mb-4 uppercase italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>🔗 {t.onboarding_join_title}</h3>
                         <p className={`mb-8 font-bold leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-300'}`}>{t.tour_step2_msg}</p>
+                        <button onClick={onNext} className={`w-full py-4 rounded-xl font-black uppercase tracking-widest transition-all ${isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#4a4a4a]' : 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.5)]'}`}>
+                            {t.tour_next}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Step 3: Ratio Hint */}
+            {step === 3 && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md pointer-events-auto p-6 animate-in slide-in-from-right-10 duration-300">
+                    <div className={`p-8 rounded-3xl border-2 text-center relative overflow-hidden ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.2)]'}`}>
+                        <h3 className={`text-xl font-black mb-4 uppercase italic ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>⚙️ {t.points_time_rules}</h3>
+                        <p className={`mb-8 font-bold leading-relaxed ${isDoodle ? 'text-[#666]' : 'text-slate-300'}`}>{t.tour_step3_msg}</p>
                         <button onClick={onFinish} className={`w-full py-4 rounded-xl font-black uppercase tracking-widest transition-all ${isDoodle ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:opacity-90' : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'}`}>
                             {t.tour_finish}
                         </button>

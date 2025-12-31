@@ -61,7 +61,7 @@ const rawTranslations = {
     clear_history_only: ['僅清空異動紀錄', 'Clear History Logs Only'],
     clear_history_desc: ['保留點數與時間，僅刪除日誌', 'Keep points/time, delete logs only'],
     reset_family_data: ['徹底重設家庭資料 (歸零)', 'Reset Family Data (Zero Out)'],
-    reset_family_desc: ['清空所有紀錄並將點數時間全部歸零', 'Clear all logs and reset points/time to 0'],
+    reset_family_desc: ['清空紀錄並歸零，但會保留小孩名單', 'Clear logs/stats to 0, but keep kid profiles'],
     save_changes: ['儲存所有變更並立即生效', 'Save All Changes'],
     add_member: ['新增成員', 'Add Member'],
     click_to_change_avatar: ['點擊更換頭像', 'Click to Change Avatar'],
@@ -154,6 +154,7 @@ const rawTranslations = {
     tour_welcome: ['歡迎使用 Points Bank！', 'Welcome to Points Bank!'],
     tour_step1_msg: ['第一次使用嗎？請先點擊「設定」，新增您的小孩成員。', 'First time? Click "Settings" to add your kids.'],
     tour_step2_msg: ['如果您要加入現有的家庭，也可以在設定中的「加入現有家庭」按+號後，輸入邀請碼。', 'You can also join an existing family here by clicking the + button in the "Join Existing Family" section and entering the invite code.'],
+    tour_step3_msg: ['預設的 點數：時間：現金 比例是1：2：5，可以在設定中調整。', 'The default Points:Time:Cash ratio is 1:2:5, which can be adjusted in Settings.'],
     tour_next: ['下一步', 'Next'],
     tour_finish: ['知道了', 'Got it'],
 };
