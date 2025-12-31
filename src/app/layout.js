@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Points & Screen Time | Cloud Sync',
+  title: 'Points Bank | Smart Family Token System',
   description: 'Manage screen time with a visual points system.',
   icons: {
     icon: '/logo.png',

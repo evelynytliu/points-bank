@@ -1,6 +1,6 @@
 {
     "name": "Points Bank",
-    "short_name": "Points",
+    "short_name": "Points Bank",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
