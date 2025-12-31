@@ -1901,7 +1901,7 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                             <style>{`
                                 @keyframes deep-pulse {
                                     0%, 100% { opacity: 1; transform: scale(1); }
-                                    50% { opacity: 0.2; transform: scale(0.85); }
+                                    50% { opacity: 0.6; transform: scale(0.92); }
                                 }
                                 .custom-deep-pulse {
                                     animation: deep-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
