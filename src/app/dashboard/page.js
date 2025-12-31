@@ -1895,10 +1895,17 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     {!isUpdatingGoal && (
                         <div
                             onClick={(e) => { e.stopPropagation(); setShowGoalModal(true); }}
-                            className={`absolute -top-5 right-2 z-20 text-2xl cursor-pointer transition-transform hover:scale-125 ${goal ? 'animate-[pulse_2s_ease-in-out_infinite]' : 'opacity-50 animate-[pulse_3s_ease-in-out_infinite]'}`}
+                            className={`absolute -top-5 right-2 z-20 cursor-pointer transition-transform hover:scale-125 ${goal ? 'animate-[pulse_2s_ease-in-out_infinite]' : 'opacity-40 hover:opacity-100 animate-[pulse_3s_ease-in-out_infinite]'}`}
                             title={goal ? goal.title : "設定願望"}
                         >
-                            {goal ? '🎯' : '➕'}
+                            {goal ? (
+                                <span className="text-2xl">🎯</span>
+                            ) : (
+                                <Plus
+                                    className={`w-6 h-6 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}
+                                    strokeWidth={3}
+                                />
+                            )}
                         </div>
                     )}
 
