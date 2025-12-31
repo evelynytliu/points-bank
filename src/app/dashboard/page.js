@@ -1734,46 +1734,65 @@ function AnimatedCounter({ value }) {
 
 function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
-    const timePercent = Math.min(100, (kid.total_minutes / timeLimit) * 100);
-    const isWarning = timePercent > 0 && timePercent <= 30;
-    const isDanger = timePercent <= 10;
 
+    // Visual states to control animation timing
+    const [isInView, setIsInView] = useState(false);
+    const [visualPoints, setVisualPoints] = useState(kid.total_points);
+    const [visualMinutes, setVisualMinutes] = useState(kid.total_minutes);
     const prevPointsRef = useRef(kid.total_points);
     const cardRef = useRef(null);
 
+    // Track visibility
     useEffect(() => {
-        if (kid.total_points > prevPointsRef.current) {
-            // Trigger confetti
-            const rect = cardRef.current?.getBoundingClientRect();
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInView(entry.isIntersecting);
+            },
+            { threshold: 0.3 } // Trigger when 30% visible
+        );
+        if (cardRef.current) observer.observe(cardRef.current);
+        return () => observer.disconnect();
+    }, []);
 
-            // Default to center if no rect, otherwise center of card
-            const origin = rect ? {
-                x: (rect.left + rect.width / 2) / window.innerWidth,
-                y: (rect.top + rect.height / 2) / window.innerHeight
-            } : { x: 0.5, y: 0.5 };
+    // Sync visual state when in view
+    useEffect(() => {
+        if (!isInView) return;
 
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: origin,
-                zIndex: 1500, // Above modals
-                colors: familySettings?.theme === 'doodle'
-                    ? ['#ff8a80', '#ffd180', '#88d8b0', '#4a4a4a']
-                    : ['#22d3ee', '#e879f9', '#ffffff']
-            });
+        // Check for points update
+        if (visualPoints !== kid.total_points) {
+            // Check if we need confetti (only on increase)
+            if (kid.total_points > prevPointsRef.current) {
+                const rect = cardRef.current?.getBoundingClientRect();
+                const origin = rect ? {
+                    x: (rect.left + rect.width / 2) / window.innerWidth,
+                    y: (rect.top + rect.height / 2) / window.innerHeight
+                } : { x: 0.5, y: 0.5 };
+
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: origin,
+                    zIndex: 1500,
+                    colors: familySettings?.theme === 'doodle'
+                        ? ['#ff8a80', '#ffd180', '#88d8b0', '#4a4a4a']
+                        : ['#22d3ee', '#e879f9', '#ffffff']
+                });
+            }
+            setVisualPoints(kid.total_points);
+            prevPointsRef.current = kid.total_points;
         }
-        prevPointsRef.current = kid.total_points;
-    }, [kid.total_points, familySettings?.theme]);
 
-    // Need to pass kidCard props correctly, so we need to inject t into KidCard or pass it down.
-    // Since KidCard is a separate function component defined in the same file but doesn't have access to 't' from dashboard scope automatically unless passed.
-    // I will update KidCard signature to accept 't'.
+        // Check for minutes update
+        if (visualMinutes !== kid.total_minutes) {
+            setVisualMinutes(kid.total_minutes);
+        }
 
-    // Wait, I need to pass 't' to KidCard first.
-    // Let's first update the KidCard usage in Dashboard component.
-    // But first let's finish the replacement list. I will assume I can update the KidCard signature in a separate chunk.
+    }, [kid.total_points, kid.total_minutes, isInView, familySettings?.theme, visualPoints, visualMinutes]);
 
-    // Let's modify the KidCard usage first.
+    const timePercent = Math.min(100, (visualMinutes / timeLimit) * 100);
+    const isWarning = timePercent > 0 && timePercent <= 30;
+    const isDanger = timePercent <= 10;
+
     return (
         <div ref={cardRef} className={`p-8 group relative overflow-hidden transition-all duration-500 ${familySettings?.theme === 'doodle'
             ? 'bg-white border-4 border-[#4a4a4a] rounded-[40px_10px_35px_15px] shadow-[10px_10px_0px_rgba(74,74,74,0.15)]'
@@ -1796,8 +1815,8 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                         <div className={`text-sm ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} font-black uppercase mb-1 tracking-widest flex items-center gap-1`}>
                             <Star className="w-4 h-4 fill-current" /> {t.points_label}
                         </div>
-                        <div className={`${kid.total_points.toString().length > 4 ? 'text-4xl' : kid.total_points.toString().length > 3 ? 'text-5xl' : 'text-6xl'} font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>
-                            <AnimatedCounter value={kid.total_points} />
+                        <div className={`${visualPoints.toString().length > 4 ? 'text-4xl' : visualPoints.toString().length > 3 ? 'text-5xl' : 'text-6xl'} font-black italic relative z-10 leading-none ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'}`}>
+                            <AnimatedCounter value={visualPoints} />
                         </div>
                     </div>
 
@@ -1811,14 +1830,14 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                             <div className="flex items-center justify-end gap-3">
                                 <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                    <AnimatedCounter value={kid.total_points * (familySettings?.point_to_minutes || 2)} />
+                                    <AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} />
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.minutes_unit}</span>
                                 </span>
                             </div>
                             <div className="flex items-center justify-end gap-3">
                                 <Coins className={`w-5 h-5 text-green-500`} />
                                 <span className={`text-xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                    <AnimatedCounter value={kid.total_points * (familySettings?.point_to_cash || 5)} />
+                                    <AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} />
                                     <span className="text-xs font-bold not-italic ml-1 opacity-60">{t.cash_unit}</span>
                                 </span>
                             </div>
@@ -1842,7 +1861,7 @@ function KidCard({ kid, onUpdate, onDelete, currentLimit, familySettings, actorN
                     <div className={`relative z-10 flex items-center gap-2 font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
                         <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? '' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
                         <span className={familySettings?.theme === 'doodle' ? '' : 'drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]'}>
-                            <span className="text-xl"><AnimatedCounter value={kid.total_minutes} /></span> <span className="text-sm">{t.minutes_unit}</span>
+                            <span className="text-xl"><AnimatedCounter value={visualMinutes} /></span> <span className="text-sm">{t.minutes_unit}</span>
                         </span>
                     </div>
 
