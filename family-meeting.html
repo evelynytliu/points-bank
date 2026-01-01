@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Meeting | 家庭會議室</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="icon" href="./public/logo.png" type="image/png">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #fdfcf9;
+            --ink: #2d2d2d;
+            --muted: #7a7a7a;
+            --accent: #ff8a80;
+            --accent-soft: #fff5f3;
+            --paper: #ffffff;
+            --deco: #e8e1d9;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --video-bg: #eceae5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            background-color: var(--bg);
+            color: var(--ink);
+            line-height: 1.75;
+            letter-spacing: 0.02em;
+            -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(circle, #d8d0c8 1.5px, transparent 1.5px);
+            background-size: 30px 30px;
+        }
+
+        /* Reusing core classes from index.html */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 900;
+            line-height: 1.3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Nav */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(253, 252, 249, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--ink);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-cta {
+            background: var(--accent);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Hero specific for this page */
+        .meeting-hero {
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+
+        .meeting-hero h1 {
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .meeting-hero p {
+            font-size: 1.2rem;
+            color: var(--muted);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Video Section */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin: 4rem 0;
+        }
+
+        .video-card {
+            background: white;
+            border: 2px solid var(--ink);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 8px 8px 0 var(--deco);
+            transition: transform 0.3s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 12px 12px 0 var(--accent-soft);
+        }
+
+        .video-placeholder {
+            aspect-ratio: 16/9;
+            background: var(--video-bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px dashed var(--muted);
+        }
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            color: var(--ink);
+        }
+
+        .video-tag {
+            position: absolute;
+            top: -15px;
+            left: 2rem;
+            background: var(--ink);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            transform: rotate(-2deg);
+        }
+
+        /* Agenda Section */
+        .agenda {
+            padding: 4rem 0;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-num {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            line-height: 50px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 1px dashed var(--deco);
+            margin-top: 4rem;
+        }
+
+        .footer-logo {
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+
+            .video-grid,
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            /* Hide on mobile for simplicity in this quick implementation */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="nav-brand">
+                <img src="./public/logo.png" alt="Logo" style="width: 32px; height: 32px;">
+                Points Bank
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">回首頁</a></li>
+                <li><a href="https://points-bank.vercel.app" class="nav-cta">進入系統 <i data-lucide="arrow-right"
+                            size="16"></i></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="meeting-hero">
+            <span
+                style="font-size: 0.9rem; font-weight: 700; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; display: block;">Family
+                Meeting Room</span>
+            <h1>家庭會議室</h1>
+            <p>每週 10 分鐘，開啟家庭好關係。<br>不需要很嚴肅，只要一個簡短的影片，一點點的討論，就能建立起全家都認同的規則。</p>
+        </section>
+
+        <!-- Video Selection -->
+        <!-- Storybook Section -->
+        <!-- Storybook Section Styles -->
+        <style>
+            .storybook-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 5rem;
+                margin: 4rem 0;
+            }
+
+            .story-section {
+                /* Container for each story block */
+            }
+
+            .story-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .story-tag {
+                display: inline-block;
+                padding: 0.5rem 1.5rem;
+                border-radius: 50px;
+                font-weight: 900;
+                font-size: 1rem;
+                color: white;
+            }
+
+            .storybook-container {
+                background: white;
+                border: 3px solid var(--ink);
+                border-radius: 25px;
+                overflow: hidden;
+                box-shadow: 15px 15px 0 var(--deco);
+                position: relative;
+                transition: transform 0.3s;
+            }
+
+            .storybook-container:hover {
+                transform: translateY(-5px);
+            }
+
+            /* Theme Colors */
+            .theme-kid {
+                --theme-color: #4caf50;
+                --shadow-color: #a5d6a7;
+            }
+
+            .theme-parent {
+                --theme-color: #ff8a80;
+                --shadow-color: #ffcbbd;
+            }
+
+            .theme-kid .storybook-container {
+                box-shadow: 15px 15px 0 var(--shadow-color);
+            }
+
+            .theme-parent .storybook-container {
+                box-shadow: 15px 15px 0 var(--shadow-color);
+            }
+
+            .story-stage {
+                aspect-ratio: 16/9;
+                background: #f0f0f0;
+                position: relative;
+                overflow: hidden;
+                border-bottom: 3px solid var(--ink);
+            }
+
+            .story-stage img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+            }
+
+            .story-controls {
+                padding: 2rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 1.5rem;
+                background: #fff;
+            }
+
+            .story-content {
+                flex: 1;
+            }
+
+            .story-title {
+                font-size: 1.5rem;
+                font-weight: 900;
+                margin-bottom: 0.5rem;
+                color: var(--ink);
+            }
+
+            .story-text {
+                font-size: 1.1rem;
+                line-height: 1.6;
+                color: #444;
+                margin-bottom: 1rem;
+                min-height: 3.5em;
+            }
+
+            .control-btn {
+                background: var(--ink);
+                color: white;
+                border: none;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.2s, opacity 0.2s;
+                flex-shrink: 0;
+                margin-top: 0.5rem;
+            }
+
+            .control-btn:hover:not(:disabled) {
+                transform: scale(1.1);
+            }
+
+            .control-btn:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+            .voice-btn {
+                background: var(--theme-color);
+                color: white;
+                border: none;
+                padding: 0.6rem 1.2rem;
+                border-radius: 50px;
+                font-weight: 700;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.95rem;
+                transition: all 0.2s;
+            }
+
+            .voice-btn:hover {
+                filter: brightness(1.1);
+            }
+
+            .voice-btn.playing {
+                animation: pulse 1.5s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            .story-progress {
+                display: flex;
+                gap: 0.6rem;
+                padding: 0 2rem 1.5rem;
+            }
+
+            .progress-dot {
+                flex: 1;
+                height: 8px;
+                background: #eee;
+                border-radius: 4px;
+                transition: background 0.3s;
+            }
+
+            .progress-dot.active {
+                background: var(--theme-color);
+            }
+
+            .tip-box {
+                margin-top: 2rem;
+                background: #fff5f3;
+                padding: 1.5rem;
+                border-radius: 15px;
+                border: 2px dashed #ff8a80;
+                position: relative;
+            }
+        </style>
+
+        <div class="storybook-layout">
+
+            <!-- Player 1: Kids -->
+            <div class="story-section theme-kid">
+                <div class="story-header">
+                    <div class="story-tag" style="background: var(--theme-color);">給孩子看</div>
+                    <span style="font-weight: 700; color: var(--muted); letter-spacing: 0.05em;">KIDS STORYBOOK</span>
+                </div>
+
+                <div class="storybook-container">
+                    <div class="story-stage">
+                        <img id="kid-image" src="./public/slides/slide1.png" alt="Story Slide">
+                    </div>
+
+                    <div class="story-controls">
+                        <button class="control-btn" onclick="changeSlide('kid', -1)" id="kid-btn-prev" disabled>
+                            <i data-lucide="chevron-left"></i>
+                        </button>
+
+                        <div class="story-content">
+                            <h3 id="kid-title" class="story-title">危機出現！</h3>
+                            <div id="kid-text" class="story-text">
+                                嗶嗶嗶！緊急警報！奇怪的『螢幕病毒』正在攻擊我們家！...
+                            </div>
+                            <button class="voice-btn" onclick="toggleVoice('kid')" id="kid-voice-btn">
+                                <i data-lucide="volume-2" size="18"></i> <span id="kid-voice-text">播放故事</span>
+                            </button>
+                        </div>
+
+                        <button class="control-btn" onclick="changeSlide('kid', 1)" id="kid-btn-next">
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="story-progress" id="kid-progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Player 2: Parents -->
+            <div class="story-section theme-parent">
+                <div class="story-header">
+                    <div class="story-tag" style="background: var(--theme-color);">給家長看</div>
+                    <span
+                        style="font-weight: 700; color: var(--muted); letter-spacing: 0.05em; font-size: 1.2rem;">溫和而堅定的力量：家長引導指南</span>
+                </div>
+
+                <div class="storybook-container">
+                    <div class="story-stage">
+                        <img id="parent-image" src="./public/slides/parent_slide1.png" alt="Parent Slide">
+                    </div>
+
+                    <div class="story-controls">
+                        <button class="control-btn" onclick="changeSlide('parent', -1)" id="parent-btn-prev" disabled>
+                            <i data-lucide="chevron-left"></i>
+                        </button>
+
+                        <div class="story-content">
+                            <h3 id="parent-title" class="story-title">溫和而堅定的力量</h3>
+                            <div id="parent-text" class="story-text">
+                                我們都經歷過：想拿走平板時的尖叫，還有無止盡的討價還價。這場「螢幕戰爭」消耗了我們太多的親子存摺。但，如果我們換個角度看呢？
+                            </div>
+                            <button class="voice-btn" onclick="toggleVoice('parent')" id="parent-voice-btn">
+                                <i data-lucide="play-circle" size="18"></i> <span id="parent-voice-text">播放語音導讀</span>
+                            </button>
+                        </div>
+
+                        <button class="control-btn" onclick="changeSlide('parent', 1)" id="parent-btn-next">
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="story-progress" id="parent-progress-bar"></div>
+                </div>
+
+                <!-- Tip Box (Moved here) -->
+                <div class="tip-box">
+                    <h4
+                        style="color: var(--accent); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="lightbulb"></i> 家長引導小撇步
+                    </h4>
+                    <p style="font-size: 0.95rem; color: #555; line-height: 1.6;">
+                        看完影片後，試著問孩子：<br>
+                        1. 「如果是你，這週想要挑戰存多少點？」<br>
+                        2. 「我們一起來看看 App 裡有什麼獎勵？」
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            // Data Sources
+            const kidSlides = [
+                {
+                    title: "危機出現！",
+                    image: "./public/slides/kid_zombie.png",
+                    text: "緊急警報！奇怪的『螢幕病毒』正在攻擊我們家！如果一直看平板不休息，就會變身成... 『沙發馬鈴薯殭屍』！啊！！太可怕啦！"
+                },
+                {
+                    title: "你的超能力",
+                    image: "./public/slides/kid_superpower.png",
+                    text: "但是，不用擔心！你有一個超強的武器，那就是你的——『關機手指』！只要帥氣地按下關機鍵，你就能瞬間解救你的大腦！"
+                },
+                {
+                    title: "勇氣能量庫",
+                    image: "./public/slides/slide3.png",
+                    text: "為了獎勵打敗殭屍的英雄，我們引進了最新科技—— Points Bank 能量庫！這不只是存錢筒，這是專門收集你的『勇氣』的地方。"
+                },
+                {
+                    title: "能量轉換",
+                    image: "./public/slides/slide4.png",
+                    text: "你省下來的每一分鐘，都沒有不見喔！它們會被這台機器吸進去，咻——碰！變身成超珍貴的『點數』！"
+                },
+                {
+                    title: "選擇你的戰利品",
+                    image: "./public/slides/kid_choice.png",
+                    text: "這些點數能幹嘛？身為英雄的你，有兩個選擇！選項A：留著以後看更多卡通！選項B：把點數變成真錢，去把那個玩具帶回家！"
+                },
+                {
+                    title: "任務開始",
+                    image: "./public/slides/kid_mission.png",
+                    text: "聽好囉，時間大師！從現在開始，你要讓螢幕吃掉你的時間？還是要把時間變成寶藏帶回家？遙控器在你手上... 遊戲開始！"
+                }
+            ];
+
+            const parentSlides = [
+                {
+                    title: "溫和而堅定的力量",
+                    image: "./public/slides/parent_slide1.png",
+                    text: "我們都經歷過：想拿走平板時的尖叫，還有無止盡的討價還價。這場「螢幕戰爭」消耗了我們太多的親子存摺。但，如果我們換個角度看呢？"
+                },
+                {
+                    title: "從「限制」到「管理」",
+                    image: "./public/slides/parent_autonomy.png",
+                    text: "最新的教育心理學發現，賦予孩子「自主權」是關鍵。當螢幕時間變成一種「被禁止的誘惑」，它就更有吸引力；但當它變成可以管理的「資源」，孩子就會開始學習規劃。"
+                },
+                {
+                    title: "看不見的貨幣學",
+                    image: "./public/slides/parent_slide2.png",
+                    text: "Points Bank 的核心不是交換，而是「價值觀的具象化」。我們讓「省下的時間」變得有價值，讓「想要的時間」需要付出代價。這是在教導最基礎的經濟學：資源是有限的。"
+                },
+                {
+                    title: "延遲滿足的練習",
+                    image: "./public/slides/parent_patience.png",
+                    text: "當孩子為了買一個心儀的玩具，決定今天少看 20 分鐘卡通，這就是珍貴的「延遲滿足」。這種自我控制的能力，比單純不看電視更有長遠的教育意義。"
+                },
+                {
+                    title: "溫和的實驗",
+                    image: "./public/slides/parent_slide3.png",
+                    text: "這套系統不是完美的魔法，而是一個邀請。邀請您和孩子一起實驗：如果我們把決定權交還給孩子，加上明確的界線，家裡的氣氛會不會不一樣？"
+                },
+                {
+                    title: "找回連結",
+                    image: "./public/slides/parent_connection.png",
+                    text: "最終目標不是為了點數，而是為了騰出時間。當爭吵減少了，我們也許能用那些省下來的時間，一起讀個故事，或只是聊聊天。這值得我們一試，對吧？"
+                }
+            ];
+
+            // State Management
+            const players = {
+                kid: {
+                    index: 0,
+                    slides: kidSlides,
+                    speaking: false
+                },
+                parent: {
+                    index: 0,
+                    slides: parentSlides,
+                    speaking: false
+                }
+            };
+
+            let synth = window.speechSynthesis;
+            let currentUtterance = null;
+            let currentSpeakingId = null; // 'kid' or 'parent'
+
+            function initPage() {
+                updateSlide('kid');
+                renderProgress('kid');
+                updateSlide('parent');
+                renderProgress('parent');
+
+                getChineseVoice(); // Pre-load
+            }
+
+            function renderProgress(id) {
+                const p = players[id];
+                const bar = document.getElementById(`${id}-progress-bar`);
+                bar.innerHTML = p.slides.map((_, i) =>
+                    `<div class="progress-dot ${i === 0 ? 'active' : ''}" style="width: 100%;"></div>`
+                ).join('');
+            }
+
+            function updateSlide(id) {
+                const p = players[id];
+                const slide = p.slides[p.index];
+
+                // Elements
+                document.getElementById(`${id}-image`).src = slide.image;
+                document.getElementById(`${id}-title`).innerText = slide.title;
+                document.getElementById(`${id}-text`).innerText = slide.text;
+
+                // Progress Dots
+                const dots = document.querySelectorAll(`#${id}-progress-bar .progress-dot`);
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === p.index);
+                });
+
+                // Buttons
+                document.getElementById(`${id}-btn-prev`).disabled = p.index === 0;
+                document.getElementById(`${id}-btn-next`).disabled = p.index === p.slides.length - 1;
+
+                // Stop voice if this player was speaking
+                if (currentSpeakingId === id) {
+                    cancelVoice();
+                }
+            }
+
+            function changeSlide(id, dir) {
+                const p = players[id];
+                p.index += dir;
+                updateSlide(id);
+
+                // Auto-play removed for manual control, but could add here
+            }
+
+            async function getChineseVoice() {
+                if (synth.getVoices().length === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                const voices = synth.getVoices();
+                const preferred = ["Microsoft HsiaoChen", "Microsoft Yunxi", "Google 國語", "Google 普通话"];
+                let selected = null;
+                for (const name of preferred) {
+                    selected = voices.find(v => v.name.includes(name));
+                    if (selected) break;
+                }
+                return selected || voices.find(v => v.lang.includes('zh')) || voices[0];
+            }
+
+            function toggleVoice(id) {
+                if (currentSpeakingId === id && synth.speaking) {
+                    cancelVoice();
+                } else {
+                    playVoice(id);
+                }
+            }
+
+            async function playVoice(id) {
+                cancelVoice(); // Stop any other player
+
+                currentSpeakingId = id;
+                const p = players[id];
+                const text = p.slides[p.index].text;
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voice = await getChineseVoice();
+                if (voice) utterance.voice = voice;
+
+                // Adjust parameters based on ID
+                if (id === 'kid') {
+                    utterance.rate = 0.9;
+                    utterance.pitch = (voice && voice.name.includes("Google")) ? 1.1 : 1.0;
+                } else {
+                    utterance.rate = 1.0;
+                    utterance.pitch = 1.0;
+                }
+
+                utterance.onend = () => {
+                    resetVoiceBtn(id);
+                    currentSpeakingId = null;
+                };
+
+                synth.speak(utterance);
+
+                // UI
+                const btn = document.getElementById(`${id}-voice-btn`);
+                const btnText = document.getElementById(`${id}-voice-text`);
+                if (btn) {
+                    btn.classList.add('playing');
+                    if (btnText) btnText.innerText = "播放中...";
+                }
+            }
+
+            function cancelVoice() {
+                synth.cancel();
+                currentSpeakingId = null;
+                ['kid', 'parent'].forEach(resetVoiceBtn);
+            }
+
+            function resetVoiceBtn(id) {
+                const btn = document.getElementById(`${id}-voice-btn`);
+                const btnText = document.getElementById(`${id}-voice-text`);
+                if (btn) {
+                    btn.classList.remove('playing');
+                    if (btnText) btnText.innerText = id === 'kid' ? "播放故事" : "播放語音導讀";
+                }
+            }
+
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = getChineseVoice;
+            }
+
+            document.addEventListener('DOMContentLoaded', initPage);
+        </script>
+
+        <!-- Agenda -->
+        <section class="agenda">
+            <h2 style="text-align: center; margin-bottom: 1rem;">會議流程建議</h2>
+            <p style="text-align: center; color: var(--muted);">簡單三步驟，讓會議輕鬆又有效</p>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3>觀看影片</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                        選擇適合的影片一起觀看，為討論建立共同的話題與氛圍。
+                    </p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3>開放討論</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                        讓孩子先說說看想法。例如：「如果你是影片裡的主角，你會怎麼做？」
+                    </p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3>約定規則</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                        打開 Points Bank，一起設定下週的目標與獎勵，並按下「開始」！
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="footer-logo">POINTS BANK</div>
+        <p style="font-size: 0.8rem; color: var(--muted);">© 2025 Family Meeting Helper</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
