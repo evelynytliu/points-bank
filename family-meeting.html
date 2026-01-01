@@ -278,6 +278,13 @@
                 Meeting Room</span>
             <h1>家庭會議室</h1>
             <p>每週 10 分鐘，開啟家庭好關係。<br>不需要很嚴肅，只要一個簡短的影片，一點點的討論，就能建立起全家都認同的規則。</p>
+
+            <!-- Voice Tip -->
+            <div id="voice-tip"
+                style="display: flex; max-width: 600px; margin: 1rem auto; background: #e8eaf6; color: #3f51b5; padding: 0.8rem 1.5rem; border-radius: 50px; font-size: 0.9rem; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid #c5cae9;">
+                <i data-lucide="sparkles" size="16"></i>
+                <span id="voice-tip-text">建議使用電腦版 <strong>Microsoft Edge</strong> 瀏覽器播放，語音效果最自然好聽喔！</span>
+            </div>
         </section>
 
         <!-- Video Selection -->
@@ -336,11 +343,20 @@
                 --shadow-color: #ffcbbd;
             }
 
+            .theme-guide {
+                --theme-color: #5c6bc0;
+                --shadow-color: #c5cae9;
+            }
+
             .theme-kid .storybook-container {
                 box-shadow: 15px 15px 0 var(--shadow-color);
             }
 
             .theme-parent .storybook-container {
+                box-shadow: 15px 15px 0 var(--shadow-color);
+            }
+
+            .theme-guide .storybook-container {
                 box-shadow: 15px 15px 0 var(--shadow-color);
             }
 
@@ -411,6 +427,8 @@
                 cursor: not-allowed;
             }
 
+
+            /* Voice Button Styles */
             .voice-btn {
                 background: var(--theme-color);
                 color: white;
@@ -430,8 +448,40 @@
                 filter: brightness(1.1);
             }
 
+            .voice-btn .icon-play {
+                display: inline-block;
+            }
+
+            .voice-btn .icon-pause {
+                display: none;
+            }
+
             .voice-btn.playing {
+                background: #e8f5e9;
+                color: #2e7d32;
+                border-color: #a5d6a7;
                 animation: pulse 1.5s infinite;
+            }
+
+            /* Playing state: Show Play icon (default), show Pause on Hover */
+            .voice-btn.playing .icon-play {
+                display: inline-block;
+            }
+
+            .voice-btn.playing:hover .icon-play {
+                display: none;
+            }
+
+            .voice-btn.playing:hover .icon-pause {
+                display: inline-block;
+            }
+
+            .voice-btn.playing:hover {
+                background: #ffebee;
+                color: #c62828;
+                border-color: #ef9a9a;
+                animation: none;
+                /* Stop pulse on hover to indicate pause action */
             }
 
             @keyframes pulse {
@@ -501,7 +551,9 @@
                                 嗶嗶嗶！緊急警報！奇怪的『螢幕病毒』正在攻擊我們家！...
                             </div>
                             <button class="voice-btn" onclick="toggleVoice('kid')" id="kid-voice-btn">
-                                <i data-lucide="volume-2" size="18"></i> <span id="kid-voice-text">播放故事</span>
+                                <span class="icon-play"><i data-lucide="volume-2" size="18"></i></span>
+                                <span class="icon-pause"><i data-lucide="pause" size="18"></i></span>
+                                <span id="kid-voice-text">播放故事</span>
                             </button>
                         </div>
 
@@ -538,7 +590,9 @@
                                 我們都經歷過：想拿走平板時的尖叫，還有無止盡的討價還價。這場「螢幕戰爭」消耗了我們太多的親子存摺。但，如果我們換個角度看呢？
                             </div>
                             <button class="voice-btn" onclick="toggleVoice('parent')" id="parent-voice-btn">
-                                <i data-lucide="play-circle" size="18"></i> <span id="parent-voice-text">播放語音導讀</span>
+                                <span class="icon-play"><i data-lucide="play-circle" size="18"></i></span>
+                                <span class="icon-pause"><i data-lucide="pause" size="18"></i></span>
+                                <span id="parent-voice-text">播放語音導讀</span>
                             </button>
                         </div>
 
@@ -564,6 +618,44 @@
                 </div>
             </div>
 
+            <!-- Player 3: Guide (Joint) -->
+            <div class="story-section theme-guide">
+                <div class="story-header">
+                    <div class="story-tag" style="background: var(--theme-color);">一起看</div>
+                    <span style="font-weight: 700; color: var(--muted); letter-spacing: 0.05em;">OPERATION MANUAL</span>
+                </div>
+
+                <div class="storybook-container">
+                    <div class="story-stage">
+                        <img id="guide-image" src="./public/slides/guide_step1.png" alt="Guide Slide">
+                    </div>
+
+                    <div class="story-controls">
+                        <button class="control-btn" onclick="changeSlide('guide', -1)" id="guide-btn-prev" disabled>
+                            <i data-lucide="chevron-left"></i>
+                        </button>
+
+                        <div class="story-content">
+                            <h3 id="guide-title" class="story-title">許下願望</h3>
+                            <div id="guide-text" class="story-text">
+                                首先，打開系統，把你最想要、最想要的那個玩具或禮物登錄進去。這就是我們的終點線！系統會告訴你，你需要多少點數才能得到它。
+                            </div>
+                            <button class="voice-btn" onclick="toggleVoice('guide')" id="guide-voice-btn">
+                                <span class="icon-play"><i data-lucide="volume-2" size="18"></i></span>
+                                <span class="icon-pause"><i data-lucide="pause" size="18"></i></span>
+                                <span id="guide-voice-text">播放說明</span>
+                            </button>
+                        </div>
+
+                        <button class="control-btn" onclick="changeSlide('guide', 1)" id="guide-btn-next">
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="story-progress" id="guide-progress-bar"></div>
+                </div>
+            </div>
+
         </div>
 
         <script>
@@ -571,8 +663,8 @@
             const kidSlides = [
                 {
                     title: "危機出現！",
-                    image: "./public/slides/kid_zombie.png",
-                    text: "緊急警報！奇怪的『螢幕病毒』正在攻擊我們家！如果一直看平板不休息，就會變身成... 『沙發馬鈴薯殭屍』！啊！！太可怕啦！"
+                    image: "./public/slides/kid_mud.png",
+                    text: "緊急警報！奇怪的『螢幕病毒』正在攻擊我們家！如果一直看平板不休息，就會變身成... 軟趴趴的『沙發泥巴怪』！黏在沙發上動不了啦！"
                 },
                 {
                     title: "你的超能力",
@@ -581,12 +673,12 @@
                 },
                 {
                     title: "勇氣能量庫",
-                    image: "./public/slides/slide3.png",
-                    text: "為了獎勵打敗殭屍的英雄，我們引進了最新科技—— Points Bank 能量庫！這不只是存錢筒，這是專門收集你的『勇氣』的地方。"
+                    image: "./public/slides/kid_energy_bank.png",
+                    text: "為了獎勵打敗泥巴怪的英雄，我們引進了最新科技—— Points Bank 能量庫！這不只是存錢筒，這是專門收集你的『勇氣』的地方。"
                 },
                 {
                     title: "能量轉換",
-                    image: "./public/slides/slide4.png",
+                    image: "./public/slides/kid_energy_bank.png",
                     text: "你省下來的每一分鐘，都沒有不見喔！它們會被這台機器吸進去，咻——碰！變身成超珍貴的『點數』！"
                 },
                 {
@@ -601,10 +693,43 @@
                 }
             ];
 
+            const guideSlides = [
+                {
+                    title: "步驟一：許下願望 (Set the Goal)",
+                    image: "./public/slides/guide_step1.png",
+                    text: "歡迎來到 Points Bank！要怎麼讓這個神奇的系統運作呢？第一步：打開系統，把你最想要、最想要的那個玩具或禮物登錄進去。這就是我們的終點線！系統會告訴你，你需要多少點數才能得到它。"
+                },
+                {
+                    title: "步驟二：誠實的交易 (The Trade)",
+                    image: "./public/slides/guide_step2.png",
+                    text: "重點來了！當你想要看電視、玩平板的時候，螢幕還沒打開之前，要先打開 Points Bank。你自己按下「兌換」按鈕，看著你的帳戶扣掉時間。這時候你會感覺到一點點心痛，沒錯，這讓你更珍惜接下來的時間。"
+                },
+                {
+                    title: "步驟三：設定計時器 (The Timer)",
+                    image: "./public/slides/guide_step3.png",
+                    text: "扣完款後，拿出計時器（或手機鬧鐘），設定好你剛剛買的時間（例如 30 分鐘）。鬧鐘開始倒數，你就可以盡情享受你的螢幕時間了！"
+                },
+                {
+                    title: "步驟四：完美的結束 (The Finish)",
+                    image: "./public/slides/guide_step4.png",
+                    text: "當「嗶嗶嗶」鬧鐘響起時，最帥氣的動作來了——立刻關掉螢幕。如果你做到了，恭喜你！你守護了你的信用。"
+                },
+                {
+                    title: "步驟五：見證魔法 (The Magic)",
+                    image: "./public/slides/guide_step5.png",
+                    text: "如果你今天原本可以看 60 分鐘，但你只兌換了 30 分鐘，剩下沒用完的時間去哪了？別擔心，系統可以把它們「轉換」成點數，存進你的存摺裡。看著那個進度條越來越接近禮物，那種成就感比看電視還要快樂！"
+                },
+                {
+                    title: "黃金法則 (Golden Rules)",
+                    image: "./public/slides/guide_summary.png",
+                    text: "最後，請記住這三條黃金法則：1. 先扣點，再開機（這是鐵律）。2. 鬧鐘響，就關機（這叫信用）。3. 多忍耐，多點數（這叫智慧）。準備好了嗎？讓我們開始累積第一筆財富吧！"
+                }
+            ];
+
             const parentSlides = [
                 {
                     title: "溫和而堅定的力量",
-                    image: "./public/slides/parent_slide1.png",
+                    image: "./public/slides/parent_conflict.png",
                     text: "我們都經歷過：想拿走平板時的尖叫，還有無止盡的討價還價。這場「螢幕戰爭」消耗了我們太多的親子存摺。但，如果我們換個角度看呢？"
                 },
                 {
@@ -645,20 +770,44 @@
                     index: 0,
                     slides: parentSlides,
                     speaking: false
+                },
+                guide: {
+                    index: 0,
+                    slides: guideSlides,
+                    speaking: false
                 }
             };
 
             let synth = window.speechSynthesis;
             let currentUtterance = null;
             let currentSpeakingId = null; // 'kid' or 'parent'
+            let lastVoiceEndTime = 0; // To track when the last voice finished
 
-            function initPage() {
+
+
+            async function initPage() {
                 updateSlide('kid');
                 renderProgress('kid');
                 updateSlide('parent');
                 renderProgress('parent');
+                updateSlide('guide');
+                renderProgress('guide');
 
-                getChineseVoice(); // Pre-load
+                getChineseVoice(); // Pre-load voice
+            }
+
+            // checkAndShowTip logic removed - tip is always shown now.
+
+            // Standard voice loading event for Chrome
+            speechSynthesis.onvoiceschanged = () => {
+                getChineseVoice(); // Refresh cache if needed
+            };
+
+            // Robust initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initPage);
+            } else {
+                initPage();
             }
 
             function renderProgress(id) {
@@ -695,11 +844,20 @@
             }
 
             function changeSlide(id, dir) {
+                // Smart Auto-play Logic
+                // If it's currently speaking OR it finished speaking very recently (< 5 seconds),
+                // then we assume the user is in "listening mode" and wants to continue.
+                const isSpeaking = (currentSpeakingId === id && synth.speaking);
+                const recentEnded = (Date.now() - lastVoiceEndTime < 5000);
+                const shouldAutoPlay = isSpeaking || recentEnded;
+
                 const p = players[id];
                 p.index += dir;
                 updateSlide(id);
 
-                // Auto-play removed for manual control, but could add here
+                if (shouldAutoPlay) {
+                    playVoice(id);
+                }
             }
 
             async function getChineseVoice() {
@@ -707,12 +865,21 @@
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 const voices = synth.getVoices();
-                const preferred = ["Microsoft HsiaoChen", "Microsoft Yunxi", "Google 國語", "Google 普通话"];
+                // Priority: Taiwan Neural Voices (HsiaoChen), then generic TW, then any Chinese
+                const preferred = [
+                    "Microsoft HsiaoChen", // Windows/Edge (The "Sweet AI" voice user wants)
+                    "Han", // Apple
+                    "Yating", // Apple
+                    "Google 國語", // Chrome Android
+                    "zh-TW" // Generic Lang Code
+                ];
+
                 let selected = null;
                 for (const name of preferred) {
-                    selected = voices.find(v => v.name.includes(name));
+                    selected = voices.find(v => v.name.includes(name) || (name === "zh-TW" && v.lang === "zh-TW"));
                     if (selected) break;
                 }
+                // Fallback to any Chinese if strict TW not found
                 return selected || voices.find(v => v.lang.includes('zh')) || voices[0];
             }
 
@@ -733,18 +900,27 @@
 
                 const utterance = new SpeechSynthesisUtterance(text);
                 const voice = await getChineseVoice();
-                if (voice) utterance.voice = voice;
+                if (voice) {
+                    utterance.voice = voice;
+                    // console.log("Selected voice:", voice.name); // Debug
+                }
 
-                // Adjust parameters based on ID
+                // AI Voice Optimization:
+                // Neural voices (like HsiaoChen) sound robotic if pitch/rate are changed too much.
+                // Keep closer to 1.0 for naturalness.
                 if (id === 'kid') {
-                    utterance.rate = 0.9;
-                    utterance.pitch = (voice && voice.name.includes("Google")) ? 1.1 : 1.0;
+                    utterance.rate = 1.1; // Slightly faster for kid energy (better than slowing down)
+                    utterance.pitch = 1.0; // Keep pitch natural
+                } else if (id === 'guide') {
+                    utterance.rate = 1.0; // Professional speed
+                    utterance.pitch = 1.0;
                 } else {
-                    utterance.rate = 1.0;
+                    utterance.rate = 1.0; // Calm parent speed
                     utterance.pitch = 1.0;
                 }
 
                 utterance.onend = () => {
+                    lastVoiceEndTime = Date.now();
                     resetVoiceBtn(id);
                     currentSpeakingId = null;
                 };
@@ -763,7 +939,7 @@
             function cancelVoice() {
                 synth.cancel();
                 currentSpeakingId = null;
-                ['kid', 'parent'].forEach(resetVoiceBtn);
+                ['kid', 'parent', 'guide'].forEach(resetVoiceBtn);
             }
 
             function resetVoiceBtn(id) {
@@ -771,13 +947,15 @@
                 const btnText = document.getElementById(`${id}-voice-text`);
                 if (btn) {
                     btn.classList.remove('playing');
-                    if (btnText) btnText.innerText = id === 'kid' ? "播放故事" : "播放語音導讀";
+                    if (btnText) btnText.innerText = id === 'kid' ? "播放故事" : (id === 'guide' ? "播放說明" : "播放語音導讀");
                 }
             }
 
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = getChineseVoice;
-            }
+            // Standard voice loading event for Chrome
+            speechSynthesis.onvoiceschanged = () => {
+                // console.log("Voices changed event fired");
+                getChineseVoice(); // Refresh cache if needed
+            };
 
             document.addEventListener('DOMContentLoaded', initPage);
         </script>
