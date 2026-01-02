@@ -7,7 +7,8 @@
     <title>Points Bank | 家庭教養點數系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="icon" href="./public/logo.png" type="image/png">
     <link rel="manifest" href="manifest.json">
@@ -929,62 +930,118 @@
     </section>
 
     <!-- NEW: HOW IT WORKS VISUAL STRIP -->
-    <section class="section" style="background: white; padding: 4rem 0; border-top: 1px dashed var(--deco);">
-        <div class="container">
-            <div class="section-header" style="margin-bottom: 3rem;">
-                <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">孩子眼中的 Points Bank</h2>
-                <p style="font-size: 1rem;">簡單 5 步驟，建立儀式感</p>
+    <section class="section"
+        style="background: #fff; padding: 6rem 0; border-top: 2px solid var(--ink); position: relative; overflow: hidden;">
+        <!-- Background Pattern -->
+        <div
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.3; background-image: radial-gradient(#d3d3d3 1px, transparent 1px); background-size: 20px 20px; z-index: 0;">
+        </div>
+
+        <div class="container" style="position: relative; z-index: 1;">
+            <div class="section-header" style="margin-bottom: 4rem;">
+                <span
+                    style="background: var(--accent); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; display: inline-block;">KID'S
+                    PERSPECTIVE</span>
+                <h2 style="font-size: 2.2rem; margin-bottom: 1rem; font-weight: 900; color: var(--ink);">
+                    孩子眼中的 <span style="font-family: 'Indie Flower', cursive; font-size: 1.2em;">Points Bank</span>
+                </h2>
+                <p style="font-size: 1.1rem; color: #666; max-width: 600px; margin: 0 auto;">簡單 5 步驟，把「管教」變成好玩的「闖關遊戲」
+                </p>
             </div>
 
             <div class="visual-steps-grid"
-                style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; text-align: center;">
+                style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; text-align: center; counter-reset: step-counter;">
                 <!-- Step 1 -->
-                <div class="step-visual">
-                    <img src="./public/slides/guide_step1.png"
-                        style="width: 100%; max-width: 180px; border-radius: 20px; border: 2px solid var(--ink); margin-bottom: 1rem; box-shadow: 5px 5px 0 var(--deco);"
-                        alt="Make a Wish">
-                    <h4 style="font-size: 1.1rem; color: var(--ink);">1. 許願</h4>
+                <div class="step-card" style="position: relative;">
+                    <div
+                        style="background: white; border: 3px solid var(--ink); border-radius: 20px; padding: 10px; box-shadow: 8px 8px 0 rgba(0,0,0,0.1); transition: transform 0.2s; margin-bottom: 1.5rem;">
+                        <img src="./public/slides/guide_step1.png" style="width: 100%; border-radius: 15px;"
+                            alt="Make a Wish">
+                    </div>
+                    <div
+                        style="font-weight: 800; font-size: 1.4rem; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span
+                            style="background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">1</span>
+                        許願
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">拍張照，把想要的樂高設成目標！</p>
                 </div>
                 <!-- Step 2 -->
-                <div class="step-visual">
-                    <img src="./public/slides/guide_step2.png"
-                        style="width: 100%; max-width: 180px; border-radius: 20px; border: 2px solid var(--ink); margin-bottom: 1rem; box-shadow: 5px 5px 0 var(--deco);"
-                        alt="The Deal">
-                    <h4 style="font-size: 1.1rem; color: var(--ink);">2. 約定</h4>
+                <div class="step-card" style="position: relative;">
+                    <div
+                        style="background: white; border: 3px solid var(--ink); border-radius: 20px; padding: 10px; box-shadow: 8px 8px 0 rgba(0,0,0,0.1); transition: transform 0.2s; margin-bottom: 1.5rem;">
+                        <img src="./public/slides/guide_step2.png" style="width: 100%; border-radius: 15px;"
+                            alt="The Deal">
+                    </div>
+                    <div
+                        style="font-weight: 800; font-size: 1.4rem; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span
+                            style="background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">2</span>
+                        約定
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">想看 20 分鐘？沒問題，打勾確認。</p>
                 </div>
                 <!-- Step 3 -->
-                <div class="step-visual">
-                    <img src="./public/slides/guide_step3.png"
-                        style="width: 100%; max-width: 180px; border-radius: 20px; border: 2px solid var(--ink); margin-bottom: 1rem; box-shadow: 5px 5px 0 var(--deco);"
-                        alt="Timer">
-                    <h4 style="font-size: 1.1rem; color: var(--ink);">3. 計時</h4>
+                <div class="step-card" style="position: relative;">
+                    <div
+                        style="background: white; border: 3px solid var(--ink); border-radius: 20px; padding: 10px; box-shadow: 8px 8px 0 rgba(0,0,0,0.1); transition: transform 0.2s; margin-bottom: 1.5rem;">
+                        <img src="./public/slides/guide_step3.png" style="width: 100%; border-radius: 15px;"
+                            alt="Timer">
+                    </div>
+                    <div
+                        style="font-weight: 800; font-size: 1.4rem; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span
+                            style="background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">3</span>
+                        計時
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">把計時器放在旁邊，時間看得到。</p>
                 </div>
                 <!-- Step 4 -->
-                <div class="step-visual">
-                    <img src="./public/slides/guide_step4.png"
-                        style="width: 100%; max-width: 180px; border-radius: 20px; border: 2px solid var(--ink); margin-bottom: 1rem; box-shadow: 5px 5px 0 var(--deco);"
-                        alt="Power Off">
-                    <h4 style="font-size: 1.1rem; color: var(--ink);">4. 關機</h4>
+                <div class="step-card" style="position: relative;">
+                    <div
+                        style="background: white; border: 3px solid var(--ink); border-radius: 20px; padding: 10px; box-shadow: 8px 8px 0 rgba(0,0,0,0.1); transition: transform 0.2s; margin-bottom: 1.5rem;">
+                        <img src="./public/slides/guide_step4.png" style="width: 100%; border-radius: 15px;"
+                            alt="Power Off">
+                    </div>
+                    <div
+                        style="font-weight: 800; font-size: 1.4rem; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span
+                            style="background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">4</span>
+                        關機
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">叮咚！時間到主動關，超有成就感。</p>
                 </div>
                 <!-- Step 5 -->
-                <div class="step-visual">
-                    <img src="./public/slides/guide_step5.png"
-                        style="width: 100%; max-width: 180px; border-radius: 20px; border: 2px solid var(--ink); margin-bottom: 1rem; box-shadow: 5px 5px 0 var(--deco);"
-                        alt="Reward">
-                    <h4 style="font-size: 1.1rem; color: var(--ink);">5. 魔法</h4>
+                <div class="step-card" style="position: relative;">
+                    <div
+                        style="background: white; border: 3px solid var(--ink); border-radius: 20px; padding: 10px; box-shadow: 8px 8px 0 rgba(0,0,0,0.1); transition: transform 0.2s; margin-bottom: 1.5rem;">
+                        <img src="./public/slides/guide_step5.png" style="width: 100%; border-radius: 15px;"
+                            alt="Reward">
+                    </div>
+                    <div
+                        style="font-weight: 800; font-size: 1.4rem; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span
+                            style="background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">5</span>
+                        魔法
+                    </div>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">沒用完的時間變成點數，離目標更近了！</p>
                 </div>
             </div>
 
             <style>
-                @media (max-width: 768px) {
+                .step-card:hover>div:first-child {
+                    transform: rotate(-2deg) scale(1.05);
+                }
+
+                @media (max-width: 900px) {
                     .visual-steps-grid {
                         grid-template-columns: repeat(2, 1fr) !important;
-                        gap: 2rem !important;
+                        gap: 3rem !important;
                     }
 
-                    .visual-steps-grid .step-visual:last-child {
+                    .visual-steps-grid .step-card:last-child {
                         grid-column: span 2;
-                        max-width: 200px;
+                        max-width: 250px;
                         margin: 0 auto;
                     }
                 }
@@ -992,54 +1049,76 @@
         </div>
     </section>
 
-    <!-- FEATURES SECTION -->
+    <!-- FEATURES SECTION (Core Logic) -->
     <section class="section" id="features" style="background: white; border-top: 1px solid #f0f0f0;">
         <div class="container">
-            <div class="section-header">
-                <div class="section-badge">
-                    <svg viewBox="0 0 200 80" preserveAspectRatio="none">
-                        <path d="M5,12 C70,4 140,18 195,10 C197,32 193,58 195,68 C140,78 70,72 5,75 C7,58 3,32 5,12 Z"
-                            fill="none" stroke="var(--ink)" stroke-width="2" />
-                    </svg>
+            <div class="section-header" style="margin-bottom: 4rem;">
+                <span
+                    style="background: #e1f5fe; color: #0288d1; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; display: inline-block;">CORE
+                    LOGIC</span>
+                <h2 style="font-size: 2.2rem; margin-bottom: 1.5rem; font-weight: 900; color: var(--ink);">
                     核心教養邏輯
-                </div>
-                <p class="section-desc">
-                    不是用家事或作業來「賺」點數，而是讓孩子練習「今天先不玩，時間存起來換更棒的東西」。核心是延遲滿足的訓練，而非把日常責任變成交易。
-                </p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i data-lucide="brain" size="28"></i>
-                    </div>
-                    <h3>「今天存起來，週末加倍享受」</h3>
-                    <p>就像經典的棉花糖實驗，我們將「延遲滿足」的練習帶入日常。孩子選擇將今天的 20 分鐘螢幕時間「存起來」，換取週末 2
-                        小時的電影之旅。在這「忍住現在小確幸、換取未來大滿足」的過程中，孩子的大腦前額葉正在悄悄變強。這不只是存點數，更是受用一生的自制力訓練。
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i data-lucide="heart" size="28"></i>
-                    </div>
-                    <h3>看得見的自制力成果</h3>
-                    <p>比起家長的碎念，孩子更相信自己看見的成果。當 App 顯示這週因為克制而累積了 50
-                        點，每一次的忍耐都變成了「看得見的財富」。這種透明的正向回饋，能啟動孩子的內在驅動力，讓他們主動思考：「我今天要把它用完，還是存一點？」這才是發自內心的真自律。
-                    </p>
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i data-lucide="coins" size="28"></i>
-                    </div>
-                    <h3>從「時間銀行」學資源配置</h3>
-                    <p>從「省下 20
-                        分鐘」到「換取心愛的樂高」，孩子親身體驗了經濟學的核心：資源有限，所以需要選擇。透過系統，抽象的「時間」變成了可儲蓄、可兌換的資產。孩子在每一次的取捨中，學會了規劃資源、評估價值，這比書本上的經濟學更深刻、更實用。
-                    </p>
+                </h2>
+                <div style="max-width: 700px; margin: 0 auto; line-height: 1.8; color: #555; font-size: 1.05rem;">
+                    不是用家事或作業來「賺」點數，而是讓孩子練習<br>
+                    <strong>「今天先不玩，時間存起來換更棒的東西」</strong>。<br>
+                    核心是<span
+                        style="background: linear-gradient(180deg, transparent 60%, #b3e5fc 60%); padding: 0 5px;">延遲滿足</span>的訓練，而非把日常責任變成交易。
                 </div>
             </div>
+
+            <div class="logic-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+
+                <!-- Logic 1 -->
+                <div class="logic-card"
+                    style="background: #fff; padding: 2.5rem; border-radius: 25px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; transition: transform 0.3s ease;">
+                    <div
+                        style="width: 60px; height: 60px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #1976d2;">
+                        <i data-lucide="brain" size="32"></i>
+                    </div>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; color: var(--ink);">
+                        今天存起來，週末加倍享受</h3>
+                    <p style="color: #666; line-height: 1.7; font-size: 1rem;">
+                        就像經典的棉花糖實驗，我們將「延遲滿足」的練習帶入日常。孩子選擇將今天的 20 分鐘螢幕時間「存起來」，換取週末 2 小時的電影之旅。在這過程中，孩子的大腦前額葉正在悄悄變強。
+                    </p>
+                </div>
+
+                <!-- Logic 2 -->
+                <div class="logic-card"
+                    style="background: #fff; padding: 2.5rem; border-radius: 25px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; transition: transform 0.3s ease;">
+                    <div
+                        style="width: 60px; height: 60px; background: #fce4ec; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #c2185b;">
+                        <i data-lucide="heart" size="32"></i>
+                    </div>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; color: var(--ink);">看得見的自制力成果
+                    </h3>
+                    <p style="color: #666; line-height: 1.7; font-size: 1rem;">
+                        比起家長的碎念，孩子更相信自己看見的成果。當 App 顯示這週因為克制而累積了 50 點，每一次的忍耐都變成了「看得見的財富」。這種透明的正向回饋，能啟動孩子的內在驅動力。
+                    </p>
+                </div>
+
+                <!-- Logic 3 -->
+                <div class="logic-card"
+                    style="background: #fff; padding: 2.5rem; border-radius: 25px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; transition: transform 0.3s ease;">
+                    <div
+                        style="width: 60px; height: 60px; background: #fff8e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #fbc02d;">
+                        <i data-lucide="coins" size="32"></i>
+                    </div>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; color: var(--ink);">
+                        從「時間銀行」學資源配置</h3>
+                    <p style="color: #666; line-height: 1.7; font-size: 1rem;">
+                        從「省下 20 分鐘」到「換取心愛的樂高」，孩子親身體驗了經濟學的核心：資源有限，所以需要選擇。孩子在每一次的取捨中，學會了規劃資源、評估價值，這比書本更深刻。
+                    </p>
+                </div>
+            </div>
+
+            <style>
+                .logic-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+                }
+            </style>
         </div>
     </section>
 
@@ -1551,68 +1630,83 @@
     <!-- DISCLAIMER SECTION -->
     <section class="section" id="disclaimer" style="background: var(--bg); padding: 4rem 0;">
         <div class="container">
-            <div class="disclaimer-box"
-                style="max-width: 800px; margin: 0 auto; background: #fffdf9; border: 2px dashed var(--accent); border-radius: 30px; padding: clamp(1.5rem, 5vw, 3rem); position: relative;">
-                <div
-                    style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 900; letter-spacing: 1px; font-size: 0.9rem; width: max-content; max-width: 90%; white-space: nowrap;">
-                    溫馨提醒：這是一場全家人的實驗
-                </div>
-                <h3
-                    style="text-align: center; margin-bottom: 2rem; font-weight: 900; color: var(--ink); font-size: 1.8rem; line-height: 1.4;">
+            <div class="section-header" style="margin-bottom: 4rem;">
+                <span
+                    style="background: #e0f2f1; color: #00897b; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; display: inline-block;">GENTLE
+                    REMINDER</span>
+                <h2 style="font-size: 2.2rem; margin-bottom: 1.5rem; font-weight: 900; color: var(--ink);">
                     沒有「完美」的系統<br>
-                    只有「一致」的陪伴
-                </h3>
-                <div style="font-size: 1.1rem; line-height: 1.9; color: #444;">
-                    <p style="margin-bottom: 2rem; text-align: center;">
-                        Points Bank 是一個輔助工具，但<strong>它並不會自動教出會自律的孩子</strong>。<br>
-                        真正的自律，來自於您與孩子之間穩定的信任，以及全家人對規則的一致守護。
-                    </p>
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-                        <div
-                            style="display: flex; gap: 1.2rem; align-items: start; background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #fee;">
-                            <i data-lucide="shield-check" style="color: var(--accent); flex-shrink: 0; margin-top: 4px;"
-                                size="24"></i>
-                            <div>
-                                <strong
-                                    style="color: var(--ink); display: block; margin-bottom: 0.4rem;">全家人的一致性</strong>
-                                <span
-                                    style="font-size: 0.95rem; color: #666;">如果媽媽嚴格執行點數制，但爸爸或阿公阿嬤私下「大放送」，系統將會失效。請確保家中所有主要照顧者都達成共識。</span>
-                            </div>
-                        </div>
-                        <div
-                            style="display: flex; gap: 1.2rem; align-items: start; background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #fee;">
-                            <i data-lucide="heart-handshake"
-                                style="color: var(--accent); flex-shrink: 0; margin-top: 4px;" size="24"></i>
-                            <div>
-                                <strong
-                                    style="color: var(--ink); display: block; margin-bottom: 0.4rem;">討論而非命令</strong>
-                                <span
-                                    style="font-size: 0.95rem; color: #666;">建議開始使用前，先與孩子來一場「家庭會議」。討論為什麼要用點數、兌換規則是什麼，讓孩子參與制定，而非單方面被強制執行。</span>
-                                <br><br>
-                                <a href="family-meeting.html"
-                                    style="color: var(--accent); font-weight: 900; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 0.95rem;">
-                                    👉 不知道怎麼開口？前往「家庭會議室」，試著讓簡報幫您說 <i data-lucide="arrow-right" size="16"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div
-                            style="display: flex; gap: 1.2rem; align-items: start; background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #fee;">
-                            <i data-lucide="refresh-cw" style="color: var(--accent); flex-shrink: 0; margin-top: 4px;"
-                                size="24"></i>
-                            <div>
-                                <strong
-                                    style="color: var(--ink); display: block; margin-bottom: 0.4rem;">動態調整的彈性</strong>
-                                <span
-                                    style="font-size: 0.95rem; color: #666;">規則不是死的。如果發現點數太難賺或太容易換到，請隨時修正。這個系統是為了服務您的生活，而不是讓生活被系統綁架。</span>
-                            </div>
-                        </div>
+                    只有<span
+                        style="background: linear-gradient(180deg, transparent 60%, #a7ffeb 60%); padding: 0 5px;">「一致」的陪伴</span>
+                </h2>
+                <div style="max-width: 700px; margin: 0 auto; line-height: 1.8; color: #555; font-size: 1.05rem;">
+                    Points Bank 是一個輔助工具，但<strong>它並不會自動教出會自律的孩子</strong>。<br>
+                    真正的自律，來自於您與孩子之間穩定的信任，以及全家人對規則的一致守護。
+                </div>
+            </div>
+
+            <div class="reminder-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+
+                <!-- Reminder 1 -->
+                <div class="reminder-card"
+                    style="background: #fff; padding: 2.5rem; border-radius: 25px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.3s ease;">
+                    <div
+                        style="width: 50px; height: 50px; background: #e8f5e9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #43a047;">
+                        <i data-lucide="shield-check" size="28"></i>
                     </div>
-                    <p
-                        style="text-align: center; font-style: italic; color: #888; margin-top: 2.5rem; border-top: 1px dashed #eee; padding-top: 1.5rem; font-size: 0.95rem;">
-                        「好的系統是輔助輪，最終目的是為了讓孩子學會自己騎車。」
+                    <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; color: var(--ink);">全家人的一致性
+                    </h3>
+                    <p style="color: #666; line-height: 1.6; font-size: 0.95rem;">
+                        教養不需要 100% 的完美同步，偶爾的彈性與例外是完全 OK 的。重點是大方向的共識，讓系統成為家長間的幫手，減輕管教的情緒負擔，而不是增加彼此的壓力。
+                    </p>
+                </div>
+
+                <!-- Reminder 2 -->
+                <div class="reminder-card"
+                    style="background: #fff; padding: 2.5rem; border-radius: 25px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.3s ease;">
+                    <div
+                        style="width: 50px; height: 50px; background: #fff3e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #fb8c00;">
+                        <i data-lucide="heart-handshake" size="28"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; color: var(--ink);">討論而非命令</h3>
+                    <p style="color: #666; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                        建議開始使用前，先與孩子來一場「家庭會議」，讓孩子參與制定規則，而非單方面強制執行。
+                    </p>
+                    <a href="family-meeting.html"
+                        style="display: block; background: #fff8e1; color: var(--ink); padding: 10px 15px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.9rem; text-align: center; border: 1px solid #ffecb3;">
+                        👉 前往「家庭會議室」，試著讓簡報幫你做好事前準備
+                    </a>
+                </div>
+
+                <!-- Reminder 3 -->
+                <div class="reminder-card"
+                    style="background: #fff; padding: 2.5rem; border-radius: 25px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: transform 0.3s ease;">
+                    <div
+                        style="width: 50px; height: 50px; background: #e1f5fe; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #039be5;">
+                        <i data-lucide="refresh-cw" size="28"></i>
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; color: var(--ink);">動態調整的彈性
+                    </h3>
+                    <p style="color: #666; line-height: 1.6; font-size: 0.95rem;">
+                        規則不是死的。如果發現點數太難賺或太容易換到，請隨時修正。這個系統是為了服務生活，別被系統綁架。
                     </p>
                 </div>
             </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <span
+                    style="font-family: 'Noto Serif TC', serif; font-size: 1.4rem; color: #555; background: #f5f5f5; padding: 12px 30px; border-radius: 30px; letter-spacing: 0.5px; font-weight: 700;">
+                    「好的系統是輔助輪，最終目的是為了讓孩子學會自己騎車。」
+                </span>
+            </div>
+
+            <style>
+                .reminder-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+                }
+            </style>
         </div>
     </section>
 
