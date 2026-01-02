@@ -138,7 +138,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         // Create engine
         const engine = Engine.create({
             gravity: { x: 0, y: isContainer ? 1.2 : 0.8 },
-            enableSleeping: true,
+            enableSleeping: false, // Updated: Keep bodies active for better interaction
             positionIterations: 10,
             velocityIterations: 8
         });
@@ -190,14 +190,16 @@ export default function StarJar({ points, theme, seed = 0 }) {
         }
 
         const starBodies = starData.map((star) => {
-            const radius = isContainer ? 14 : 4;
-            const body = Bodies.circle(star.initialX, star.initialY, radius, {
-                restitution: 0.1,
-                friction: 0.3,
+            // Updated: Larger radius to match visual scale (Visual is ~60px, Radius 25 -> 50px diameter)
+            const radius = isContainer ? 25 : 6;
+            // Updated: Use Polygon (5 sides) instead of Circle for irregular stacking (less neat)
+            const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
+                angle: (star.rotate * Math.PI) / 180, // Sync initial angle
+                restitution: 0.2, // Slightly more bouncy
+                friction: 0.5, // More friction to stack higher/messier
                 density: 0.002,
                 frictionAir: 0.04,
                 slop: 0.05,
-                sleepThreshold: 60,
                 render: {
                     fillStyle: star.color,
                     strokeStyle: "#d4a373",
@@ -216,7 +218,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         mouse.pixelRatio = window.devicePixelRatio || 1;
         const mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
-            constraint: { stiffness: 0.05, render: { visible: false } }
+            constraint: { stiffness: 0.2, render: { visible: false } } // Updated: Higher stiffness for throwing
         });
         World.add(engine.world, mouseConstraint);
 
@@ -310,9 +312,8 @@ export default function StarJar({ points, theme, seed = 0 }) {
                             }}
                         >
                             <div className="transform -translate-x-1/2 -translate-y-1/2 text-[color:var(--star-color)]" style={{ '--star-color': star.color }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="1.5">
-                                    <path d="M12 2C12 2 14 8 16 9C19 10 22 9 22 9C22 9 19 14 19 16C19 19 21 22 21 22C21 22 16 20 12 20C8 20 3 22 3 22C3 22 5 19 5 16C5 14 2 9 2 9C2 9 5 10 8 9C10 8 12 2 12 2Z"
-                                        strokeLinejoin="round" strokeLinecap="round" />
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
+                                    <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z" />
                                 </svg>
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
@@ -50,11 +50,11 @@ function SortableKidItem({
             dragListener={false}
             dragControls={dragControls}
         >
-            <div className={`p-4 rounded-2xl border ${family?.theme === 'doodle' ? 'bg-[#fdfbf7] border-[#eee]' : 'bg-white/5 border-white/5'} cursor-default select-none flex flex-col md:flex-row md:items-center gap-3 md:gap-4`}>
+            <div className={`p-4 rounded-2xl border ${family?.theme !== 'neon' ? 'bg-[#fdfbf7] border-[#eee]' : 'bg-white/5 border-white/5'} cursor-default select-none flex flex-col md:flex-row md:items-center gap-3 md:gap-4`}>
                 {/* Left: Avatar & Name */}
                 <div className="flex items-center gap-3 w-full md:w-auto md:flex-1 min-w-0">
                     <div
-                        className={`p-2 rounded-lg cursor-grab active:cursor-grabbing touch-none ${family?.theme === 'doodle' ? 'text-[#ccc] hover:bg-black/5' : 'text-slate-600 hover:bg-white/5'}`}
+                        className={`p-2 rounded-lg cursor-grab active:cursor-grabbing touch-none ${family?.theme !== 'neon' ? 'text-[#ccc] hover:bg-black/5' : 'text-slate-600 hover:bg-white/5'}`}
                         style={{ touchAction: 'none' }}
                         onPointerDown={(e) => dragControls.start(e)}
                     >
@@ -62,20 +62,20 @@ function SortableKidItem({
                     </div>
                     <button
                         onClick={() => setShowAvatarPicker(showAvatarPicker === kid.id ? null : kid.id)}
-                        className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 ${family?.theme === 'doodle' ? 'bg-white shadow-sm border-[#eee]' : 'bg-black/40 border-white/10'} border`}
+                        className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 ${family?.theme !== 'neon' ? 'bg-white shadow-sm border-[#eee]' : 'bg-black/40 border-white/10'} border`}
                     >
                         {kid.avatar || '👶'}
                     </button>
                     {editingKidId === kid.id ? (
                         <input
                             autoFocus
-                            className={`flex-1 min-w-0 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-cyan-500 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'text-white'}`}
+                            className={`flex-1 min-w-0 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-cyan-500 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'text-white'}`}
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
                             placeholder={t.enter_kid_name}
                         />
                     ) : (
-                        <span className={`font-bold truncate text-lg ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.name}</span>
+                        <span className={`font-bold truncate text-lg ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.name}</span>
                     )}
                 </div>
 
@@ -84,11 +84,11 @@ function SortableKidItem({
                     {editingKidId === kid.id ? (
                         // Edit Mode: PIN Input
                         <div className="flex items-center gap-2">
-                            <label className={`text-xs font-black uppercase ${family?.theme === 'doodle' ? 'text-slate-400' : 'text-slate-500'}`}>PIN</label>
+                            <label className={`text-xs font-black uppercase ${family?.theme !== 'neon' ? 'text-slate-400' : 'text-slate-500'}`}>PIN</label>
                             <input
                                 type="text"
                                 maxLength={4}
-                                className={`w-16 text-center font-mono text-sm py-1.5 rounded-lg border focus:outline-none focus:ring-1 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-cyan-400 focus:ring-cyan-500'}`}
+                                className={`w-16 text-center font-mono text-sm py-1.5 rounded-lg border focus:outline-none focus:ring-1 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-cyan-400 focus:ring-cyan-500'}`}
                                 value={editPin}
                                 onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ''))}
                             />
@@ -96,8 +96,8 @@ function SortableKidItem({
                     ) : (
                         // Display Mode: Text Only PIN
                         <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-black uppercase tracking-wider ${family?.theme === 'doodle' ? 'text-[#ccc]' : 'text-slate-600'}`}>PIN</span>
-                            <span className={`font-mono font-bold text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
+                            <span className={`text-[10px] font-black uppercase tracking-wider ${family?.theme !== 'neon' ? 'text-[#ccc]' : 'text-slate-600'}`}>PIN</span>
+                            <span className={`font-mono font-bold text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>
                                 {kid.login_pin || '1234'}
                             </span>
                         </div>
@@ -110,8 +110,8 @@ function SortableKidItem({
                         </div>
                     ) : (
                         <div className="flex gap-1">
-                            <button onClick={() => startEditKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'text-slate-400 hover:text-blue-500 hover:bg-blue-50' : 'text-slate-500 hover:text-blue-400 hover:bg-blue-500/20'}`} title="修改資料"><Edit2 className="w-4 h-4" /></button>
-                            <button onClick={() => deleteKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'text-slate-400 hover:text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/20'}`} title="刪除小孩"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => startEditKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-slate-400 hover:text-blue-500 hover:bg-blue-50' : 'text-slate-500 hover:text-blue-400 hover:bg-blue-500/20'}`} title="修改資料"><Edit2 className="w-4 h-4" /></button>
+                            <button onClick={() => deleteKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-slate-400 hover:text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/20'}`} title="刪除小孩"><Trash2 className="w-4 h-4" /></button>
                         </div>
                     )}
                 </div>
@@ -203,7 +203,7 @@ export default function Dashboard() {
         parent_pin: '0000',
         use_parent_pin: false,
         short_id: '',
-        theme: 'cyber'
+        theme: 'doodle'
     });
 
     const [modal, setModal] = useState({
@@ -822,7 +822,7 @@ export default function Dashboard() {
         const { data: familyData, error } = await supabase.from('families').insert({
             family_name: newFamilyName,
             admin_id: user.id,
-            theme: 'cyber'
+            theme: 'doodle'
         }).select().single();
 
         if (error) {
@@ -1019,20 +1019,20 @@ export default function Dashboard() {
     );
 
     return (
-        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'doodle' || family?.theme === 'jar') ? 'bg-[#fffbf0]' : 'bg-[#080812]'}`}>
+        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme !== 'neon' || family?.theme === 'jar') ? 'bg-[#fffbf0]' : 'bg-[#080812]'}`}>
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 py-6">
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
-                        <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30'}`}></div>
-                        <Logo className={`${family?.theme === 'doodle' ? '' : 'text-cyan-400'} w-12 h-12 relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-125`} />
+                        <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30'}`}></div>
+                        <Logo className={`${family?.theme !== 'neon' ? '' : 'text-cyan-400'} w-12 h-12 relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-125`} />
                     </div>
                     <div className="flex flex-col">
-                        <h1 className={`text-3xl font-black ${family?.theme === 'doodle' ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
+                        <h1 className={`text-3xl font-black ${family?.theme !== 'neon' ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
                             <span className="relative pr-2">
                                 {t.points_bank}
-                                <span className={`absolute -bottom-1 left-0 w-full h-3 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/30' : 'bg-cyan-500/20'} -rotate-1 rounded-full -z-10 group-hover:h-full group-hover:bottom-0 transition-all duration-300 mix-blend-multiply`}></span>
+                                <span className={`absolute -bottom-1 left-0 w-full h-3 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/30' : 'bg-cyan-500/20'} -rotate-1 rounded-full -z-10 group-hover:h-full group-hover:bottom-0 transition-all duration-300 mix-blend-multiply`}></span>
                             </span>
-                            {userRole === 'kid' && <span className={`text-xs ${family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'} px-2 py-1 rounded-lg -rotate-6 shadow-sm border border-white/20 tracking-normal not-italic normal-case`}>{t.kid_mode}</span>}
+                            {userRole === 'kid' && <span className={`text-xs ${family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'} px-2 py-1 rounded-lg -rotate-6 shadow-sm border border-white/20 tracking-normal not-italic normal-case`}>{t.kid_mode}</span>}
                         </h1>
                     </div>
                 </div>
@@ -1044,7 +1044,7 @@ export default function Dashboard() {
                                 setShowSettingsModal(true);
                                 setHighlightSettings(false);
                             }}
-                            className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme === 'doodle' ? 'bg-white border-[#e0e0e0] hover:border-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border-white/10 hover:bg-cyan-500/20 text-slate-300'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md ${highlightSettings ? (family?.theme === 'doodle' ? 'ring-2 ring-[#ff8a80] border-[#ff8a80]' : 'ring-2 ring-cyan-500 border-cyan-500') : ''}`}
+                            className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme !== 'neon' ? 'bg-white border-[#e0e0e0] hover:border-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border-white/10 hover:bg-cyan-500/20 text-slate-300'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md ${highlightSettings ? (family?.theme !== 'neon' ? 'ring-2 ring-[#ff8a80] border-[#ff8a80]' : 'ring-2 ring-cyan-500 border-cyan-500') : ''}`}
                         >
                             <Settings className={`w-4 h-4 transition-transform duration-500 ${highlightSettings ? 'rotate-180 text-[#ff8a80]' : 'group-hover:rotate-90'}`} />
                             <span className="font-bold text-sm whitespace-nowrap">{t.settings}</span>
@@ -1052,7 +1052,7 @@ export default function Dashboard() {
                     )}
                     <button
                         onClick={handleLogout}
-                        className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme === 'doodle' ? 'bg-white border-[#e0e0e0] hover:border-[#ff8a80] text-[#4a4a4a] hover:text-[#ff8a80]' : 'bg-white/5 border-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md`}
+                        className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme !== 'neon' ? 'bg-white border-[#e0e0e0] hover:border-[#ff8a80] text-[#4a4a4a] hover:text-[#ff8a80]' : 'bg-white/5 border-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md`}
                         title={t.logout}
                     >
                         <LogOut className="w-4 h-4" />
@@ -1066,15 +1066,15 @@ export default function Dashboard() {
 
                     {/* Only show Admin Panel to parents or if needed */}
                     {/* Admin Panel available to all, but actions may require PIN */}
-                    <div className={`glass-panel ${family?.theme === 'doodle' ? 'border-[#4a4a4a]' : 'border-cyan-500/20'} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
+                    <div className={`glass-panel ${family?.theme !== 'neon' ? 'border-[#4a4a4a]' : 'border-cyan-500/20'} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
                         <button
                             onClick={() => setIsAdminExpanded(!isAdminExpanded)}
-                            className={`w-full flex justify-between items-center p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5 hover:bg-[#ff8a80]/10' : 'bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20'} transition-all`}
+                            className={`w-full flex justify-between items-center p-6 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/5 hover:bg-[#ff8a80]/10' : 'bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20'} transition-all`}
                         >
-                            <div className={`flex items-center gap-3 font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} uppercase tracking-wider`}>
-                                <Zap className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-5 h-5 animate-pulse`} /> {t.admin_console}
+                            <div className={`flex items-center gap-3 font-black italic ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'} uppercase tracking-wider`}>
+                                <Zap className={`${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-5 h-5 animate-pulse`} /> {t.admin_console}
                             </div>
-                            {isAdminExpanded ? <ChevronUp className={family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} /> : <ChevronDown className={family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} />}
+                            {isAdminExpanded ? <ChevronUp className={family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} /> : <ChevronDown className={family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} />}
                         </button>
 
                         <div className="p-8 pt-2">
@@ -1084,8 +1084,8 @@ export default function Dashboard() {
                                         key={k.id}
                                         onClick={() => toggleKidSelection(k.id)}
                                         className={`px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 border ${selectedKids.includes(k.id)
-                                            ? (family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white border-[#4a4a4a] shadow-[4px_4px_0px_#d8c4b6]' : 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]')
-                                            : (family?.theme === 'doodle' ? 'bg-white text-[#4a4a4a] border-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white')}`}
+                                            ? (family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white border-[#4a4a4a] shadow-[4px_4px_0px_#d8c4b6]' : 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]')
+                                            : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white')}`}
                                     >
                                         {selectedKids.includes(k.id) && <CheckCircle2 className="w-4 h-4" />}
                                         {k.name}
@@ -1095,16 +1095,16 @@ export default function Dashboard() {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div className="space-y-1">
-                                    <label className={`text-base font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
-                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
+                                    <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
+                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className={`text-base font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
-                                    <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
+                                    <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
+                                    <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className={`text-base font-black ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
-                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
+                                    <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
+                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
                                 </div>
                             </div>
 
@@ -1116,7 +1116,7 @@ export default function Dashboard() {
                                         setMinChange(family?.weekday_limit || 0);
                                         setCustomReason(t.weekday_alloc_reason || '平日分配');
                                     }}
-                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                                 >
                                     🏢 {t.weekday} ({family?.weekday_limit}m)
                                 </button>
@@ -1126,7 +1126,7 @@ export default function Dashboard() {
                                         setMinChange(family?.holiday_limit || 0);
                                         setCustomReason(t.holiday_alloc_reason || '假日分配');
                                     }}
-                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10'}`}
+                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10'}`}
                                 >
                                     🏖️ {t.holiday} ({family?.holiday_limit}m)
                                 </button>
@@ -1161,38 +1161,38 @@ export default function Dashboard() {
                 </div>
 
                 <div className="lg:col-span-4 space-y-8">
-                    <h2 className={`text-2xl font-black italic ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
+                    <h2 className={`text-2xl font-black italic ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
                     <div className="min-h-[500px]">
                         {logs.length === 0 ? (
-                            <div className={`flex flex-col items-center justify-center h-[450px] text-center ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-600'}`}>
+                            <div className={`flex flex-col items-center justify-center h-[450px] text-center ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-600'}`}>
                                 <History className="w-12 h-12 mb-4 opacity-50" />
                                 <p className="text-lg font-bold">{t.no_logs_found}</p>
                             </div>
                         ) : (
                             logs.map(log => (
-                                <li key={log.id} className={`p-4 rounded-xl ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5'} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme === 'doodle' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20'}`}>
+                                <li key={log.id} className={`p-4 rounded-xl ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5'} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme !== 'neon' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20'}`}>
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
-                                            <span className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
-                                            <span className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
+                                            <span className={`font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-cyan-400'} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
+                                            <span className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600'} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
                                         </div>
                                         {userRole === 'parent' && (
                                             <button
                                                 onClick={() => deleteLog(log.id)}
-                                                className={`p-1.5 rounded-lg ${family?.theme === 'doodle' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-white/5'} transition-all`}
+                                                className={`p-1.5 rounded-lg ${family?.theme !== 'neon' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-white/5'} transition-all`}
                                                 title="刪除此筆紀錄"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         )}
                                     </div>
-                                    <div className={`text-base ${family?.theme === 'doodle' ? 'text-[#555]' : 'text-slate-300'} font-medium`}>{log.reason || '調整'}</div>
+                                    <div className={`text-base ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-300'} font-medium`}>{log.reason || '調整'}</div>
                                     <div className="flex justify-between items-center mt-1">
                                         <div className="flex gap-2">
                                             {log.points_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} 點</span>}
-                                            {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme === 'doodle' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
+                                            {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
                                         </div>
-                                        <div className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-600'} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
+                                        <div className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600'} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
                                     </div>
                                 </li>
                             ))
@@ -1200,7 +1200,7 @@ export default function Dashboard() {
                     </div>
                     <button
                         onClick={() => router.push('/logs')}
-                        className={`w-full mt-4 py-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
+                        className={`w-full mt-4 py-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
                     >
                         <History className="w-4 h-4" /> 查看全部異動紀錄
                     </button>
@@ -1210,10 +1210,10 @@ export default function Dashboard() {
             {/* Settings Modal */}
             {showSettingsModal && (
                 <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-4">
-                    <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme === 'doodle' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30'} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
+                    <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme !== 'neon' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30'} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
                         {/* Sticky Header */}
-                        <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'doodle' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md z-10`}>
-                            <h3 className={`text-2xl font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.settings}</h3>
+                        <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md z-10`}>
+                            <h3 className={`text-2xl font-black ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.settings}</h3>
                             <button onClick={() => {
                                 const isChanged =
                                     tempSettings.weekday_limit !== family.weekday_limit ||
@@ -1237,7 +1237,7 @@ export default function Dashboard() {
                                 } else {
                                     setShowSettingsModal(false);
                                 }
-                            }} className={`${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
+                            }} className={`${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
                         </div>
 
                         {/* Scrollable Content */}
@@ -1247,20 +1247,20 @@ export default function Dashboard() {
                             {APP_CONFIG.ENABLE_FAMILY_SWITCHING && familyHistory.length > 0 && (
                                 <section>
                                     <div className="flex items-center justify-between mb-4">
-                                        <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.switch_family || '切換家庭'}</h4>
-                                        <button onClick={() => setShowJoinInput(!showJoinInput)} className={`p-1.5 rounded-lg transition-all ${family?.theme === 'doodle' ? 'text-[#888] hover:bg-black/5 hover:text-[#4a4a4a]' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}>
+                                        <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.switch_family || '切換家庭'}</h4>
+                                        <button onClick={() => setShowJoinInput(!showJoinInput)} className={`p-1.5 rounded-lg transition-all ${family?.theme !== 'neon' ? 'text-[#888] hover:bg-black/5 hover:text-[#4a4a4a]' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}>
                                             <Plus className={`w-4 h-4 transition-transform duration-300 ${showJoinInput ? 'rotate-45' : ''}`} />
                                         </button>
                                     </div>
                                     <div className="space-y-3">
                                         {familyHistory.map(hist => (
-                                            <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme === 'doodle' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500') : (family?.theme === 'doodle' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
+                                            <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500') : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
                                                 <div>
-                                                    <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{hist.name}</div>
+                                                    <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{hist.name}</div>
                                                     <div className="text-[10px] opacity-60 font-mono">ID: {hist.short_id}</div>
                                                 </div>
                                                 {hist.id === family?.id ? (
-                                                    <span className={`text-xs font-black px-3 py-1 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'}`}>{t.current_family || '目前'}</span>
+                                                    <span className={`text-xs font-black px-3 py-1 rounded-full ${family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'}`}>{t.current_family || '目前'}</span>
                                                 ) : (
                                                     <button onClick={() => {
                                                         showModal({
@@ -1269,20 +1269,20 @@ export default function Dashboard() {
                                                             message: `請輸入「${hist.name}」的家庭 PIN 碼：`,
                                                             onConfirm: (val) => handleJoinFamily(hist.short_id, val)
                                                         });
-                                                    }} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                                                    }} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
                                                         {t.switch_button || '切換'}
                                                     </button>
                                                 )}
                                             </div>
                                         ))}
                                         {showJoinInput && (
-                                            <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme === 'doodle' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'}`}>
-                                                <div className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.join_new_family_label || '加入新家庭'}</div>
+                                            <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'}`}>
+                                                <div className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.join_new_family_label || '加入新家庭'}</div>
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
                                                         placeholder={t.join_new_family_placeholder || '輸入家庭代碼'}
-                                                        className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
+                                                        className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
                                                         value={joinNewFamilyCode}
                                                         onChange={e => setJoinNewFamilyCode(e.target.value)}
                                                     />
@@ -1290,14 +1290,14 @@ export default function Dashboard() {
                                                         type="password"
                                                         maxLength={4}
                                                         placeholder="PIN"
-                                                        className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
+                                                        className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
                                                         value={joinNewFamilyPin}
                                                         onChange={e => setJoinNewFamilyPin(e.target.value.replace(/\D/g, ''))}
                                                     />
                                                     <button
                                                         onClick={() => handleJoinFamily(joinNewFamilyCode, joinNewFamilyPin)}
                                                         disabled={!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim()}
-                                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
+                                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme !== 'neon' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
                                                     >
                                                         {t.join_btn_short || '加入'}
                                                     </button>
@@ -1310,47 +1310,47 @@ export default function Dashboard() {
 
                             {/* 1. 點數與時間規則 (最常用) */}
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
+                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <div className="space-y-2 text-center col-span-2 md:col-span-1">
-                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                            <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
-                                            <span className={`pr-3 text-xs font-black ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                        <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                            <input type="number" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
+                                            <span className={`pr-3 text-xs font-black ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2 text-center col-span-2 md:col-span-1">
-                                        <label className={`text-xs font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.holiday_limit}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                            <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
-                                            <span className={`pr-3 text-xs font-black ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                        <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.holiday_limit}</label>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                            <input type="number" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
+                                            <span className={`pr-3 text-xs font-black ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-1 text-center col-span-2 md:col-span-1">
-                                        <div className={`flex items-end gap-2 px-1 ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
+                                        <div className={`flex items-end gap-2 px-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
                                             <div className="w-[30px] text-center pb-1">{t.pts_to_time_rate?.split(':')[0]?.trim() || 'Points'}</div>
                                             <div className="w-[10px] text-center pb-1">:</div>
                                             <div className="flex-1 text-center pb-1">{t.pts_to_time_rate?.split(':')[1]?.trim() || 'Minutes'}</div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
-                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
-                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                                <input type="number" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
+                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
+                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
+                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                                <input type="number" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
                                             </div>
                                         </div>
                                     </div>
                                     <div className="space-y-1 text-center col-span-2 md:col-span-1">
-                                        <div className={`flex items-end gap-2 px-1 ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
+                                        <div className={`flex items-end gap-2 px-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
                                             <div className="w-[30px] text-center pb-1">{t.pts_to_cash_rate?.split(':')[0]?.trim() || 'Points'}</div>
                                             <div className="w-[10px] text-center pb-1">:</div>
                                             <div className="flex-1 text-center pb-1">{t.pts_to_cash_rate?.split(':')[1]?.trim() || 'Cash'}</div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
-                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme === 'doodle' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
-                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                                <input type="number" step="0.1" className={`w-full ${family?.theme === 'doodle' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
+                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
+                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
+                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
+                                                <input type="number" step="0.1" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
                                             </div>
                                         </div>
                                     </div>
@@ -1358,8 +1358,8 @@ export default function Dashboard() {
                             </section>
 
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.kids_mgmt}</h4>
-                                <div className={`text-xs ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} opacity-60 mb-3`}>{t.kid_sort_hint}</div>
+                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.kids_mgmt}</h4>
+                                <div className={`text-xs ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} opacity-60 mb-3`}>{t.kid_sort_hint}</div>
                                 <Reorder.Group axis="y" values={kids} onReorder={handleReorderKids} className="space-y-3 mb-4">
                                     {kids.map(kid => (
                                         <SortableKidItem
@@ -1382,19 +1382,19 @@ export default function Dashboard() {
                                         />
                                     ))}
                                 </Reorder.Group>
-                                <button onClick={() => { setShowAddModal(true); setShowSettingsModal(false); }} className={`w-full py-4 rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 font-black transition-all ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30 text-[#ff8a80] hover:bg-[#ff8a80]/5' : 'border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10'}`}>
+                                <button onClick={() => { setShowAddModal(true); setShowSettingsModal(false); }} className={`w-full py-4 rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 font-black transition-all ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30 text-[#ff8a80] hover:bg-[#ff8a80]/5' : 'border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10'}`}>
                                     <Plus className="w-5 h-5" /> {t.add_kid_member}
                                 </button>
                             </section>
 
                             <div className="flex flex-col gap-6">
                                 {/* 3. 家庭邀請碼 */}
-                                <section className={`p-4 md:p-6 ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
-                                    <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
+                                <section className={`p-4 md:p-6 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
+                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-center flex-wrap gap-2">
                                             <div className="flex items-center gap-2">
-                                                <label className={`text-xs font-black ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
+                                                <label className={`text-xs font-black ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 {/* Invite Parent */}
@@ -1424,7 +1424,7 @@ export default function Dashboard() {
                                                             }
                                                         });
                                                     }}
-                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
+                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
                                                 >
                                                     <Share2 className="w-3.5 h-3.5" />
                                                     {t.invite_parent_btn}
@@ -1468,7 +1468,7 @@ export default function Dashboard() {
                                                                                     }
                                                                                 });
                                                                             }}
-                                                                            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all active:scale-95 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
+                                                                            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all active:scale-95 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
                                                                         >
                                                                             <span className="text-2xl">{kid.avatar || '👶'}</span>
                                                                             <span className="font-bold text-sm truncate w-full text-center">{kid.name}</span>
@@ -1479,7 +1479,7 @@ export default function Dashboard() {
                                                             confirmText: t.cancel || '取消',
                                                         });
                                                     }}
-                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme === 'doodle' ? 'bg-[#ffccbc] text-[#d84315] hover:bg-[#ffab91]' : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'}`}
+                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-[#ffccbc] text-[#d84315] hover:bg-[#ffab91]' : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'}`}
                                                 >
                                                     <UserPlus className="w-3.5 h-3.5" />
                                                     {t.invite_kid_btn}
@@ -1489,14 +1489,14 @@ export default function Dashboard() {
                                         <div className="relative flex items-center">
                                             <input
                                                 type="text"
-                                                className={`w-full flex-1 ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-3 md:p-4 pr-12 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                className={`w-full flex-1 ${family?.theme !== 'neon' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-3 md:p-4 pr-12 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                                                 value={tempSettings.short_id}
                                                 onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
                                                 placeholder="例如: FAMILY123"
                                             />
                                             <button
                                                 onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }}
-                                                className={`absolute right-2 p-2 rounded-xl transition-all ${family?.theme === 'doodle' ? 'text-[#ccc] hover:text-[#4a4a4a] hover:bg-black/5' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
+                                                className={`absolute right-2 p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-[#ccc] hover:text-[#4a4a4a] hover:bg-black/5' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
                                                 title={t.copy_code || 'Copy'}
                                             >
                                                 <Copy className="w-5 h-5" />
@@ -1508,15 +1508,15 @@ export default function Dashboard() {
 
                                 {/* 4. 家長與管理員 */}
                                 <section>
-                                    <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
+                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
                                     <div className="space-y-3">
                                         {familyMembers.map(m => (
-                                            <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
+                                            <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full ${family?.theme === 'doodle' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
+                                                    <div className={`w-8 h-8 rounded-full ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
                                                     <div>
-                                                        <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
-                                                        <div className={`text-[10px] ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} font-black`}>{m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
+                                                        <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
+                                                        <div className={`text-[10px] ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} font-black`}>{m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
                                                     </div>
                                                 </div>
                                                 {m.id !== family.admin_id && m.id !== user.id && (
@@ -1530,21 +1530,21 @@ export default function Dashboard() {
 
                             {/* 5. 安全與偏好設定 */}
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
+                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
                                 <div className="space-y-8">
                                     {/* Security - PIN */}
                                     <div className="space-y-6">
                                         {/* Row 1: PIN Input (Masked) + Eye Icon */}
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <div className={`text-sm font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
+                                                <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
                                             </div>
                                             <div className="relative">
                                                 <input
                                                     type={isPinVisible ? "text" : "password"}
                                                     maxLength={4}
                                                     placeholder={t.four_digit_pin}
-                                                    className={`w-full ${family?.theme === 'doodle' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
+                                                    className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
                                                     value={tempSettings.parent_pin}
                                                     onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })}
                                                 />
@@ -1583,23 +1583,23 @@ export default function Dashboard() {
                                                             });
                                                         }
                                                     }}
-                                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${family?.theme === 'doodle' ? 'hover:bg-gray-100 text-gray-400' : 'hover:bg-white/10 text-slate-500'}`}
+                                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${family?.theme !== 'neon' ? 'hover:bg-gray-100 text-gray-400' : 'hover:bg-white/10 text-slate-500'}`}
                                                 >
                                                     {isPinVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5 opacity-70" />}
                                                 </button>
                                             </div>
-                                            <div className={`text-xs text-center ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_sub}</div>
+                                            <div className={`text-xs text-center ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_sub}</div>
                                         </div>
 
                                         {/* Row 2: Enable Toggle */}
                                         <div className="space-y-2">
-                                            <div className={`flex items-center justify-between p-4 ${family?.theme === 'doodle' ? 'bg-white' : 'bg-black/40'} rounded-2xl border ${family?.theme === 'doodle' ? 'border-[#eee]' : 'border-white/5'}`}>
-                                                <div className={`font-bold ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
+                                            <div className={`flex items-center justify-between p-4 ${family?.theme !== 'neon' ? 'bg-white' : 'bg-black/40'} rounded-2xl border ${family?.theme !== 'neon' ? 'border-[#eee]' : 'border-white/5'}`}>
+                                                <div className={`font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
                                                 <button
                                                     onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
                                                     className={`w-16 h-8 rounded-full transition-all relative flex items-center shadow-inner shrink-0 ${tempSettings.use_parent_pin
-                                                        ? (family?.theme === 'doodle' ? 'bg-orange-400' : 'bg-cyan-500')
-                                                        : (family?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10')
+                                                        ? (family?.theme !== 'neon' ? 'bg-orange-400' : 'bg-cyan-500')
+                                                        : (family?.theme !== 'neon' ? 'bg-[#eee]' : 'bg-white/10')
                                                         }`}
                                                 >
                                                     <div className={`text-[10px] font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
@@ -1608,14 +1608,14 @@ export default function Dashboard() {
                                                     <div className={`w-6 h-6 bg-white rounded-full transition-all shadow-md z-10 transform ${tempSettings.use_parent_pin ? 'translate-x-9' : 'translate-x-1'}`} />
                                                 </button>
                                             </div>
-                                            <div className={`text-xs text-center ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.enable_pin_sub}</div>
+                                            <div className={`text-xs text-center ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.enable_pin_sub}</div>
                                         </div>
                                     </div>
 
 
                                     {/* UI Style */}
                                     <div className="space-y-4">
-                                        <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.ui_style_selection}</h4>
+                                        <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.ui_style_selection}</h4>
                                         <div className="grid grid-cols-2 gap-4">
                                             <button onClick={() => setTempSettings({ ...tempSettings, theme: 'jar' })} className={`col-span-2 h-full min-h-[100px] p-4 rounded-xl border-2 transition-all text-center flex flex-row items-center justify-center gap-4 bg-[#fff9c4] border-[#ffd54f] text-[#f57f17] hover:scale-[1.02] active:scale-95 ${tempSettings.theme === 'jar' ? 'ring-2 ring-[#fbc02d] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
                                                 <div className="w-10 h-10 rounded-full border-2 border-[#fbc02d] flex items-center justify-center bg-white text-[#fbc02d]">
@@ -1626,7 +1626,7 @@ export default function Dashboard() {
                                                     <div className="text-[10px] uppercase tracking-widest opacity-80">Interactive Hero</div>
                                                 </div>
                                             </button>
-                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
+                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'neon' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'neon' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
                                                 <div className="w-12 h-12 rounded-full border-2 border-cyan-500 flex items-center justify-center mb-2 bg-black shadow-[0_0_10px_#06b6d4]">
                                                     <Zap className="w-6 h-6" />
                                                 </div>
@@ -1650,21 +1650,21 @@ export default function Dashboard() {
                                 <section className="relative group">
                                     <button
                                         onClick={dismissInstallPrompt}
-                                        className={`absolute top-0 right-0 p-2 rounded-full z-10 opacity-50 hover:opacity-100 transition-all ${family?.theme === 'doodle' ? 'text-[#4a4a4a] hover:bg-black/5' : 'text-white hover:bg-white/10'}`}
+                                        className={`absolute top-0 right-0 p-2 rounded-full z-10 opacity-50 hover:opacity-100 transition-all ${family?.theme !== 'neon' ? 'text-[#4a4a4a] hover:bg-black/5' : 'text-white hover:bg-white/10'}`}
                                         title={t.dismiss || 'Dismiss'}
                                     >
                                         <X className="w-5 h-5" />
                                     </button>
 
-                                    <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
-                                    <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme === 'doodle' ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20'}`}>
+                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
+                                    <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20'}`}>
                                         <div className="text-center md:text-left">
-                                            <h5 className={`font-black text-lg mb-1 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.install_app}</h5>
-                                            <p className={`text-xs opacity-70 mb-0 max-w-xs ${family?.theme === 'doodle' ? 'text-[#666]' : 'text-slate-400'}`}>{t.install_app_desc}</p>
+                                            <h5 className={`font-black text-lg mb-1 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.install_app}</h5>
+                                            <p className={`text-xs opacity-70 mb-0 max-w-xs ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.install_app_desc}</p>
                                         </div>
                                         <button
                                             onClick={handleInstallClick}
-                                            className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme === 'doodle'
+                                            className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme !== 'neon'
                                                 ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:bg-[#ff8a80] hover:border-[#ff8a80]'
                                                 : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
                                                 }`}
@@ -1677,26 +1677,26 @@ export default function Dashboard() {
                             )}
 
                             {/* 7. 資料重設與匯出 */}
-                            <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme === 'doodle' ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5'}`}>
-                                <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-red-500'} uppercase tracking-[0.2em] mb-4 flex items-center gap-2`}><Trash2 className="w-3 h-3" /> {t.data_mgmt_export}</h4>
+                            <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5'}`}>
+                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-red-500'} uppercase tracking-[0.2em] mb-4 flex items-center gap-2`}><Trash2 className="w-3 h-3" /> {t.data_mgmt_export}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'}`}>
+                                    <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'}`}>
                                         <div className="flex justify-between items-start w-full"><div className="text-sm font-bold mb-1">{t.export_full_history}</div><Download className="w-4 h-4 text-cyan-500" /></div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'doodle' ? 'text-[#666]' : 'text-slate-400'}`}>{t.csv_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.csv_desc}</div>
                                     </button>
-                                    <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10'}`}>
+                                    <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10'}`}>
                                         <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'doodle' ? 'text-[#666]' : 'text-slate-400'}`}>{t.clear_history_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.clear_history_desc}</div>
                                     </button>
-                                    <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'doodle' ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30'} md:col-span-2`}>
+                                    <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme !== 'neon' ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30'} md:col-span-2`}>
                                         <div className="text-sm font-bold mb-1">{t.reset_family_data}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-red-400'}`}>{t.reset_family_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-red-400'}`}>{t.reset_family_desc}</div>
                                     </button>
                                 </div>
                             </section>
                         </div>
 
-                        <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme === 'doodle' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md`}>
+                        <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md`}>
                             <button onClick={saveSettings} className="btn btn-primary w-full gap-2 font-black !py-4 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"><Save className="w-5 h-5" /> {t.save_changes}</button>
                         </div>
                     </div>
@@ -1715,8 +1715,8 @@ export default function Dashboard() {
 
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[110] p-6 animate-in fade-in duration-300">
-                    <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl'}`}>
-                        <h3 className={`text-2xl font-black mb-8 italic flex items-center gap-3 uppercase tracking-tight ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}><Plus className="text-cyan-500" /> {t.add_member}</h3>
+                    <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl'}`}>
+                        <h3 className={`text-2xl font-black mb-8 italic flex items-center gap-3 uppercase tracking-tight ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}><Plus className="text-cyan-500" /> {t.add_member}</h3>
 
                         <div className="flex flex-col items-center gap-6 mb-8">
                             <button
@@ -1724,17 +1724,17 @@ export default function Dashboard() {
                                     const nextIdx = (AVATARS.indexOf(newKidAvatar) + 1) % AVATARS.length;
                                     setNewKidAvatar(AVATARS[nextIdx]);
                                 }}
-                                className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme === 'doodle' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30'}`}
+                                className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30'}`}
                             >
                                 {newKidAvatar}
                             </button>
-                            <p className={`text-[10px] font-bold ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'} uppercase tracking-widest`}>{t.click_to_change_avatar}</p>
+                            <p className={`text-[10px] font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase tracking-widest`}>{t.click_to_change_avatar}</p>
 
                             <input
                                 autoFocus
                                 type="text"
                                 placeholder={t.enter_kid_name}
-                                className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500'}`}
+                                className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500'}`}
                                 value={newKidName}
                                 onChange={e => setNewKidName(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && addKid()}
@@ -1742,7 +1742,7 @@ export default function Dashboard() {
                         </div>
 
                         <div className="flex gap-4">
-                            <button onClick={() => setShowAddModal(false)} className={`flex-1 py-4 px-6 rounded-xl font-bold transition-all ${family?.theme === 'doodle' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-500 hover:text-white'}`}>{t.cancel}</button>
+                            <button onClick={() => setShowAddModal(false)} className={`flex-1 py-4 px-6 rounded-xl font-bold transition-all ${family?.theme !== 'neon' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-500 hover:text-white'}`}>{t.cancel}</button>
                             <button onClick={addKid} className="btn btn-primary flex-1 font-black shadow-xl">{t.join_member} 🚀</button>
                         </div>
                     </div>
@@ -1753,16 +1753,16 @@ export default function Dashboard() {
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-[120] p-6 animate-in fade-in duration-500">
                     <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Option 1: Create New */}
-                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500'}`}>
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme === 'doodle' ? 'bg-[#fff5e6]' : 'bg-cyan-500/20 text-cyan-400'}`}>🏠</div>
+                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500'}`}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme !== 'neon' ? 'bg-[#fff5e6]' : 'bg-cyan-500/20 text-cyan-400'}`}>🏠</div>
                             <div>
-                                <h3 className={`text-2xl font-black mb-2 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_create_title}</h3>
-                                <p className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_create_desc}</p>
+                                <h3 className={`text-2xl font-black mb-2 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_create_title}</h3>
+                                <p className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_create_desc}</p>
                             </div>
                             <input
                                 type="text"
                                 placeholder={t.onboarding_family_name_placeholder}
-                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-cyan-500'}`}
+                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-cyan-500'}`}
                                 value={newFamilyName}
                                 onChange={e => setNewFamilyName(e.target.value)}
                             />
@@ -1770,16 +1770,16 @@ export default function Dashboard() {
                         </div>
 
                         {/* Option 2: Join Existing */}
-                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme === 'doodle' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500'}`}>
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme === 'doodle' ? 'bg-[#f3e5f5]' : 'bg-purple-500/20 text-purple-400'}`}>🔗</div>
+                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500'}`}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme !== 'neon' ? 'bg-[#f3e5f5]' : 'bg-purple-500/20 text-purple-400'}`}>🔗</div>
                             <div>
-                                <h3 className={`text-2xl font-black mb-2 ${family?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_join_title}</h3>
-                                <p className={`text-sm ${family?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_join_desc}</p>
+                                <h3 className={`text-2xl font-black mb-2 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_join_title}</h3>
+                                <p className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_join_desc}</p>
                             </div>
                             <input
                                 type="text"
                                 placeholder={t.onboarding_join_placeholder}
-                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
+                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
                                 value={joinCode}
                                 onChange={e => setJoinCode(e.target.value)}
                             />
@@ -1788,13 +1788,13 @@ export default function Dashboard() {
                                     type="text"
                                     maxLength={4}
                                     placeholder={t.four_digit_pin}
-                                    className={`w-full p-4 rounded-xl font-bold font-mono outline-none transition-all ${family?.theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
+                                    className={`w-full p-4 rounded-xl font-bold font-mono outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
                                     value={joinPin}
                                     onChange={e => setJoinPin(e.target.value.replace(/\D/g, ''))}
                                 />
-                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${family?.theme === 'doodle' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${family?.theme !== 'neon' ? 'text-gray-400' : 'text-gray-500'}`} />
                             </div>
-                            <button onClick={() => handleJoinFamily(joinCode, joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
+                            <button onClick={() => handleJoinFamily(joinCode, joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme !== 'neon' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Monitor, Star, Clock, Coins, PlusCircle, Edit2 } from 'lucide-react';
+import { Monitor, Star, Clock, Coins, PlusCircle } from 'lucide-react';
 import WishGoalModal from '../WishGoalModal';
 import AnimatedCounter from '../AnimatedCounter';
 
@@ -26,16 +26,17 @@ export default function DoodleThemeLayout({
 
     // Doodle Style Constants
     const theme = 'doodle';
+    const borderColor = '#4a4a4a';
 
     return (
-        <div ref={cardRef} className="p-6 md:p-8 group relative overflow-hidden transition-all duration-500 bg-white border-4 border-[#4a4a4a] rounded-[30px] shadow-[8px_8px_0px_rgba(74,74,74,0.15)] font-['M_PLUS_Rounded_1c']">
+        <div ref={cardRef} className="p-6 md:p-8 group relative overflow-hidden transition-all duration-500 bg-white border-4 border-[#4a4a4a] rounded-[30px] shadow-[12px_12px_0px_#e0e0e0] font-['M_PLUS_Rounded_1c']">
 
-            {/* 1. Header: Avatar & Name (Centered) */}
-            <div className="flex justify-center items-center gap-4 mb-8">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center text-4xl bg-white border-2 border-[#4a4a4a] shadow-sm relative z-10">
+            {/* 1. Header: Avatar & Name */}
+            <div className="flex justify-center items-center gap-4 mb-6">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-4xl bg-white border-2 border-[#4a4a4a] shadow-[3px_3px_0px_#4a4a4a] relative z-10 overflow-hidden">
                     {kid.avatar || '👶'}
                 </div>
-                <h3 className="text-4xl font-black text-[#4a4a4a] italic uppercase tracking-tighter" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}>
+                <h3 className="text-4xl font-black text-[#4a4a4a] italic uppercase tracking-tighter" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.05)' }}>
                     {kid.name}
                 </h3>
             </div>
@@ -49,7 +50,8 @@ export default function DoodleThemeLayout({
                         <Star className="w-5 h-5 fill-current" />
                         <span>{t.points_label || '點數'}</span>
                     </div>
-                    <div className="text-[5rem] leading-none font-black text-[#4a4a4a] italic tracking-tighter" style={{ textShadow: '4px 4px 0px #eee' }}>
+                    {/* Updated: Smaller font text-6xl (was text-[5rem]) */}
+                    <div className="text-6xl leading-none font-black text-[#4a4a4a] italic tracking-tighter" style={{ textShadow: '3px 3px 0px #eee' }}>
                         <AnimatedCounter value={visualPoints} />
                     </div>
                 </div>
@@ -99,7 +101,7 @@ export default function DoodleThemeLayout({
                         <div className="flex items-center gap-3">
                             <Monitor className="w-5 h-5 text-[#ff8a80]" />
                             <div className="text-lg font-black text-[#555] italic">
-                                <span className="text-2xl text-[#4a4a4a]"><AnimatedCounter value={Math.floor(visualPoints * (familySettings?.point_to_minutes || 2))} /></span>
+                                <span className="text-xl text-[#4a4a4a]"><AnimatedCounter value={Math.floor(visualPoints * (familySettings?.point_to_minutes || 2))} /></span>
                                 <span className="text-xs ml-1 font-bold text-[#999]">{t.minutes_unit}</span>
                             </div>
                         </div>
@@ -107,7 +109,7 @@ export default function DoodleThemeLayout({
                         <div className="flex items-center gap-3">
                             <Coins className="w-5 h-5 text-[#4caf50]" />
                             <div className="text-lg font-black text-[#555] italic">
-                                <span className="text-2xl text-[#4a4a4a]"><AnimatedCounter value={(visualPoints * (familySettings?.point_to_cash || 5))} /></span>
+                                <span className="text-xl text-[#4a4a4a]"><AnimatedCounter value={(visualPoints * (familySettings?.point_to_cash || 5))} /></span>
                                 <span className="text-xs ml-1 font-bold text-[#999]">{t.cash_unit}</span>
                             </div>
                         </div>
@@ -115,25 +117,13 @@ export default function DoodleThemeLayout({
                 </div>
             </div>
 
-            {/* 3. Time Limit Progress Bar (Restored) */}
+            {/* 3. Time Limit Progress Bar */}
             <div className="mb-6">
-                <div className="relative w-full h-12 rounded-2xl overflow-hidden flex items-center justify-center bg-[#88d8b0] border-2 border-[#4a4a4a] shadow-sm">
-                    {/* Background for unfilled? No, bg is green. */}
-                    {/* Actually, user image shows filled green with text inside. */}
-                    {/* Let's try to replicate the "Green Bar" look. 
-                       If it's a progress bar, it should fill up. 
-                       But the image shows fully green "40 分鐘 / 40". 
-                       Maybe it is just a Status Bar showing remaining time?
-                       The original code had a progress bar. 
-                       I'll stick to the Progress Bar logic but style it like the image.
-                    */}
+                <div className="relative w-full h-12 rounded-xl overflow-hidden flex items-center justify-center bg-[#e0e0e0] border-2 border-[#4a4a4a] shadow-[3px_3px_0px_rgba(74,74,74,0.2)]">
                     <div
-                        className="absolute top-0 left-0 h-full bg-[#66bb6a] transition-all duration-1000 opacity-20"
+                        className="absolute top-0 left-0 h-full bg-[#66bb6a] transition-all duration-1000"
                         style={{ width: `${timePercent}%` }}
                     />
-                    {/* The image shows a SOLID green bar. I will match the image aesthetic: Green background by default? */}
-                    {/* Wait, the image shows "40 Mins / 40". So it is Full. */}
-
                     <div className="relative z-10 flex items-center gap-2 font-black text-[#4a4a4a] text-lg tracking-widest">
                         <Monitor className="w-5 h-5 opacity-60" />
                         <span>{visualMinutes}</span>
@@ -143,13 +133,13 @@ export default function DoodleThemeLayout({
                 </div>
             </div>
 
-            {/* 4. Quick Actions */}
-            <div className="grid grid-cols-4 gap-2 mb-3">
+            {/* 4. Quick Actions (Refined 2D Buttons) */}
+            <div className="grid grid-cols-4 gap-3 mb-4">
                 {[10, 20, 30].map(mins => (
                     <button
                         key={mins}
                         onClick={() => onUpdate(kid, 0, -mins, t.quick_deduct || '快速扣除', actorName)}
-                        className="bg-[#fbe9e7] border-[#4a4a4a] border-2 text-[#4a4a4a] font-black rounded-xl py-2 hover:bg-[#ffccbc] hover:-translate-y-0.5 transition-all shadow-sm active:translate-y-0"
+                        className="bg-[#fbe9e7] border-2 border-[#4a4a4a] text-[#4a4a4a] font-black rounded-xl py-2 shadow-[3px_3px_0px_#4a4a4a] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all hover:bg-[#ffccbc] text-sm md:text-base"
                     >
                         -{mins}
                     </button>
@@ -167,14 +157,14 @@ export default function DoodleThemeLayout({
                             }
                         });
                     }}
-                    className="bg-white border-[#4a4a4a] border-2 text-[#4a4a4a] font-black rounded-xl py-2 hover:bg-[#f5f5f5] hover:-translate-y-0.5 transition-all shadow-sm active:translate-y-0 text-sm"
+                    className="bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] font-black rounded-xl py-2 shadow-[3px_3px_0px_#4a4a4a] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all hover:bg-[#f5f5f5] text-sm md:text-base"
                 >
                     {t.custom || '自訂'}
                 </button>
             </div>
 
-            {/* 5. Exchange Buttons */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* 5. Exchange Buttons (Refined 2D Buttons) */}
+            <div className="grid grid-cols-2 gap-4">
                 <button
                     onClick={() => {
                         const kidMins = kid.total_minutes;
@@ -195,7 +185,7 @@ export default function DoodleThemeLayout({
                             }
                         });
                     }}
-                    className="bg-[#edf2f4] border-[#4a4a4a] border-2 text-[#4a4a4a] hover:bg-[#dee2e6] hover:-translate-y-0.5 border-b-4 rounded-xl p-3 text-lg font-black transition-all flex items-center justify-center gap-3 shadow-sm"
+                    className="bg-[#edf2f4] border-2 border-[#4a4a4a] text-[#4a4a4a] shadow-[4px_4px_0px_#4a4a4a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] rounded-xl p-3 text-lg font-black transition-all flex items-center justify-center gap-3 hover:bg-[#dee2e6]"
                 >
                     <Monitor className="w-5 h-5" /> ➔ <Star className="w-5 h-5 text-[#ffb74d]" />
                 </button>
@@ -218,7 +208,7 @@ export default function DoodleThemeLayout({
                             }
                         });
                     }}
-                    className="bg-[#e8f5e9] border-[#4a4a4a] border-2 text-[#2e7d32] hover:bg-[#c8e6c9] hover:-translate-y-0.5 border-b-4 rounded-xl p-3 text-lg font-black transition-all flex items-center justify-center gap-3 shadow-sm"
+                    className="bg-[#e8f5e9] border-2 border-[#4a4a4a] text-[#2e7d32] shadow-[4px_4px_0px_#4a4a4a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] rounded-xl p-3 text-lg font-black transition-all flex items-center justify-center gap-3 hover:bg-[#c8e6c9]"
                 >
                     <Star className="w-5 h-5 text-[#ffb74d]" /> ➔ <Monitor className="w-5 h-5" />
                 </button>
