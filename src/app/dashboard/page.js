@@ -1914,7 +1914,7 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
                     </div>
                 </div>
                 <div className={`py-2 px-6 w-full md:w-fit md:ml-auto relative flex items-center justify-between md:justify-end gap-4 ${familySettings?.theme === 'doodle'
-                    ? 'border-y-2 border-dashed border-[#4a4a4a]/10 my-2'
+                    ? 'my-2'
                     : 'bg-white/5 rounded-2xl border border-white/5 my-2 p-3'}`}>
 
 
