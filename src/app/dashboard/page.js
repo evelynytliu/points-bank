@@ -5,11 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Reorder, useDragControls } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Logo from '@/components/Logo';
-import WishGoalModal from '@/components/WishGoalModal';
+
 import { LogOut, Plus, PlusCircle, TrendingUp, History, Monitor, Star, Clock, Calendar, Share2, Key, Settings, X, Save, User, UserPlus, CheckCircle2, ChevronDown, ChevronUp, Zap, ShieldAlert, Trash2, Coins, Download, Copy, Smile, GripVertical, Edit2, Eye, EyeOff, Lock } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import { APP_CONFIG } from '@/lib/config';
 import StarJar from '@/components/StarJar';
+import JarThemeLayout from '@/components/themes/JarThemeLayout';
+import NeonThemeLayout from '@/components/themes/NeonThemeLayout';
+import DoodleThemeLayout from '@/components/themes/DoodleThemeLayout';
+import AnimatedCounter from '@/components/AnimatedCounter';
 
 const AVATARS = [
     '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', '🐷', '🐯',
@@ -1015,7 +1019,7 @@ export default function Dashboard() {
     );
 
     return (
-        <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
+        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'doodle' || family?.theme === 'jar') ? 'bg-[#fffbf0]' : 'bg-[#080812]'}`}>
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 py-6">
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
@@ -1613,6 +1617,15 @@ export default function Dashboard() {
                                     <div className="space-y-4">
                                         <h4 className={`text-sm font-black ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.ui_style_selection}</h4>
                                         <div className="grid grid-cols-2 gap-4">
+                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'jar' })} className={`col-span-2 h-full min-h-[100px] p-4 rounded-xl border-2 transition-all text-center flex flex-row items-center justify-center gap-4 bg-[#fff9c4] border-[#ffd54f] text-[#f57f17] hover:scale-[1.02] active:scale-95 ${tempSettings.theme === 'jar' ? 'ring-2 ring-[#fbc02d] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
+                                                <div className="w-10 h-10 rounded-full border-2 border-[#fbc02d] flex items-center justify-center bg-white text-[#fbc02d]">
+                                                    <Star className="w-5 h-5 fill-current" />
+                                                </div>
+                                                <div className="text-left">
+                                                    <div className="text-sm font-black mb-0.5">Star Jar</div>
+                                                    <div className="text-[10px] uppercase tracking-widest opacity-80">Interactive Hero</div>
+                                                </div>
+                                            </button>
                                             <button onClick={() => setTempSettings({ ...tempSettings, theme: 'cyber' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'cyber' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
                                                 <div className="w-12 h-12 rounded-full border-2 border-cyan-500 flex items-center justify-center mb-2 bg-black shadow-[0_0_10px_#06b6d4]">
                                                     <Zap className="w-6 h-6" />
@@ -1790,47 +1803,12 @@ export default function Dashboard() {
     );
 }
 
-function AnimatedCounter({ value }) {
-    const [display, setDisplay] = useState(value);
 
-    useEffect(() => {
-        const start = display;
-        if (start === value) return;
-
-        const duration = 1000;
-        let startTime = null;
-        let reqId;
-
-        const animate = (time) => {
-            if (!startTime) startTime = time;
-            const progress = Math.min((time - startTime) / duration, 1);
-            const ease = 1 - Math.pow(1 - progress, 3); // Cubic ease out
-
-            const current = start + (value - start) * ease;
-
-            if (Number.isInteger(value)) {
-                setDisplay(Math.floor(current));
-            } else {
-                setDisplay(parseFloat(current.toFixed(1)));
-            }
-
-            if (progress < 1) {
-                reqId = requestAnimationFrame(animate);
-            } else {
-                setDisplay(value);
-            }
-        };
-        reqId = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(reqId);
-    }, [value]);
-
-    return <>{display}</>;
-}
 
 function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
 
-    const [showGoalModal, setShowGoalModal] = useState(false);
+
 
     // Visual states to control animation timing
     const [isInView, setIsInView] = useState(false);
@@ -1904,230 +1882,43 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
     const isWarning = timePercent > 0 && timePercent <= 30;
     const isDanger = timePercent <= 10;
 
-    return (
-        <div ref={cardRef} className={`p-8 group relative overflow-hidden transition-all duration-500 ${familySettings?.theme === 'doodle'
-            ? 'bg-white border-4 border-[#4a4a4a] rounded-[40px_10px_35px_15px] shadow-[10px_10px_0px_rgba(74,74,74,0.15)]'
-            : 'glass-panel border-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.15)] ring-1 ring-cyan-400/20'}`}>
+    const theme = familySettings?.theme;
 
-            {/* Header: Kid Name */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl ${familySettings?.theme === 'doodle' ? 'bg-white shadow-md' : 'bg-cyan-500/10 shadow-[0_0_20px_rgba(0,229,255,0.15)]'}`}>
-                    {kid.avatar || '👶'}
-                </div>
-                <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
-            </div>
+    const commonProps = {
+        cardRef,
+        kid,
+        goal,
+        visualPoints,
+        visualMinutes,
+        timePercent,
+        isDanger,
+        isWarning,
+        timeLimit,
+        familySettings,
+        t,
+        actorName,
+        onUpdate,
+        onUpdateGoal,
+        onDeleteGoal,
+        showModal,
+        isUpdatingGoal
+    };
 
-            {/* Main Content: Star Jar Showcase */}
-            <div className="relative mb-8">
-                {/* Star Jar - Hero Element (Centered & Enlarged) */}
-                <div className="flex justify-center items-center py-6">
-                    <div className="transform scale-150 origin-center">
-                        <StarJar points={visualPoints} theme={familySettings?.theme} seed={kid.id} />
-                    </div>
-                </div>
+    if (theme === 'jar') {
+        return <JarThemeLayout {...commonProps} />;
+    }
+    if (theme === 'neon') {
+        return <NeonThemeLayout {...commonProps} />;
+    }
 
-                {/* Stats Cards Around Jar */}
-                <div className="grid grid-cols-2 gap-4 mt-8">
-                    {/* Time Card */}
-                    <div className={`p-4 rounded-2xl border-2 ${familySettings?.theme === 'doodle' ? 'bg-[#fff5f5] border-[#ff8a80]/30' : 'bg-white/5 border-white/10'}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                            <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
-                            <span className={`text-xs font-bold uppercase tracking-wider ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`}>
-                                {t.minutes_unit}
-                            </span>
-                        </div>
-                        <div className={`text-3xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                            <AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} />
-                        </div>
-                    </div>
-
-                    {/* Cash Card */}
-                    <div className={`p-4 rounded-2xl border-2 ${familySettings?.theme === 'doodle' ? 'bg-[#f1f8e9] border-green-500/30' : 'bg-white/5 border-white/10'}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                            <Coins className="w-5 h-5 text-green-500" />
-                            <span className={`text-xs font-bold uppercase tracking-wider text-green-500`}>
-                                {t.cash_unit}
-                            </span>
-                        </div>
-                        <div className={`text-3xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                            <AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Goal Progress - Below Jar */}
-                <div
-                    onClick={() => setShowGoalModal(true)}
-                    className={`mt-6 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] ${familySettings?.theme === 'doodle' ? 'bg-[#fff9e6] border-2 border-[#ffd180]/40' : 'bg-white/5 border-2 border-white/10'}`}>
-                    {isUpdatingGoal ? (
-                        <div className="space-y-2 animate-pulse opacity-60">
-                            <div className="h-4 w-32 bg-gray-200 rounded-full"></div>
-                            <div className="h-3 w-full bg-gray-100 rounded-full"></div>
-                        </div>
-                    ) : goal ? (
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl">🎯</span>
-                                    <span className={`text-lg font-bold ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                        {goal.title}
-                                    </span>
-                                </div>
-                                <span className={`text-sm font-bold ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]/60' : 'text-white/60'}`}>
-                                    {visualPoints} / {goal.target_points}
-                                </span>
-                            </div>
-                            <div className={`w-full h-3 rounded-full overflow-hidden ${familySettings?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10'}`}>
-                                <div
-                                    className={`h-full rounded-full transition-all duration-1000 ${familySettings?.theme === 'doodle' ? 'bg-[#ff8a80]' : 'bg-cyan-400'}`}
-                                    style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }}
-                                />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className={`flex items-center justify-center gap-2 text-sm font-bold opacity-60 hover:opacity-100 transition-opacity ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                            <PlusCircle className="w-4 h-4" /> {t.wish_setup_new || '設定願望'}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="mb-6">
-                <div className={`relative w-full h-11 rounded-2xl overflow-hidden flex items-center justify-center ${familySettings?.theme === 'doodle' ? 'bg-[#eee] border border-[#4a4a4a]/40' : 'bg-black/40 border border-white/10 shadow-inner'}`}>
-                    {/* Progress Fill */}
-                    <div
-                        className={`bar-fill absolute top-0 left-0 h-full transition-all duration-1000 ${isDanger ? 'danger' : isWarning ? 'warning' : ''}`}
-                        style={{
-                            width: `${timePercent}%`,
-                            background: familySettings?.theme === 'doodle' ? (isDanger ? '#ff8a80' : isWarning ? '#ffd180' : '#88d8b0') : undefined
-                        }}
-                    />
-
-                    {/* Center Text: Current Value */}
-                    <div className={`relative z-10 flex items-center gap-2 font-black uppercase tracking-widest ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                        <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? '' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
-                        <span className={familySettings?.theme === 'doodle' ? '' : 'drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]'}>
-                            <span className="text-xl"><AnimatedCounter value={visualMinutes} /></span> <span className="text-sm">{t.minutes_unit}</span>
-                        </span>
-                    </div>
-
-                    {/* Right Text: Max Limit */}
-                    <div className={`absolute right-4 z-10 flex items-center h-full font-black opacity-50 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                        / {timeLimit}
-                    </div>
-                </div>
-            </div>
-
-            <div className="space-y-4 mb-3">
-                <div className="grid grid-cols-4 gap-2">
-                    <button onClick={() => {
-                        showModal({
-                            type: 'confirm',
-                            title: t.quick_deduct,
-                            message: `${t.confirm_deduct} 10 ${t.minutes_unit}?`,
-                            onConfirm: () => onUpdate(kid, 0, -10, t.quick_deduct, actorName)
-                        });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−10</button>
-                    <button onClick={() => {
-                        showModal({
-                            type: 'confirm',
-                            title: t.quick_deduct,
-                            message: `${t.confirm_deduct} 20 ${t.minutes_unit}?`,
-                            onConfirm: () => onUpdate(kid, 0, -20, t.quick_deduct, actorName)
-                        });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−20</button>
-                    <button onClick={() => {
-                        showModal({
-                            type: 'confirm',
-                            title: t.quick_deduct,
-                            message: `${t.confirm_deduct} 30 ${t.minutes_unit}?`,
-                            onConfirm: () => onUpdate(kid, 0, -30, t.quick_deduct, actorName)
-                        });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>−30</button>
-                    <button onClick={() => {
-                        showModal({
-                            type: 'prompt',
-                            title: t.prompt_custom_deduct,
-                            message: t.prompt_enter_mins_deduct,
-                            unit: t.minutes_unit,
-                            onConfirm: (val) => {
-                                const m = parseInt(val);
-                                if (m) onUpdate(kid, 0, -m, t.manual_deduct, actorName);
-                            }
-                        });
-                    }} className={`${familySettings?.theme === 'doodle' ? 'bg-[#fafafa] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-red-500/60 hover:bg-red-500/20 hover:text-red-400'} border-2 border-b-4 p-2 rounded-xl text-sm font-black transition-all uppercase tracking-widest flex items-center justify-center`}>{t.custom}</button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-                <button
-                    onClick={() => {
-                        const kidMins = kid.total_minutes;
-                        const rate = familySettings?.point_to_minutes || 2;
-                        const maxPts = Math.floor(kidMins / rate);
-                        if (maxPts < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
-                        showModal({
-                            type: 'prompt',
-                            title: t.prompt_redeem_points,
-                            message: t.prompt_rate_mins_to_pts?.replace('{rate}', rate).replace('{value}', kidMins),
-                            defaultValue: kidMins.toString(),
-                            unit: t.minutes_unit,
-                            rate: rate,
-                            mode: 'minsToPts',
-                            onConfirm: (val) => {
-                                const mins = parseInt(val);
-                                const pts = Math.floor(mins / rate);
-                                if (pts > 0 && mins <= kidMins) onUpdate(kid, pts, -(pts * rate), t.time_to_points, actorName);
-                            }
-                        });
-                    }}
-                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#edf2f4] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'} border-2 border-b-4 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
-                >
-                    <Monitor className="w-5 h-5" /> ➔ <Star className="w-5 h-5 text-orange-400" />
-                </button>
-                <button
-                    onClick={() => {
-                        const kidPts = kid.total_points;
-                        const rate = familySettings?.point_to_minutes || 2;
-                        if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
-                        showModal({
-                            type: 'prompt',
-                            title: t.prompt_redeem_time,
-                            message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
-                            defaultValue: '1',
-                            unit: t.points_label,
-                            rate: rate,
-                            mode: 'ptsToMins',
-                            onConfirm: (val) => {
-                                const want = parseInt(val);
-                                if (want && want <= kidPts) onUpdate(kid, -want, want * rate, t.points_to_time, actorName);
-                            }
-                        });
-                    }}
-                    className={`${familySettings?.theme === 'doodle' ? 'bg-[#e8f5e9] border-[#4a4a4a]/40 text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5' : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'} border-2 border-b-4 p-3 rounded-xl text-lg font-black transition-all uppercase tracking-widest flex items-center justify-center gap-3`}
-                >
-                    <Star className="w-5 h-5 text-orange-400" /> ➔ <Monitor className="w-5 h-5" />
-                </button>
-            </div>
-
-            <WishGoalModal
-                isOpen={showGoalModal}
-                onClose={() => setShowGoalModal(false)}
-                kid={kid}
-                goal={goal}
-                onSave={(data) => onUpdateGoal(kid.id, data)}
-                onDelete={() => onDeleteGoal(kid.id)}
-                t={t}
-                theme={familySettings?.theme}
-            />
-        </div >
-    );
+    // Default to DoodleThemeLayout
+    return <DoodleThemeLayout {...commonProps} />;
 }
 
 // Tour Overlay Component
 function TourOverlay({ step, onNext, onFinish, t, familyTheme }) {
     if (step === 0) return null;
-    const isDoodle = familyTheme === 'doodle';
+    const isDoodle = familyTheme !== 'neon';
 
     return (
         <div className="fixed inset-0 z-[200] pointer-events-none">
@@ -2169,7 +1960,7 @@ function TourOverlay({ step, onNext, onFinish, t, familyTheme }) {
 // Custom Modal Component
 function CustomModal({ config, onClose, familyTheme, t = {} }) {
     const [inputValue, setInputValue] = useState(config.value || '');
-    const isDoodle = familyTheme === 'doodle';
+    const isDoodle = familyTheme !== 'neon';
 
     // Reset local value when modal opens/changes
     useEffect(() => {
