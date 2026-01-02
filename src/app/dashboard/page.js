@@ -1908,86 +1908,87 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
         <div ref={cardRef} className={`p-8 group relative overflow-hidden transition-all duration-500 ${familySettings?.theme === 'doodle'
             ? 'bg-white border-4 border-[#4a4a4a] rounded-[40px_10px_35px_15px] shadow-[10px_10px_0px_rgba(74,74,74,0.15)]'
             : 'glass-panel border-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.15)] ring-1 ring-cyan-400/20'}`}>
-            <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-6 mb-6">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl ${familySettings?.theme === 'doodle' ? 'bg-white shadow-md' : 'bg-cyan-500/10 shadow-[0_0_20px_rgba(0,229,255,0.15)]'}`}>
-                            {kid.avatar || '👶'}
-                        </div>
-                        <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
+
+            {/* Header: Kid Name */}
+            <div className="flex items-center justify-center gap-4 mb-8">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl ${familySettings?.theme === 'doodle' ? 'bg-white shadow-md' : 'bg-cyan-500/10 shadow-[0_0_20px_rgba(0,229,255,0.15)]'}`}>
+                    {kid.avatar || '👶'}
+                </div>
+                <h3 className={`text-4xl font-black ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'} italic uppercase tracking-tighter`}>{kid.name}</h3>
+            </div>
+
+            {/* Main Content: Star Jar Showcase */}
+            <div className="relative mb-8">
+                {/* Star Jar - Hero Element (Centered & Enlarged) */}
+                <div className="flex justify-center items-center py-6">
+                    <div className="transform scale-150 origin-center">
+                        <StarJar points={visualPoints} theme={familySettings?.theme} seed={kid.id} />
                     </div>
                 </div>
-                <div className={`w-full relative flex items-center gap-6 ${familySettings?.theme === 'doodle' ? 'py-4' : 'py-2'}`}>
 
-                    {/* Left Column: The Star Jar (Hero Element) */}
-                    <div className="flex-1 flex justify-center items-center py-2 relative">
-                        <div className="transform scale-125 origin-center">
-                            <StarJar points={visualPoints} theme={familySettings?.theme} seed={kid.id} />
+                {/* Stats Cards Around Jar */}
+                <div className="grid grid-cols-2 gap-4 mt-8">
+                    {/* Time Card */}
+                    <div className={`p-4 rounded-2xl border-2 ${familySettings?.theme === 'doodle' ? 'bg-[#fff5f5] border-[#ff8a80]/30' : 'bg-white/5 border-white/10'}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Monitor className={`w-5 h-5 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
+                            <span className={`text-xs font-bold uppercase tracking-wider ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`}>
+                                {t.minutes_unit}
+                            </span>
+                        </div>
+                        <div className={`text-3xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                            <AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} />
                         </div>
                     </div>
 
-                    {/* Center Divider: Soft dashed line for separation */}
-                    {familySettings?.theme === 'doodle' && (
-                        <div className="h-24 w-px border-l-2 border-dashed border-[#4a4a4a]/10 mx-2"></div>
+                    {/* Cash Card */}
+                    <div className={`p-4 rounded-2xl border-2 ${familySettings?.theme === 'doodle' ? 'bg-[#f1f8e9] border-green-500/30' : 'bg-white/5 border-white/10'}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                            <Coins className="w-5 h-5 text-green-500" />
+                            <span className={`text-xs font-bold uppercase tracking-wider text-green-500`}>
+                                {t.cash_unit}
+                            </span>
+                        </div>
+                        <div className={`text-3xl font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                            <AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Goal Progress - Below Jar */}
+                <div
+                    onClick={() => setShowGoalModal(true)}
+                    className={`mt-6 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] ${familySettings?.theme === 'doodle' ? 'bg-[#fff9e6] border-2 border-[#ffd180]/40' : 'bg-white/5 border-2 border-white/10'}`}>
+                    {isUpdatingGoal ? (
+                        <div className="space-y-2 animate-pulse opacity-60">
+                            <div className="h-4 w-32 bg-gray-200 rounded-full"></div>
+                            <div className="h-3 w-full bg-gray-100 rounded-full"></div>
+                        </div>
+                    ) : goal ? (
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl">🎯</span>
+                                    <span className={`text-lg font-bold ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                        {goal.title}
+                                    </span>
+                                </div>
+                                <span className={`text-sm font-bold ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]/60' : 'text-white/60'}`}>
+                                    {visualPoints} / {goal.target_points}
+                                </span>
+                            </div>
+                            <div className={`w-full h-3 rounded-full overflow-hidden ${familySettings?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10'}`}>
+                                <div
+                                    className={`h-full rounded-full transition-all duration-1000 ${familySettings?.theme === 'doodle' ? 'bg-[#ff8a80]' : 'bg-cyan-400'}`}
+                                    style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={`flex items-center justify-center gap-2 text-sm font-bold opacity-60 hover:opacity-100 transition-opacity ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
+                            <PlusCircle className="w-4 h-4" /> {t.wish_setup_new || '設定願望'}
+                        </div>
                     )}
-
-                    {/* Right Column: Info Stack (Goal, Time, Value) - Cleaner design */}
-                    <div className="flex-1 flex flex-col justify-center items-start gap-3 pr-2">
-
-                        {/* 1. Goal Progress Section - No outer border */}
-                        <div
-                            onClick={() => setShowGoalModal(true)}
-                            className="w-full cursor-pointer group/goal"
-                        >
-                            {isUpdatingGoal ? (
-                                <div className="space-y-1 animate-pulse opacity-60">
-                                    <div className="h-4 w-24 bg-gray-200 rounded-full"></div>
-                                    <div className="h-2 w-full bg-gray-100 rounded-full"></div>
-                                </div>
-                            ) : goal ? (
-                                <div className="flex flex-col gap-1.5 w-full">
-                                    <div className="flex items-center gap-2" title={goal.title}>
-                                        <span className="text-lg">🎯</span>
-                                        <span className={`text-sm font-bold truncate max-w-[140px] ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                            {goal.title}
-                                        </span>
-                                    </div>
-                                    <div className={`w-full h-2 rounded-full overflow-hidden ${familySettings?.theme === 'doodle' ? 'bg-[#eee]' : 'bg-white/10'}`}>
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-1000 ${familySettings?.theme === 'doodle' ? 'bg-[#ff8a80]' : 'bg-cyan-400'}`}
-                                            style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className={`flex items-center gap-2 text-xs font-bold opacity-50 hover:opacity-100 transition-opacity ${familySettings?.theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                    <PlusCircle className="w-3.5 h-3.5" /> {t.wish_setup_new || '設定願望'}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* 2. Stats Rows (Time & Cash) - Ultra clean */}
-                        <div className="flex flex-col gap-2 w-full">
-                            {/* Time Status */}
-                            <div className="flex items-center gap-2">
-                                <Monitor className={`w-4 h-4 ${familySettings?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`} />
-                                <span className={`text-lg font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                    <AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} />
-                                </span>
-                                <span className={`text-xs font-bold opacity-40 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.minutes_unit}</span>
-                            </div>
-
-                            {/* Cash Status */}
-                            <div className="flex items-center gap-2">
-                                <Coins className="w-4 h-4 text-green-500" />
-                                <span className={`text-lg font-black italic ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
-                                    <AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} />
-                                </span>
-                                <span className={`text-xs font-bold opacity-40 ${familySettings?.theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.cash_unit}</span>
-                            </div>
-                        </div>
-
-                    </div>
                 </div>
             </div>
 
