@@ -172,10 +172,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const radius = isContainer ? 20 : 6;
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180,
-                restitution: 0.2,
-                friction: 0.2,
-                density: 0.002,
-                frictionAir: 0.02,
+                restitution: 0.6, // 增加彈性，碰撞更活潑
+                friction: 0.05, // 降低摩擦力，移動更順暢
+                density: 0.001, // 降低密度，更輕盈
+                frictionAir: 0.005, // 大幅降低空氣阻力，反應更快
                 slop: 0.05,
                 render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
             });
@@ -264,11 +264,11 @@ export default function StarJar({ points, theme, seed = 0 }) {
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
-                        // 大幅降低力道，並且主要施加水平方向的力
-                        const forceMagnitude = 0.0003 * magnitude;
+                        // 增加力道，讓星星被晃動時更明顯
+                        const forceMagnitude = 0.0015 * magnitude; // 增加5倍力道
                         Matter.Body.applyForce(body, body.position, {
-                            x: (Math.random() - 0.5) * forceMagnitude * 2, // 水平方向力道稍大
-                            y: (Math.random() - 0.8) * forceMagnitude * 0.5 // 垂直方向力道很小，且偏向下
+                            x: (Math.random() - 0.5) * forceMagnitude * 3, // 水平方向力道更大
+                            y: (Math.random() - 0.5) * forceMagnitude * 2 // 垂直方向也增加
                         });
                     }
                 });
