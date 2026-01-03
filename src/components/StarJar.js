@@ -43,8 +43,11 @@ export default function StarJar({ points, theme, seed = 0 }) {
     const bodiesRef = useRef([]);
     const [starPositions, setStarPositions] = useState([]);
 
+    // Debug State
+    const [sensorDebug, setSensorDebug] = useState({ status: 'Click Jar', x: 0, y: 0, z: 0, shake: 0 });
+
     // Track container size for responsive physics
-    const [containerSize, setContainerSize] = useState({ width: 100, height: 150 }); // Init with dummy values
+    const [containerSize, setContainerSize] = useState({ width: 100, height: 150 });
 
     // Auto-resize observer
     useEffect(() => {
@@ -54,16 +57,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const parent = sceneRef.current.parentElement;
             if (parent) {
                 const { offsetWidth, offsetHeight } = parent;
-                // Add debounce or check diff
                 if (Math.abs(offsetWidth - containerSize.width) > 5 || Math.abs(offsetHeight - containerSize.height) > 5) {
                     setContainerSize({ width: offsetWidth, height: offsetHeight });
                 }
             }
         };
-
-        // Initial measurement
         updateSize();
-
         const observer = new ResizeObserver(updateSize);
         observer.observe(sceneRef.current.parentElement);
         return () => observer.disconnect();
@@ -92,26 +91,17 @@ export default function StarJar({ points, theme, seed = 0 }) {
             : ["#22d3ee", "#38bdf8", "#fbbf24", "#fcd34d"];
 
         const stars = [];
-
-        // Dynamic config
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
         const startY = isContainer ? height - 80 : 124;
         const scaleBase = isContainer ? 2.0 : 0.65;
-
-        // Adjust columns for wider containers
         const cols = isContainer ? Math.floor(width / 50) : 5.5;
 
         for (let i = 0; i < visualStarCount; i++) {
             const row = Math.floor(i / cols);
             const col = i % cols;
-
-            const xBase = isContainer
-                ? (width * 0.1) + (col * (width * 0.8 / cols))
-                : 22 + (col * 12);
-
+            const xBase = isContainer ? (width * 0.1) + (col * (width * 0.8 / cols)) : 22 + (col * 12);
             const xJitter = (sr(i + 42) - 0.5) * (isContainer ? 30 : 16);
             const x = Math.min(width - 20, Math.max(20, xBase + xJitter));
-
             const yBase = startY - (row * (isContainer ? 25 : 6.5));
             const yJitter = (sr(i * 3.3) - 0.5) * (isContainer ? 20 : 8);
 
@@ -127,15 +117,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
         return stars;
     }, [visualStarCount, isDoodle, isContainer, numericSeed, containerSize]);
 
-    // Initialize Matter.js physics
+    // Initialize Matter.js
     useEffect(() => {
         if (!sceneRef.current) return;
-
         const { Engine, Render, World, Bodies, Mouse, MouseConstraint, Events, Runner } = Matter;
-
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
 
-        // Create engine
         const engine = Engine.create({
             gravity: { x: 0, y: isContainer ? 1.2 : 0.8 },
             enableSleeping: false,
@@ -144,7 +131,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
         });
         engineRef.current = engine;
 
-        // Create renderer
         const render = Render.create({
             element: sceneRef.current,
             engine: engine,
@@ -158,32 +144,23 @@ export default function StarJar({ points, theme, seed = 0 }) {
         });
         renderRef.current = render;
 
-        // Style canvas
         render.canvas.style.position = 'absolute';
         render.canvas.style.top = '0';
         render.canvas.style.left = '0';
         render.canvas.style.width = '100%';
         render.canvas.style.height = '100%';
-        render.canvas.style.pointerEvents = 'auto'; // allow mouse interaction
+        render.canvas.style.pointerEvents = 'auto';
         render.canvas.style.zIndex = '20';
         render.canvas.style.opacity = '0';
 
-        // Create Boundaries based on dynamic size
-        const wallOpts = {
-            isStatic: true,
-            friction: 0.8,
-            render: { fillStyle: 'transparent' }
-        };
-
+        const wallOpts = { isStatic: true, friction: 0.8, render: { fillStyle: 'transparent' } };
         const walls = [];
 
         if (isContainer) {
-            // Full Container Walls
-            walls.push(Bodies.rectangle(width / 2, height, width, 60, wallOpts)); // Floor
-            walls.push(Bodies.rectangle(0, height / 2, 60, height, wallOpts)); // Left
-            walls.push(Bodies.rectangle(width, height / 2, 60, height, wallOpts)); // Right
+            walls.push(Bodies.rectangle(width / 2, height, width, 60, wallOpts));
+            walls.push(Bodies.rectangle(0, height / 2, 60, height, wallOpts));
+            walls.push(Bodies.rectangle(width, height / 2, 60, height, wallOpts));
         } else {
-            // Original Mini Jar Walls
             walls.push(Bodies.rectangle(50, 127, 65, 2, wallOpts));
             walls.push(Bodies.rectangle(15, 85, 2, 90, { ...wallOpts, friction: 0.5 }));
             walls.push(Bodies.rectangle(85, 85, 2, 90, { ...wallOpts, friction: 0.5 }));
@@ -194,15 +171,11 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180,
                 restitution: 0.2,
-                friction: 0.2, // Reduced friction
+                friction: 0.2,
                 density: 0.002,
-                frictionAir: 0.02, // Reduced air resistance
+                frictionAir: 0.02,
                 slop: 0.05,
-                render: {
-                    fillStyle: star.color,
-                    strokeStyle: "#d4a373",
-                    lineWidth: 1
-                }
+                render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
             });
             body.starData = star;
             return body;
@@ -211,7 +184,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
         bodiesRef.current = starBodies;
         World.add(engine.world, [...walls, ...starBodies]);
 
-        // Mouse Control
         const mouse = Mouse.create(render.canvas);
         mouse.pixelRatio = window.devicePixelRatio || 1;
         const mouseConstraint = MouseConstraint.create(engine, {
@@ -220,7 +192,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
         });
         World.add(engine.world, mouseConstraint);
 
-        // Update star positions
         Events.on(engine, 'afterUpdate', () => {
             if (!engineRef.current) return;
             const positions = starBodies.map(body => ({
@@ -231,7 +202,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
             setStarPositions(positions);
         });
 
-        // Run
         const runner = Runner.create();
         Runner.run(runner, engine);
         Render.run(render);
@@ -251,90 +221,79 @@ export default function StarJar({ points, theme, seed = 0 }) {
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
             const baseGravityY = isContainer ? 1.2 : 0.8;
-
             if (event.beta !== null && event.gamma !== null) {
-                const gravityStrength = 1.8;
-                const gravityX = (event.gamma / 45) * gravityStrength;
+                const gravityX = (event.gamma / 45) * 1.8;
                 const gravityY = baseGravityY + (event.beta / 90) * 0.5;
-
                 engineRef.current.gravity.x = Math.max(-2, Math.min(2, gravityX));
                 engineRef.current.gravity.y = Math.max(0.2, Math.min(3, gravityY));
             }
         };
 
         const handleMotion = (event) => {
-            if (!engineRef.current) return;
-
-            // 1. Try Linear Acceleration (Gravity Removed)
-            let x = event.acceleration?.x;
-            let y = event.acceleration?.y;
-            let z = event.acceleration?.z;
-            let threshold = 5;
-
-            // 2. Fallback to Raw Acceleration (Includes Gravity ~9.8)
-            // iOS often returns null for #1 but provides data here
-            if (x === null || x === undefined) {
-                if (event.accelerationIncludingGravity) {
-                    x = event.accelerationIncludingGravity.x;
-                    y = event.accelerationIncludingGravity.y;
-                    z = event.accelerationIncludingGravity.z;
-                    threshold = 25; // Higher threshold to overcome static gravity (9.8)
-                }
+            let x, y, z;
+            if (event.acceleration && event.acceleration.x !== null) {
+                x = event.acceleration.x;
+                y = event.acceleration.y;
+                z = event.acceleration.z;
+            } else if (event.accelerationIncludingGravity) {
+                x = event.accelerationIncludingGravity.x;
+                y = event.accelerationIncludingGravity.y;
+                z = event.accelerationIncludingGravity.z;
             }
 
-            if (x === null || x === undefined) return;
+            setSensorDebug(prev => ({
+                ...prev,
+                x: x ? x.toFixed(2) : 'null',
+                y: y ? y.toFixed(2) : 'null',
+                z: z ? z.toFixed(2) : 'null'
+            }));
+
+            if (!engineRef.current || x === undefined || x === null) return;
 
             const magnitude = Math.sqrt(x * x + y * y + z * z);
+            const threshold = (event.acceleration && event.acceleration.x !== null) ? 5 : 20;
 
-            // Trigger Shake if threshold exceeded
             if (magnitude > threshold) {
+                setSensorDebug(prev => ({ ...prev, shake: prev.shake + 1 }));
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
-                        // Normalize force direction randomly but scaled by energy
                         const forceMagnitude = 0.002 * magnitude;
                         Matter.Body.applyForce(body, body.position, {
                             x: (Math.random() - 0.5) * forceMagnitude,
-                            y: -(Math.random() * forceMagnitude) // Bias upwards slightly
+                            y: -(Math.random() * forceMagnitude)
                         });
                     }
                 });
             }
         };
 
-        const initSensor = async () => {
-            // 1. Orientation
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                    }
-                } catch (e) {
-                    console.error("Orientation perm failed", e);
-                }
-            } else {
-                window.addEventListener('deviceorientation', handleOrientation);
-            }
-
-            // 2. Motion
+        const requestPerms = async () => {
+            setSensorDebug(prev => ({ ...prev, status: 'Requesting...' }));
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                // iOS 13+
                 try {
-                    const permission = await DeviceMotionEvent.requestPermission();
-                    if (permission === 'granted') {
+                    const pState = await DeviceMotionEvent.requestPermission();
+                    setSensorDebug(prev => ({ ...prev, status: `Motion: ${pState}` }));
+                    if (pState === 'granted') {
                         window.addEventListener('devicemotion', handleMotion);
                     }
                 } catch (e) {
-                    console.error("Motion perm failed", e);
+                    setSensorDebug(prev => ({ ...prev, status: `Err: ${e.message}` }));
                 }
+                try {
+                    await DeviceOrientationEvent.requestPermission();
+                    window.addEventListener('deviceorientation', handleOrientation);
+                } catch (e) { }
             } else {
+                setSensorDebug(prev => ({ ...prev, status: 'Standard API' }));
                 window.addEventListener('devicemotion', handleMotion);
+                window.addEventListener('deviceorientation', handleOrientation);
             }
         };
 
         const onInteraction = () => {
-            initSensor();
-            // Capture events to ensure we trigger permissions ASAP
+            requestPerms();
             window.removeEventListener('click', onInteraction, true);
             window.removeEventListener('touchstart', onInteraction, true);
         };
@@ -350,7 +309,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         };
     }, [isContainer]);
 
-    // Falling stars visual effect
+    // Falling stars logic
     useEffect(() => {
         const currentPoints = Math.floor(points);
         const prevPoints = Math.floor(prevPointsRef.current);
@@ -358,8 +317,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const count = Math.min(currentPoints - prevPoints, 5);
             const batchSeed = Date.now();
             const newStars = Array.from({ length: count }).map((_, i) => ({
-                id: batchSeed + i,
-                delay: i * 0.15
+                id: batchSeed + i, delay: i * 0.15
             }));
             setFallingStars(prev => [...prev, ...newStars]);
         }
@@ -370,6 +328,17 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
     return (
         <div className={`relative ${isContainer ? 'w-full h-full' : 'w-24 h-32'} flex justify-center items-end`}>
+            {/* Visual Debug Overlay */}
+            {isContainer && (
+                <div className="absolute top-2 left-2 z-[100] bg-black/50 text-white text-[10px] p-2 rounded pointer-events-none font-mono">
+                    <div>Status: {sensorDebug.status}</div>
+                    <div>X: {sensorDebug.x}</div>
+                    <div>Y: {sensorDebug.y}</div>
+                    <div>Z: {sensorDebug.z}</div>
+                    <div>Shakes: {sensorDebug.shake}</div>
+                </div>
+            )}
+
             <div ref={sceneRef} className="absolute inset-0" style={{ zIndex: 20 }} />
 
             <div className="absolute inset-0 overflow-visible pointer-events-none z-50">
@@ -385,18 +354,15 @@ export default function StarJar({ points, theme, seed = 0 }) {
                     const star = starData[i];
                     if (!star) return null;
                     return (
-                        <div
-                            key={star.id}
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                top: 0,
-                                transform: `translate(${pos.x}px, ${pos.y}px) rotate(${pos.angle}rad) scale(${star.scale})`,
-                                transformOrigin: 'center center',
-                                width: '1px',
-                                height: '1px',
-                            }}
-                        >
+                        <div key={star.id} style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            transform: `translate(${pos.x}px, ${pos.y}px) rotate(${pos.angle}rad) scale(${star.scale})`,
+                            transformOrigin: 'center center',
+                            width: '1px',
+                            height: '1px',
+                        }}>
                             <div className="transform -translate-x-1/2 -translate-y-1/2 text-[color:var(--star-color)]" style={{ '--star-color': star.color }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
                                     <path d="M12 2c.6 0 1.1.4 1.4.9l2.5 5.7 6.2.7c1 .1 1.4 1.3.6 2l-4.7 4.3 1.3 6.1c.2 1-.9 1.8-1.7 1.3L12 19.9l-5.6 3.1c-.9.5-1.9-.3-1.7-1.3l1.3-6.1-4.7-4.3c-.8-.7-.4-1.9.6-2l6.2-.7 2.5-5.7c.3-.5.8-.9 1.4-.9z" />
@@ -410,22 +376,9 @@ export default function StarJar({ points, theme, seed = 0 }) {
             {!isContainer && (
                 <div className={`relative w-full h-full flex items-end ${isDoodle ? '' : 'filter drop-shadow-[0_0_20px_rgba(34,211,238,0.2)]'}`}>
                     <svg viewBox="0 0 100 140" className="absolute inset-0 w-full h-full overflow-visible z-10">
-                        <defs>
-                            <mask id="jarMask">
-                                <path d="M20,38 L80,38 Q92,38 92,55 L90,112 Q88,128 70,128 L30,128 Q12,128 10,112 L8,55 Q8,38 20,38 Z" fill="white" />
-                            </mask>
-                        </defs>
-                        <path
-                            d="M20,38 L80,38 Q92,38 92,55 L90,112 Q88,128 70,128 L30,128 Q12,128 10,112 L8,55 Q8,38 20,38 Z"
-                            fill={isDoodle ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.4)"}
-                            mask="url(#jarMask)"
-                        />
-                        <path
-                            d="M20,38 L80,38 Q92,38 92,55 L90,112 Q88,128 70,128 L30,128 Q12,128 10,112 L8,55 Q8,38 20,38 Z"
-                            fill="none"
-                            stroke={isDoodle ? "#4a4a4a" : "cyan"}
-                            strokeWidth="2"
-                        />
+                        <defs><mask id="jarMask"><path d="M20,38 L80,38 Q92,38 92,55 L90,112 Q88,128 70,128 L30,128 Q12,128 10,112 L8,55 Q8,38 20,38 Z" fill="white" /></mask></defs>
+                        <path d="M20,38 L80,38 Q92,38 92,55 L90,112 Q88,128 70,128 L30,128 Q12,128 10,112 L8,55 Q8,38 20,38 Z" fill={isDoodle ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.4)"} mask="url(#jarMask)" />
+                        <path d="M20,38 L80,38 Q92,38 92,55 L90,112 Q88,128 70,128 L30,128 Q12,128 10,112 L8,55 Q8,38 20,38 Z" fill="none" stroke={isDoodle ? "#4a4a4a" : "cyan"} strokeWidth="2" />
                     </svg>
                 </div>
             )}
