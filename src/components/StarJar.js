@@ -158,9 +158,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
         const walls = [];
 
         if (isContainer) {
-            walls.push(Bodies.rectangle(width / 2, height, width, 60, wallOpts));
-            walls.push(Bodies.rectangle(0, height / 2, 60, height, wallOpts));
-            walls.push(Bodies.rectangle(width, height / 2, 60, height, wallOpts));
+            walls.push(Bodies.rectangle(width / 2, height, width, 60, wallOpts)); // Floor
+            walls.push(Bodies.rectangle(0, height / 2, 60, height, wallOpts)); // Left
+            walls.push(Bodies.rectangle(width, height / 2, 60, height, wallOpts)); // Right
+            walls.push(Bodies.rectangle(width / 2, 0, width, 60, wallOpts)); // Ceiling (天花板)
         } else {
             walls.push(Bodies.rectangle(50, 127, 65, 2, wallOpts));
             walls.push(Bodies.rectangle(15, 85, 2, 90, { ...wallOpts, friction: 0.5 }));
@@ -257,10 +258,11 @@ export default function StarJar({ points, theme, seed = 0 }) {
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
-                        const forceMagnitude = 0.002 * magnitude;
+                        // 大幅降低力道，並且主要施加水平方向的力
+                        const forceMagnitude = 0.0003 * magnitude;
                         Matter.Body.applyForce(body, body.position, {
-                            x: (Math.random() - 0.5) * forceMagnitude,
-                            y: -(Math.random() * forceMagnitude)
+                            x: (Math.random() - 0.5) * forceMagnitude * 2, // 水平方向力道稍大
+                            y: (Math.random() - 0.8) * forceMagnitude * 0.5 // 垂直方向力道很小，且偏向下
                         });
                     }
                 });
@@ -325,7 +327,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
             {/* Explicit Permission Button for iOS */}
             {isContainer && showPermissionButton && (
-                <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-3xl">
+                <div className="absolute inset-0 z-[60] flex flex-col items-center justify-end pb-32 bg-black/20 backdrop-blur-[2px] rounded-3xl">
                     <button
                         onClick={requestPermission}
                         className="bg-white/90 text-amber-600 px-4 py-2 rounded-full font-bold shadow-lg active:scale-95 transition-transform text-sm border-2 border-amber-200"
