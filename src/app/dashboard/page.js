@@ -292,7 +292,7 @@ export default function Dashboard() {
     // Apply theme class to body
     useEffect(() => {
         const theme = family?.theme || 'cyber';
-        document.body.className = (theme === 'doodle' || theme === 'jar') ? 'theme-doodle' : '';
+        document.body.className = (theme === 'doodle') ? 'theme-doodle' : '';
     }, [family?.theme]);
 
     const showModal = (config) => {
@@ -1024,15 +1024,15 @@ export default function Dashboard() {
     }
 
     return (
-        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme !== 'neon' || family?.theme === 'jar') ? 'bg-[#fffbf0]' : 'bg-[#080812]'}`}>
+        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'jar') ? 'bg-[#0f172a]' : (family?.theme !== 'neon' ? 'bg-[#fffbf0]' : 'bg-[#080812]')}`}>
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 py-6">
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
-                        <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30'}`}></div>
-                        <Logo className={`${family?.theme !== 'neon' ? '' : 'text-cyan-400'} w-12 h-12 relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-125`} />
+                        <div className={`absolute inset-0 rounded-full blur-xl transform group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100 ${family?.theme === 'jar' ? 'bg-[#fbbf24]/30' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/30' : 'bg-cyan-400/30')}`}></div>
+                        <Logo className={`${(family?.theme !== 'neon' && family?.theme !== 'jar') ? '' : (family?.theme === 'jar' ? 'text-[#fbbf24]' : 'text-cyan-400')} w-12 h-12 relative z-10 drop-shadow-sm transition-transform duration-500 group-hover:scale-125`} />
                     </div>
                     <div className="flex flex-col">
-                        <h1 className={`text-3xl font-black ${family?.theme !== 'neon' ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
+                        <h1 className={`text-3xl font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#2d2d2d]' : 'text-white'} italic tracking-tighter uppercase relative z-10 flex items-center gap-3`}>
                             <span className="relative pr-2">
                                 {t.points_bank}
                                 <span className={`absolute -bottom-1 left-0 w-full h-3 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/30' : 'bg-cyan-500/20'} -rotate-1 rounded-full -z-10 group-hover:h-full group-hover:bottom-0 transition-all duration-300 mix-blend-multiply`}></span>

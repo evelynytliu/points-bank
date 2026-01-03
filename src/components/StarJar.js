@@ -91,9 +91,11 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const x = Math.sin(s + numericSeed) * 10000;
             return x - Math.floor(x);
         };
-        const colors = isDoodle || isContainer
-            ? ["#ffb5a7", "#ffc8a2", "#ffd5ba", "#ffe5d9"]
-            : ["#22d3ee", "#38bdf8", "#fbbf24", "#fcd34d"];
+        const colors = isDoodle
+            ? ["#ffb5a7", "#ffc8a2", "#ffd5ba", "#ffe5d9"] // Doodle Pink/Peach
+            : isContainer
+                ? ["#fbbf24", "#f59e0b", "#fde047", "#ffffff", "#fef3c7"] // Jar Gold/Yellow/Dreamy
+                : ["#22d3ee", "#38bdf8", "#fbbf24", "#fcd34d"]; // Neon Blue/Gold
 
         const stars = [];
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
