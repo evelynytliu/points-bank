@@ -53,7 +53,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
     // Auto-resize observer
     useEffect(() => {
         if (!isContainer || !sceneRef.current) return;
-
         const updateSize = () => {
             const parent = sceneRef.current.parentElement;
             if (parent) {
@@ -262,51 +261,56 @@ export default function StarJar({ points, theme, seed = 0 }) {
             }
         };
 
-        // CRITICAL: Request Permission must be direct response to click
-        const requestPerms = async () => {
-            // NO pre-await state updates here!
+        // CRITICAL: Request Permission Response Handler
+        const onEnableSensors = (e) => {
+            // Remove listeners immediately to prevent multiple calls
+            window.removeEventListener('click', onEnableSensors, true);
+            window.removeEventListener('touchstart', onEnableSensors, true);
+
+            // iOS 13+ Check
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                // iOS 13+
-                try {
-                    const pState = await DeviceMotionEvent.requestPermission();
-                    if (pState === 'granted') {
-                        window.addEventListener('devicemotion', handleMotion);
-                        setSensorStatus('Active');
-                    } else {
-                        setSensorStatus('Denied');
-                    }
-                } catch (e) {
-                    setSensorStatus(`Err: ${e.message}`);
+                // Motion Permission - DIRECT CHAIN
+                DeviceMotionEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            setSensorStatus('Active');
+                            window.addEventListener('devicemotion', handleMotion);
+                        } else {
+                            setSensorStatus(`Denied: ${response}`);
+                        }
+                    })
+                    .catch(err => {
+                        // setSensorStatus(`Err: ${err}`);
+                        // Squelch error if not user interaction related to keep clean UI
+                    });
+
+                // Orientation Permission - Parallel Request
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(response => {
+                            if (response === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                            }
+                        }).catch(e => { });
                 }
 
-                try {
-                    const oState = await DeviceOrientationEvent.requestPermission();
-                    if (oState === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                    }
-                } catch (e) { }
             } else {
+                // Non-iOS / Standard API
                 setSensorStatus('Active');
                 window.addEventListener('devicemotion', handleMotion);
                 window.addEventListener('deviceorientation', handleOrientation);
             }
         };
 
-        // We attach this to a specific touch start to capture strict iOS gesture
-        const onInteraction = () => {
-            requestPerms();
-            window.removeEventListener('click', onInteraction, true);
-            window.removeEventListener('touchstart', onInteraction, true);
-        };
-
-        window.addEventListener('click', onInteraction, true);
-        window.addEventListener('touchstart', onInteraction, true);
+        // Attach listeners using CAPTURE phase to ensure we catch the first interaction
+        window.addEventListener('click', onEnableSensors, true);
+        window.addEventListener('touchstart', onEnableSensors, true);
 
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
             window.removeEventListener('devicemotion', handleMotion);
-            window.removeEventListener('click', onInteraction, true);
-            window.removeEventListener('touchstart', onInteraction, true);
+            window.removeEventListener('click', onEnableSensors, true);
+            window.removeEventListener('touchstart', onEnableSensors, true);
         };
     }, [isContainer]);
 
@@ -331,14 +335,8 @@ export default function StarJar({ points, theme, seed = 0 }) {
         <div className={`relative ${isContainer ? 'w-full h-full' : 'w-24 h-32'} flex justify-center items-end`}>
             {/* Minimal Status Text */}
             {isContainer && sensorStatus !== 'Active' && (
-                <div className="absolute top-2 left-2 z-[100] bg-black/50 text-white text-[10px] p-2 rounded pointer-events-none font-mono">
-                    {sensorStatus} {shakeCount > 0 && `(${shakeCount})`}
-                </div>
-            )}
-            {/* Show Shake Count if debugging */}
-            {isContainer && sensorStatus === 'Active' && shakeCount > 0 && (
-                <div className="absolute top-2 left-2 z-[100] bg-black/20 text-white text-[10px] p-1 rounded pointer-events-none font-mono opacity-50">
-                    Shake: {shakeCount}
+                <div className="absolute top-2 left-2 z-[100] bg-black/50 text-white text-[10px] px-2 py-1 rounded pointer-events-none font-mono">
+                    {sensorStatus}
                 </div>
             )}
 
