@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusCircle, Monitor, Coins, Clock, Star } from 'lucide-react';
+import { PlusCircle, Monitor, Coins, Clock, Star, X } from 'lucide-react';
 import StarJar from '../StarJar';
 import WishGoalModal from '../WishGoalModal';
 import AnimatedCounter from '../AnimatedCounter';
@@ -23,6 +23,7 @@ export default function JarThemeLayout({
     showModal
 }) {
     const [showGoalModal, setShowGoalModal] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <div ref={cardRef} className="relative w-full md:max-w-2xl mx-auto my-4 group transition-all duration-500 font-['M_PLUS_Rounded_1c']">
@@ -41,10 +42,10 @@ export default function JarThemeLayout({
                 </div>
 
                 {/* Interactive Content Layer */}
-                <div className="relative z-10 p-6 flex flex-col flex-1 h-full justify-between">
+                <div className="relative z-10 p-6 flex flex-col flex-1 h-full justify-between pointer-events-none">
 
                     {/* Header: Avatar & Name */}
-                    <div className="flex items-center justify-center gap-4 mb-2 mt-2">
+                    <div className="flex items-center justify-center gap-4 mb-2 mt-2 pointer-events-auto">
                         <div className="w-16 h-16 rounded-full bg-white border-2 border-[#4a4a4a] flex items-center justify-center shadow-md text-4xl">
                             {kid.avatar || '👶'}
                         </div>
@@ -52,31 +53,31 @@ export default function JarThemeLayout({
                     </div>
 
                     {/* Split Body: Points | Divider | Stats */}
-                    <div className="flex-1 flex flex-row items-center justify-between gap-4 mb-4 font-['M_PLUS_Rounded_1c']">
-                        {/* Left: Points (Clean) */}
-                        <div className="flex-1 text-center">
+                    <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-4 mb-4 font-['M_PLUS_Rounded_1c'] pointer-events-none">
+                        {/* Left: Points (Clean with Glow) */}
+                        <div className="flex-1 text-center pointer-events-auto">
                             <div className="inline-block px-2">
-                                <div className="text-xs font-black text-[#888] uppercase tracking-widest mb-1">{t.current_points}</div>
-                                <div className="text-7xl font-black text-[#ff8a80] drop-shadow-sm tabular-nums tracking-tighter">
+                                <div className="text-xs font-black text-[#888] uppercase tracking-widest mb-1 drop-shadow-sm">{t.current_points}</div>
+                                <div className="text-7xl font-black text-[#4a4a4a] drop-shadow-[0_2px_0_rgba(255,255,255,1)] tabular-nums tracking-tighter filter">
                                     <AnimatedCounter value={visualPoints} />
                                 </div>
                             </div>
                         </div>
 
                         {/* Vertical Divider */}
-                        <div className="h-24 w-0 border-l-2 border-dashed border-[#4a4a4a]/20 self-center"></div>
+                        <div className="h-24 w-0 border-l-2 border-dashed border-[#4a4a4a]/20 self-center hidden md:block"></div>
 
-                        {/* Right: Stats & Goals (Compact) */}
-                        <div className="flex-1 flex flex-col justify-center items-start gap-2 pl-2">
+                        {/* Right: Stats & Goals (Compact with Glow) */}
+                        <div className="flex-1 flex flex-col justify-center items-start gap-2 pl-2 w-full md:w-auto pointer-events-auto">
                             {/* Goal - Text Only Style */}
                             <div onClick={() => setShowGoalModal(true)} className="w-full cursor-pointer group/goal hover:bg-white/40 rounded-xl p-1.5 transition-colors">
                                 {goal ? (
                                     <div className="flex flex-col gap-1 w-full">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-lg">🎯</span>
-                                            <span className="text-sm font-bold text-[#4a4a4a] truncate max-w-[120px]">{goal.title}</span>
+                                            <span className="text-lg drop-shadow-sm">🎯</span>
+                                            <span className="text-sm font-bold text-[#4a4a4a] truncate max-w-[120px] drop-shadow-[0_1px_0_rgba(255,255,255,1)]">{goal.title}</span>
                                         </div>
-                                        <div className="w-full h-2 rounded-full overflow-hidden bg-[#eee] border border-[#4a4a4a]/20">
+                                        <div className="w-full h-2 rounded-full overflow-hidden bg-[#eee]/80 border border-[#4a4a4a]/20 backdrop-blur-sm">
                                             <div className="h-full rounded-full transition-all duration-1000 bg-[#ff8a80]" style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }} />
                                         </div>
                                     </div>
@@ -89,64 +90,86 @@ export default function JarThemeLayout({
                             {/* Time & Cash Usage */}
                             <div className="space-y-0.5 w-full pl-1.5">
                                 <div className="flex items-center gap-2">
-                                    <Monitor className="w-3.5 h-3.5 text-[#ff8a80]" />
-                                    <span className="text-lg font-black text-[#4a4a4a] leading-none"><AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} /></span>
-                                    <span className="text-[10px] font-bold text-[#4a4a4a]/50">{t.minutes_unit}</span>
+                                    <Monitor className="w-3.5 h-3.5 text-[#ff8a80] drop-shadow-sm" />
+                                    <span className="text-lg font-black text-[#4a4a4a] leading-none drop-shadow-[0_1px_0_rgba(255,255,255,1)]"><AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} /></span>
+                                    <span className="text-[10px] font-bold text-[#4a4a4a]/50 drop-shadow-sm">{t.minutes_unit}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Coins className="w-3.5 h-3.5 text-green-600" />
-                                    <span className="text-lg font-black text-[#4a4a4a] leading-none"><AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} /></span>
-                                    <span className="text-[10px] font-bold text-[#4a4a4a]/50">{t.cash_unit}</span>
+                                    <Coins className="w-3.5 h-3.5 text-green-600 drop-shadow-sm" />
+                                    <span className="text-lg font-black text-[#4a4a4a] leading-none drop-shadow-[0_1px_0_rgba(255,255,255,1)]"><AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} /></span>
+                                    <span className="text-[10px] font-bold text-[#4a4a4a]/50 drop-shadow-sm">{t.cash_unit}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Footer: Progress & Buttons (Doodle Style) */}
-                    <div className="space-y-3">
-                        {/* Progress Bar */}
-                        <div className="relative w-full h-9 bg-[#eee] border border-[#4a4a4a]/40 rounded-xl flex items-center justify-center overflow-hidden shadow-inner">
+                </div>
+
+                {/* Collapsible Action Tray (Moved Outside Content Padding) */}
+                <div
+                    className="absolute bottom-0 inset-x-0 z-50 transition-transform duration-500 ease-in-out"
+                    style={{ transform: isMenuOpen ? 'translateY(0)' : 'translateY(100%)' }}
+                >
+                    <div className="bg-[#fffbf0]/90 backdrop-blur-md border-t-4 border-[#4a4a4a] rounded-t-[2.5rem] p-6 pb-24 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] space-y-4 pointer-events-auto">
+
+                        {/* Drag Handle / Close */}
+                        <div className="w-full flex justify-center -mt-2 mb-2" onClick={() => setIsMenuOpen(false)}>
+                            <div className="w-12 h-1.5 bg-[#4a4a4a]/20 rounded-full cursor-pointer hover:bg-[#4a4a4a]/40 transition-colors" />
+                        </div>
+
+                        {/* Progress Bar (Always useful to see when acting) */}
+                        <div className="relative w-full h-10 bg-[#eee] border border-[#4a4a4a]/40 rounded-full flex items-center justify-center overflow-hidden shadow-inner">
                             <div className={`absolute top-0 left-0 h-full transition-all duration-1000 ${isDanger ? 'bg-[#ff8a80]' : isWarning ? 'bg-[#ffd180]' : 'bg-[#88d8b0]'}`} style={{ width: `${timePercent}%` }}></div>
-                            <div className="relative z-10 flex items-center gap-2 font-black uppercase tracking-widest text-[#4a4a4a] text-xs">
-                                <Monitor className="w-3.5 h-3.5" />
-                                <span className="text-base"><AnimatedCounter value={visualMinutes} /></span>
-                                <span className="opacity-60">{t.minutes_unit} / {timeLimit}</span>
+                            <div className="relative z-10 flex items-center gap-2 font-black uppercase tracking-widest text-[#4a4a4a] text-sm">
+                                <Monitor className="w-4 h-4" />
+                                <span className="text-lg"><AnimatedCounter value={visualMinutes} /></span>
+                                <span className="opacity-60 text-xs">/ {timeLimit} {t.minutes_unit}</span>
                             </div>
                         </div>
 
-                        {/* Quick Deduct (Exact Doodle Buttons) */}
-                        <div className="grid grid-cols-4 gap-2">
+                        {/* Quick Deduct */}
+                        <div className="grid grid-cols-4 gap-3">
                             {[10, 20, 30].map(val => (
                                 <button key={val} onClick={() => {
                                     showModal({ type: 'confirm', title: t.quick_deduct, message: `${t.confirm_deduct} ${val} ${t.minutes_unit}?`, onConfirm: () => onUpdate(kid, 0, -val, t.quick_deduct, actorName) });
-                                }} className="bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5 border-2 border-b-4 p-1.5 rounded-lg text-sm font-black transition-all flex items-center justify-center">
+                                }} className="bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-1 hover:shadow-lg border-b-4 active:border-b-0 active:translate-y-1 p-3 rounded-full text-base font-black transition-all flex items-center justify-center shadow-sm">
                                     -{val}
                                 </button>
                             ))}
                             <button onClick={() => showModal({ type: 'prompt', title: t.prompt_custom_deduct, onConfirm: (v) => v && onUpdate(kid, 0, -parseInt(v), t.manual_deduct, actorName) })}
-                                className="bg-[#fafafa] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5 border-2 border-b-4 p-1.5 rounded-lg text-xs font-black transition-all flex items-center justify-center">
+                                className="bg-[#fafafa] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-1 hover:shadow-lg border-b-4 active:border-b-0 active:translate-y-1 p-3 rounded-full text-sm font-black transition-all flex items-center justify-center shadow-sm">
                                 {t.custom}
                             </button>
                         </div>
-                        {/* Redeem Buttons (Exact Doodle Buttons, Compact) */}
-                        <div className="grid grid-cols-2 gap-2">
+
+                        {/* Redeem Buttons */}
+                        <div className="grid grid-cols-2 gap-3">
                             <button onClick={() => {
                                 const kidMins = kid.total_minutes; const rate = familySettings?.point_to_minutes || 2;
                                 if (Math.floor(kidMins / rate) < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
                                 showModal({ type: 'prompt', title: t.prompt_redeem_points, message: t.prompt_rate_mins_to_pts?.replace('{rate}', rate).replace('{value}', kidMins), defaultValue: kidMins.toString(), unit: t.minutes_unit, rate: rate, mode: 'minsToPts', onConfirm: (val) => { const mins = parseInt(val); const pts = Math.floor(mins / rate); if (pts > 0 && mins <= kidMins) onUpdate(kid, pts, -(pts * rate), t.time_to_points, actorName); } });
-                            }} className="bg-[#edf2f4] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5 border-2 border-b-4 p-2 rounded-lg text-sm font-black transition-all flex items-center justify-center gap-2">
-                                <Monitor className="w-4 h-4" /> ➔ <Star className="w-4 h-4 text-orange-400" />
+                            }} className="bg-[#edf2f4] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-1 hover:shadow-lg border-b-4 active:border-b-0 active:translate-y-1 p-4 rounded-full text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <Monitor className="w-5 h-5" /> ➔ <Star className="w-5 h-5 text-orange-400" />
                             </button>
                             <button onClick={() => {
                                 const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
                                 if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
                                 showModal({ type: 'prompt', title: t.prompt_redeem_time, message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts), defaultValue: '1', unit: t.points_label, rate: rate, mode: 'ptsToMins', onConfirm: (val) => { const want = parseInt(val); if (want && want <= kidPts) onUpdate(kid, -want, want * rate, t.points_to_time, actorName); } });
-                            }} className="bg-[#e8f5e9] border-[#4a4a4a]/40 text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5 border-2 border-b-4 p-2 rounded-lg text-sm font-black transition-all flex items-center justify-center gap-2">
-                                <Star className="w-4 h-4 text-orange-400" /> ➔ <Monitor className="w-4 h-4" />
+                            }} className="bg-[#e8f5e9] border-[#4a4a4a]/40 text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-1 hover:shadow-lg border-b-4 active:border-b-0 active:translate-y-1 p-4 rounded-full text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <Star className="w-5 h-5 text-orange-400" /> ➔ <Monitor className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
+                </div>
 
+                {/* Floating Toggle Button (Persistent) */}
+                <div className="absolute bottom-6 right-6 z-[60] transition-all duration-300">
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className={`w-16 h-16 rounded-full shadow-[0_4px_0_#2d2d2d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center pointer-events-auto border-4 border-white ring-4 ring-[#4a4a4a]/10 ${isMenuOpen ? 'bg-[#ff8a80] text-white rotate-90' : 'bg-[#4a4a4a] text-white hover:scale-110 hover:bg-[#ff8a80]'}`}
+                    >
+                        {isMenuOpen ? <X className="w-8 h-8" /> : <PlusCircle className="w-8 h-8" />}
+                    </button>
                 </div>
             </div>
 

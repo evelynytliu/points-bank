@@ -83,7 +83,7 @@ export default function DoodleThemeLayout({
                                 <div className="w-full h-2.5 bg-[#f0f0f0] rounded-full overflow-hidden border border-black/5">
                                     <div
                                         className="h-full rounded-full bg-[#ff8a80] transition-all duration-1000"
-                                        style={{ width: `${Math.min(100, Math.max(5, (visualPoints / (goal.points || 1)) * 100))}%` }}
+                                        style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }}
                                     />
                                 </div>
                             </div>

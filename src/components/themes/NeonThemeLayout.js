@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Monitor, Star, Clock, Coins, PlusCircle, ArrowRight } from 'lucide-react'; // ArrowRight replacing '->' text with icon if available or just text
-import StarJar from '../StarJar';
+
 import WishGoalModal from '../WishGoalModal';
 import AnimatedCounter from '../AnimatedCounter';
 
@@ -41,10 +41,13 @@ export default function NeonThemeLayout({
                 </div>
                 <div className="w-full relative flex items-center gap-6 py-2">
 
-                    {/* Left Column: The Star Jar (Regular) */}
-                    <div className="flex-1 flex justify-center items-center py-2 relative">
-                        <div className="transform scale-125 origin-center">
-                            <StarJar points={visualPoints} theme={theme} seed={kid.id} />
+                    {/* Left Column: Big Points Number (Neon Style) */}
+                    <div className="flex-1 flex flex-col justify-center items-center py-2 relative">
+                        <div className="text-cyan-400 font-bold text-sm tracking-[0.2em] mb-2 uppercase drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">
+                            {t.current_points || 'TOTAL POINTS'}
+                        </div>
+                        <div className="text-7xl font-black text-white italic tracking-tighter drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" style={{ WebkitTextStroke: '2px rgba(34,211,238,0.3)' }}>
+                            <AnimatedCounter value={visualPoints} />
                         </div>
                     </div>
 
@@ -71,7 +74,7 @@ export default function NeonThemeLayout({
                                             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                                             {t.current_goal}
                                         </div>
-                                        <span className="text-white">{Math.floor((kid.total_points / goal.points) * 100)}%</span>
+                                        <span className="text-white">{Math.floor((visualPoints / (goal.target_points || 1)) * 100)}%</span>
                                     </div>
                                     <div className="flex items-end gap-3 transition-opacity">
                                         <div className="text-sm font-black text-white truncate max-w-[120px]">{goal.title}</div>
@@ -79,7 +82,7 @@ export default function NeonThemeLayout({
                                     <div className="w-full bg-black/40 h-1.5 rounded-full overflow-hidden border border-white/10">
                                         <div
                                             className="bg-cyan-400 h-full rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)] relative"
-                                            style={{ width: `${Math.min(100, (kid.total_points / goal.points) * 100)}%` }}
+                                            style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }}
                                         >
                                             <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/50 blur-[2px]"></div>
                                         </div>

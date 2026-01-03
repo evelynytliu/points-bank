@@ -292,7 +292,7 @@ export default function Dashboard() {
     // Apply theme class to body
     useEffect(() => {
         const theme = family?.theme || 'cyber';
-        document.body.className = theme === 'doodle' ? 'theme-doodle' : '';
+        document.body.className = (theme === 'doodle' || theme === 'jar') ? 'theme-doodle' : '';
     }, [family?.theme]);
 
     const showModal = (config) => {
@@ -424,6 +424,7 @@ export default function Dashboard() {
                     short_id: familyData.short_id || '',
                     theme: familyData.theme || 'cyber'
                 });
+                localStorage.setItem('cached_theme', familyData.theme || 'doodle');
             }
 
             // 獲取小孩清單 (考慮到舊資料遷移，如果查不到 family_id 的，可以查 parent_id 作為備案)
@@ -1014,9 +1015,13 @@ export default function Dashboard() {
         }
     };
 
-    if (loading) return (
-        <div className="min-h-screen bg-[#080812] flex items-center justify-center text-cyan-400 font-bold animate-pulse">載入中...</div>
-    );
+    if (loading) {
+        const cached = typeof window !== 'undefined' ? localStorage.getItem('cached_theme') : 'doodle';
+        const isDark = cached === 'neon' || cached === 'cyber';
+        return (
+            <div className={`min-h-screen flex items-center justify-center font-bold animate-pulse ${isDark ? 'bg-[#080812] text-cyan-400' : 'bg-[#fffbf0] text-[#ff8a80]'}`}>載入中...</div>
+        );
+    }
 
     return (
         <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme !== 'neon' || family?.theme === 'jar') ? 'bg-[#fffbf0]' : 'bg-[#080812]'}`}>

@@ -196,9 +196,9 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180, // Sync initial angle
                 restitution: 0.2, // Slightly more bouncy
-                friction: 0.5, // More friction to stack higher/messier
+                friction: 0.2, // Reduced friction to slide better on tilt
                 density: 0.002,
-                frictionAir: 0.04,
+                frictionAir: 0.02, // Reduced air resistance
                 slop: 0.05,
                 render: {
                     fillStyle: star.color,
@@ -218,7 +218,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         mouse.pixelRatio = window.devicePixelRatio || 1;
         const mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
-            constraint: { stiffness: 0.2, render: { visible: false } } // Updated: Higher stiffness for throwing
+            constraint: { stiffness: 0.2, render: { visible: false } }
         });
         World.add(engine.world, mouseConstraint);
 
@@ -233,28 +233,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
             setStarPositions(positions);
         });
 
-        const handleOrientation = (event) => {
-            if (event.beta !== null && event.gamma !== null) {
-                const maxTilt = 45;
-                const gravityStrength = 1.0;
-                const gravityX = (event.gamma / maxTilt) * gravityStrength;
-                const gravityY = (isContainer ? 1.2 : 0.8) + (event.beta / maxTilt) * gravityStrength;
-                engine.gravity.x = Math.max(-1, Math.min(1, gravityX));
-                engine.gravity.y = Math.max(0.3, Math.min(1.5, gravityY));
-            }
-        };
-
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', handleOrientation);
-        }
-
         // Run
         const runner = Runner.create();
         Runner.run(runner, engine);
         Render.run(render);
 
         return () => {
-            window.removeEventListener('deviceorientation', handleOrientation);
             Runner.stop(runner);
             Render.stop(render);
             World.clear(engine.world);
@@ -263,6 +247,73 @@ export default function StarJar({ points, theme, seed = 0 }) {
             engineRef.current = null;
         };
     }, [starData, isDoodle, isContainer, containerSize]);
+
+    // Handle Device Orientation (Gravity)
+    useEffect(() => {
+        const handleOrientation = (event) => {
+            if (!engineRef.current) return;
+
+            // Default gravity (container vs mini)
+            const baseGravityY = isContainer ? 1.2 : 0.8;
+
+            if (event.beta !== null && event.gamma !== null) {
+                const maxTilt = 45;
+                const gravityStrength = 1.5; // Increased strength
+
+                // Gamma: Left/Right tilt (-90 to 90)
+                const gravityX = (event.gamma / maxTilt) * gravityStrength;
+
+                // Beta: Front/Back tilt (-180 to 180). Phone upright ~90. Flat ~0.
+                // We want: Upright -> Gravity Down (Y=1). Flat -> Gravity Down (Y=1)??
+                // Actually, if held upright, stars fall down relative to screen. Gravity Y=1.
+                // If tilted upside down, Y=-1.
+                // The MatterJS gravity is relative to the canvas coordinate system.
+                // Mobile screen Y is always "Down" visually.
+                // Changing Gravity Y based on Beta makes sense if we want stars to fall "towards earth" even if phone is inverted.
+                // Let's keep it simple: Map Beta relative to upright.
+
+                const gravityY = baseGravityY + (event.beta / 90) * 0.5; // Subtle Y change
+
+                // Clamp
+                engineRef.current.gravity.x = Math.max(-2, Math.min(2, gravityX));
+                engineRef.current.gravity.y = Math.max(0.2, Math.min(2, gravityY));
+            }
+        };
+
+        const initSensor = async () => {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ requires permission
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                } catch (e) {
+                    console.log("Orientation permission denied or error", e);
+                }
+            } else {
+                // Android / Non-iOS
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        };
+
+        const onInteraction = () => {
+            initSensor();
+            // Remove listeners after first attempt
+            window.removeEventListener('click', onInteraction);
+            window.removeEventListener('touchstart', onInteraction);
+        };
+
+        // Attach interaction listeners to trigger permission request
+        window.addEventListener('click', onInteraction);
+        window.addEventListener('touchstart', onInteraction);
+
+        return () => {
+            window.removeEventListener('deviceorientation', handleOrientation);
+            window.removeEventListener('click', onInteraction);
+            window.removeEventListener('touchstart', onInteraction);
+        };
+    }, [isContainer]);
 
     // Falling stars visual effect
     useEffect(() => {
@@ -312,7 +363,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
                             }}
                         >
                             <div className="transform -translate-x-1/2 -translate-y-1/2 text-[color:var(--star-color)]" style={{ '--star-color': star.color }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
                                     <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z" />
                                 </svg>
                             </div>
