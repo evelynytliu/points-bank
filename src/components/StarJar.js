@@ -96,7 +96,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         // Dynamic config
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
         const startY = isContainer ? height - 80 : 124;
-        const scaleBase = isContainer ? 2.5 : 0.65;
+        const scaleBase = isContainer ? 2.0 : 0.65;
 
         // Adjust columns for wider containers
         const cols = isContainer ? Math.floor(width / 50) : 5.5;
@@ -191,7 +191,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const starBodies = starData.map((star) => {
             // Updated: Larger radius to match visual scale (Visual is ~60px, Radius 25 -> 50px diameter)
-            const radius = isContainer ? 25 : 6;
+            const radius = isContainer ? 20 : 6;
             // Updated: Use Polygon (5 sides) instead of Circle for irregular stacking (less neat)
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180, // Sync initial angle
@@ -364,7 +364,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
                         >
                             <div className="transform -translate-x-1/2 -translate-y-1/2 text-[color:var(--star-color)]" style={{ '--star-color': star.color }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
-                                    <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z" />
+                                    <path d="M12 2c.6 0 1.1.4 1.4.9l2.5 5.7 6.2.7c1 .1 1.4 1.3.6 2l-4.7 4.3 1.3 6.1c.2 1-.9 1.8-1.7 1.3L12 19.9l-5.6 3.1c-.9.5-1.9-.3-1.7-1.3l1.3-6.1-4.7-4.3c-.8-.7-.4-1.9.6-2l6.2-.7 2.5-5.7c.3-.5.8-.9 1.4-.9z" />
                                 </svg>
                             </div>
                         </div>
