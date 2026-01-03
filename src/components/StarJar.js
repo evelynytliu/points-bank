@@ -96,7 +96,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         // Dynamic config
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
         const startY = isContainer ? height - 80 : 124;
-        const scaleBase = isContainer ? 2.0 : 0.65; // Updated to 2.0
+        const scaleBase = isContainer ? 2.0 : 0.65;
 
         // Adjust columns for wider containers
         const cols = isContainer ? Math.floor(width / 50) : 5.5;
@@ -138,7 +138,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         // Create engine
         const engine = Engine.create({
             gravity: { x: 0, y: isContainer ? 1.2 : 0.8 },
-            enableSleeping: false, // Updated: Keep bodies active for better interaction
+            enableSleeping: false,
             positionIterations: 10,
             velocityIterations: 8
         });
@@ -190,13 +190,11 @@ export default function StarJar({ points, theme, seed = 0 }) {
         }
 
         const starBodies = starData.map((star) => {
-            // Updated: Larger radius to match visual scale (Visual is ~60px, Radius 25 -> 50px diameter)
-            const radius = isContainer ? 20 : 6; // Updated to 20
-            // Updated: Use Polygon (5 sides) instead of Circle for irregular stacking (less neat)
+            const radius = isContainer ? 20 : 6;
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
-                angle: (star.rotate * Math.PI) / 180, // Sync initial angle
-                restitution: 0.2, // Slightly more bouncy
-                friction: 0.2, // Reduced friction to slide better on tilt
+                angle: (star.rotate * Math.PI) / 180,
+                restitution: 0.2,
+                friction: 0.2, // Reduced friction
                 density: 0.002,
                 frictionAir: 0.02, // Reduced air resistance
                 slop: 0.05,
@@ -252,19 +250,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
     useEffect(() => {
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
-
-            // Default gravity
             const baseGravityY = isContainer ? 1.2 : 0.8;
 
             if (event.beta !== null && event.gamma !== null) {
-                // Amplify tilt effects
+                // Amplify tilt
                 const gravityStrength = 1.8;
-
-                // Gamma: Left/Right (-90 to 90)
                 const gravityX = (event.gamma / 45) * gravityStrength;
-
-                // Beta: Front/Back. 
-                // Map upright to normal gravity
                 const gravityY = baseGravityY + (event.beta / 90) * 0.5;
 
                 engineRef.current.gravity.x = Math.max(-2, Math.min(2, gravityX));
@@ -273,20 +264,27 @@ export default function StarJar({ points, theme, seed = 0 }) {
         };
 
         const handleMotion = (event) => {
-            if (!engineRef.current || !event.acceleration) return;
+            if (!engineRef.current) return;
+            // Fallback for some iOS contexts if acc is null but accIncludingGravity has data
+            // But usually we want linear acceleration (without gravity).
+            // If acceleration is null, we can't do shake easily.
+            const acc = event.acceleration;
+            if (!acc) return;
 
-            const { x, y, z } = event.acceleration;
+            const { x, y, z } = acc;
+            if (x === null || y === null) return; // Sometimes strict null check needed
+
             const magnitude = Math.sqrt(x * x + y * y + z * z);
 
-            // Shake Threshold (Sensitivity for shake)
-            if (magnitude > 15) {
-                // Apply random force to all bodies to simulate "shaking the jar"
+            // Shake Threshold (Lowered to 8)
+            if (magnitude > 8) {
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
+                        // Stronger random force
                         Matter.Body.applyForce(body, body.position, {
-                            x: (Math.random() - 0.5) * 0.05 * (magnitude / 10),
-                            y: (Math.random() - 0.5) * 0.05 * (magnitude / 10)
+                            x: (Math.random() - 0.5) * 0.1 * (magnitude / 5),
+                            y: (Math.random() - 0.5) * 0.1 * (magnitude / 5)
                         });
                     }
                 });
@@ -294,7 +292,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         };
 
         const initSensor = async () => {
-            // 1. Orientation (Tilt)
+            // 1. Orientation
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 try {
                     const permission = await DeviceOrientationEvent.requestPermission();
@@ -302,13 +300,13 @@ export default function StarJar({ points, theme, seed = 0 }) {
                         window.addEventListener('deviceorientation', handleOrientation);
                     }
                 } catch (e) {
-                    // console.log("Orientation perm failed", e);
+                    console.error("Orientation perm failed", e);
                 }
             } else {
                 window.addEventListener('deviceorientation', handleOrientation);
             }
 
-            // 2. Motion (Shake)
+            // 2. Motion
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 try {
                     const permission = await DeviceMotionEvent.requestPermission();
@@ -316,7 +314,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
                         window.addEventListener('devicemotion', handleMotion);
                     }
                 } catch (e) {
-                    // console.log("Motion perm failed", e);
+                    console.error("Motion perm failed", e);
                 }
             } else {
                 window.addEventListener('devicemotion', handleMotion);
@@ -325,18 +323,19 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const onInteraction = () => {
             initSensor();
-            window.removeEventListener('click', onInteraction);
-            window.removeEventListener('touchstart', onInteraction);
+            // Capture=true ensures we catch it
+            window.removeEventListener('click', onInteraction, true);
+            window.removeEventListener('touchstart', onInteraction, true);
         };
 
-        window.addEventListener('click', onInteraction);
-        window.addEventListener('touchstart', onInteraction);
+        window.addEventListener('click', onInteraction, true);
+        window.addEventListener('touchstart', onInteraction, true);
 
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
             window.removeEventListener('devicemotion', handleMotion);
-            window.removeEventListener('click', onInteraction);
-            window.removeEventListener('touchstart', onInteraction);
+            window.removeEventListener('click', onInteraction, true);
+            window.removeEventListener('touchstart', onInteraction, true);
         };
     }, [isContainer]);
 
