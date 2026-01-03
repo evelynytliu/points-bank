@@ -134,59 +134,52 @@ export default function JarThemeLayout({
                         </div>
 
                         {/* Action Buttons - Two Row Layout */}
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                             {/* Row 1: Quick Deduct Buttons */}
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-2">
                                 {[10, 20, 30].map(val => (
                                     <button key={val} onClick={() => {
                                         showModal({ type: 'confirm', title: t.quick_deduct, message: `${t.confirm_deduct} ${val} ${t.minutes_unit}?`, onConfirm: () => onUpdate(kid, 0, -val, t.quick_deduct, actorName) });
-                                    }} className="bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-3 py-2.5 rounded-full text-sm font-black transition-all flex items-center justify-center shadow-sm flex-1">
+                                    }} className="bg-[#fbe9e7] border-[#4a4a4a]/40 text-[#8c3333] hover:bg-[#ff8a80] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-4 py-3 rounded-full text-base font-black transition-all flex items-center justify-center shadow-sm flex-1">
                                         -{val}
                                     </button>
                                 ))}
                                 <button onClick={() => showModal({ type: 'prompt', title: t.prompt_custom_deduct, onConfirm: (v) => v && onUpdate(kid, 0, -parseInt(v), t.manual_deduct, actorName) })}
-                                    className="bg-[#fafafa] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-3 py-2.5 rounded-full text-xs font-black transition-all flex items-center justify-center shadow-sm flex-1">
+                                    className="bg-[#fafafa] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#4a4a4a] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-4 py-3 rounded-full text-sm font-black transition-all flex items-center justify-center shadow-sm flex-1">
                                     {t.custom}
                                 </button>
                             </div>
 
-                            {/* Row 2: Redeem Buttons + Close Button */}
+                            {/* Row 2: Redeem Buttons (Full Width) */}
                             <div className="flex gap-2">
                                 <button onClick={() => {
                                     const kidMins = kid.total_minutes; const rate = familySettings?.point_to_minutes || 2;
                                     if (Math.floor(kidMins / rate) < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
                                     showModal({ type: 'prompt', title: t.prompt_redeem_points, message: t.prompt_rate_mins_to_pts?.replace('{rate}', rate).replace('{value}', kidMins), defaultValue: kidMins.toString(), unit: t.minutes_unit, rate: rate, mode: 'minsToPts', onConfirm: (val) => { const mins = parseInt(val); const pts = Math.floor(mins / rate); if (pts > 0 && mins <= kidMins) onUpdate(kid, pts, -(pts * rate), t.time_to_points, actorName); } });
-                                }} className="bg-[#edf2f4] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-4 py-2.5 rounded-full text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-sm flex-1">
-                                    <Monitor className="w-4 h-4" /> ➔ <Star className="w-4 h-4 text-orange-400" />
+                                }} className="bg-[#edf2f4] border-[#4a4a4a]/40 text-[#4a4a4a] hover:bg-[#8d99ae] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-5 py-3 rounded-full text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm flex-1">
+                                    <Monitor className="w-5 h-5" /> ➔ <Star className="w-5 h-5 text-orange-400" />
                                 </button>
                                 <button onClick={() => {
                                     const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
                                     if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
                                     showModal({ type: 'prompt', title: t.prompt_redeem_time, message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts), defaultValue: '1', unit: t.points_label, rate: rate, mode: 'ptsToMins', onConfirm: (val) => { const want = parseInt(val); if (want && want <= kidPts) onUpdate(kid, -want, want * rate, t.points_to_time, actorName); } });
-                                }} className="bg-[#e8f5e9] border-[#4a4a4a]/40 text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-4 py-2.5 rounded-full text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-sm flex-1">
-                                    <Star className="w-4 h-4 text-orange-400" /> ➔ <Monitor className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="bg-[#ff8a80] border-[#4a4a4a]/40 text-white hover:bg-[#ff6b6b] hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 w-12 h-auto rounded-full text-xs font-black transition-all flex items-center justify-center shadow-sm">
-                                    <X className="w-5 h-5" />
+                                }} className="bg-[#e8f5e9] border-[#4a4a4a]/40 text-[#2e7d32] hover:bg-[#a5d6a7] hover:text-white hover:-translate-y-0.5 border-b-3 active:border-b-0 active:translate-y-0.5 px-5 py-3 rounded-full text-sm font-black transition-all flex items-center justify-center gap-2 shadow-sm flex-1">
+                                    <Star className="w-5 h-5 text-orange-400" /> ➔ <Monitor className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Floating Open Button (Only show when menu is closed) */}
-                {!isMenuOpen && (
-                    <div className="absolute bottom-6 right-6 z-[60] transition-all duration-300">
-                        <button
-                            onClick={() => setIsMenuOpen(true)}
-                            className="w-16 h-16 rounded-full shadow-[0_4px_0_#2d2d2d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center pointer-events-auto border-4 border-white ring-4 ring-[#4a4a4a]/10 bg-[#4a4a4a] text-white hover:scale-110 hover:bg-[#ff8a80]"
-                        >
-                            <PlusCircle className="w-8 h-8" />
-                        </button>
-                    </div>
-                )}
+                {/* Floating Toggle Button (+ transforms to X) */}
+                <div className="absolute bottom-6 right-6 z-[60] transition-all duration-300">
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className={`w-16 h-16 rounded-full shadow-[0_4px_0_#2d2d2d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center pointer-events-auto border-4 border-white ring-4 ring-[#4a4a4a]/10 ${isMenuOpen ? 'bg-[#ff8a80] text-white rotate-90' : 'bg-[#4a4a4a] text-white hover:scale-110 hover:bg-[#ff8a80]'}`}
+                    >
+                        {isMenuOpen ? <X className="w-8 h-8" /> : <PlusCircle className="w-8 h-8" />}
+                    </button>
+                </div>
             </div>
 
             {/* Important: Jar Theme Specific Modal Instance */}
