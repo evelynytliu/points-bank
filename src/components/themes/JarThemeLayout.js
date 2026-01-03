@@ -78,47 +78,47 @@ export default function JarThemeLayout({
                             <div className="w-12 h-1.5 bg-[#4a4a4a]/20 rounded-full cursor-pointer hover:bg-[#4a4a4a]/40 transition-colors" />
                         </div>
 
-                        {/* Goal & Stats Section (Moved from Jar Body) */}
-                        <div className="bg-white/50 rounded-2xl p-4 border border-[#4a4a4a]/10 space-y-4">
-                            {/* Goal */}
-                            <div onClick={() => setShowGoalModal(true)} className="w-full cursor-pointer group/goal hover:bg-white/60 rounded-xl transition-colors">
-                                {goal ? (
-                                    <div className="flex flex-col gap-2 w-full">
-                                        <div className="flex items-center justify-between">
+                        {/* Goal & Stats Section - Compact Layout */}
+                        <div className="bg-white/50 rounded-2xl p-3 border border-[#4a4a4a]/10">
+                            <div className="flex items-center gap-3">
+                                {/* Goal - Left Side */}
+                                <div onClick={() => setShowGoalModal(true)} className="flex-1 cursor-pointer group/goal hover:bg-white/60 rounded-xl p-2 transition-colors min-w-0">
+                                    {goal ? (
+                                        <div className="flex flex-col gap-1.5">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-xl">🎯</span>
-                                                <span className="text-base font-bold text-[#4a4a4a] truncate max-w-[200px]">{goal.title}</span>
+                                                <span className="text-lg">🎯</span>
+                                                <span className="text-sm font-bold text-[#4a4a4a] truncate">{goal.title}</span>
                                             </div>
-                                            <span className="text-xs font-bold text-[#888]">{Math.floor((visualPoints / (goal.target_points || 1)) * 100)}%</span>
+                                            <div className="w-full h-2 rounded-full overflow-hidden bg-[#eee] border border-[#4a4a4a]/20">
+                                                <div className="h-full rounded-full transition-all duration-1000 bg-[#ff8a80] striped-bar" style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }} />
+                                            </div>
                                         </div>
-                                        <div className="w-full h-3 rounded-full overflow-hidden bg-[#eee] border border-[#4a4a4a]/20">
-                                            <div className="h-full rounded-full transition-all duration-1000 bg-[#ff8a80] striped-bar" style={{ width: `${Math.min(100, Math.max(0, (visualPoints / (goal.target_points || 1)) * 100))}%` }} />
+                                    ) : (
+                                        <div className="flex items-center gap-2 text-xs font-bold text-[#888] opacity-60 hover:opacity-100">
+                                            <PlusCircle className="w-4 h-4" /> {t.wish_setup_new || '設定願望'}
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 text-sm font-bold text-[#888] opacity-60 hover:opacity-100 py-1">
-                                        <PlusCircle className="w-5 h-5" /> {t.wish_setup_new || '設定願望'}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="h-px bg-[#4a4a4a]/10 w-full" />
-
-                            {/* Time & Cash Stats */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex flex-col items-center bg-white/40 rounded-xl p-2 border border-[#4a4a4a]/5">
-                                    <div className="flex items-center gap-1.5 mb-1">
-                                        <Monitor className="w-3.5 h-3.5 text-[#ff8a80]" />
-                                        <span className="text-xs font-bold text-[#888]">{t.minutes_unit}</span>
-                                    </div>
-                                    <span className="text-2xl font-black text-[#4a4a4a] tracking-tight"><AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} /></span>
+                                    )}
                                 </div>
-                                <div className="flex flex-col items-center bg-white/40 rounded-xl p-2 border border-[#4a4a4a]/5">
-                                    <div className="flex items-center gap-1.5 mb-1">
-                                        <Coins className="w-3.5 h-3.5 text-green-600" />
-                                        <span className="text-xs font-bold text-[#888]">{t.cash_unit}</span>
+
+                                {/* Vertical Divider */}
+                                <div className="w-px h-12 bg-[#4a4a4a]/10" />
+
+                                {/* Time & Cash Stats - Right Side */}
+                                <div className="flex gap-2">
+                                    <div className="flex flex-col items-center bg-white/40 rounded-xl px-3 py-1.5 border border-[#4a4a4a]/5 min-w-[70px]">
+                                        <div className="flex items-center gap-1 mb-0.5">
+                                            <Monitor className="w-3 h-3 text-[#ff8a80]" />
+                                            <span className="text-[10px] font-bold text-[#888]">{t.minutes_unit}</span>
+                                        </div>
+                                        <span className="text-lg font-black text-[#4a4a4a] tracking-tight"><AnimatedCounter value={visualPoints * (familySettings?.point_to_minutes || 2)} /></span>
                                     </div>
-                                    <span className="text-2xl font-black text-[#4a4a4a] tracking-tight"><AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} /></span>
+                                    <div className="flex flex-col items-center bg-white/40 rounded-xl px-3 py-1.5 border border-[#4a4a4a]/5 min-w-[70px]">
+                                        <div className="flex items-center gap-1 mb-0.5">
+                                            <Coins className="w-3 h-3 text-green-600" />
+                                            <span className="text-[10px] font-bold text-[#888]">{t.cash_unit}</span>
+                                        </div>
+                                        <span className="text-lg font-black text-[#4a4a4a] tracking-tight"><AnimatedCounter value={visualPoints * (familySettings?.point_to_cash || 5)} /></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
