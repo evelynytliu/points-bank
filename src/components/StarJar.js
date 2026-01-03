@@ -100,7 +100,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
         const stars = [];
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
         const startY = isContainer ? height - 80 : 124;
-        const scaleBase = isContainer ? 2.0 : 0.65;
+
+        // Mobile Star Size Adjustment (80% of desktop)
+        const isMobileWidth = width < 600;
+        const scaleBase = isContainer ? (isMobileWidth ? 1.6 : 2.0) : 0.65;
         const cols = isContainer ? Math.floor(width / 50) : 5.5;
 
         for (let i = 0; i < visualStarCount; i++) {

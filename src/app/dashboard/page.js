@@ -292,7 +292,7 @@ export default function Dashboard() {
     // Apply theme class to body
     useEffect(() => {
         const theme = family?.theme || 'cyber';
-        document.body.className = (theme === 'doodle') ? 'theme-doodle' : '';
+        document.body.className = (theme === 'doodle') ? 'theme-doodle' : (theme === 'jar' ? 'theme-jar' : '');
     }, [family?.theme]);
 
     const showModal = (config) => {
@@ -1024,7 +1024,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'jar') ? 'bg-gradient-to-b from-[#1e1b4b] to-black' : (family?.theme !== 'neon' ? 'bg-[#fffbf0]' : 'bg-[#080812]')}`}>
+        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'jar') ? '' : (family?.theme !== 'neon' ? 'bg-[#fffbf0]' : 'bg-[#080812]')}`}>
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 py-6">
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
@@ -1071,15 +1071,15 @@ export default function Dashboard() {
 
                     {/* Only show Admin Panel to parents or if needed */}
                     {/* Admin Panel available to all, but actions may require PIN */}
-                    <div className={`glass-panel ${family?.theme !== 'neon' ? 'border-[#4a4a4a]' : 'border-cyan-500/20'} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
+                    <div className={`glass-panel ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a]' : 'border-cyan-500/20')} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
                         <button
                             onClick={() => setIsAdminExpanded(!isAdminExpanded)}
-                            className={`w-full flex justify-between items-center p-6 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/5 hover:bg-[#ff8a80]/10' : 'bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20'} transition-all`}
+                            className={`w-full flex justify-between items-center p-6 ${family?.theme === 'jar' ? 'bg-purple-900/10 hover:bg-purple-900/30' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/5 hover:bg-[#ff8a80]/10' : 'bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20')} transition-all`}
                         >
-                            <div className={`flex items-center gap-3 font-black italic ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'} uppercase tracking-wider`}>
-                                <Zap className={`${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-5 h-5 animate-pulse`} /> {t.admin_console}
+                            <div className={`flex items-center gap-3 font-black italic ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'} uppercase tracking-wider`}>
+                                <Zap className={`${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400')} w-5 h-5 animate-pulse`} /> {t.admin_console}
                             </div>
-                            {isAdminExpanded ? <ChevronUp className={family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} /> : <ChevronDown className={family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} />}
+                            {isAdminExpanded ? <ChevronUp className={(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-slate-500'} /> : <ChevronDown className={(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-slate-500'} />}
                         </button>
 
                         <div className="p-8 pt-2">
@@ -1205,7 +1205,7 @@ export default function Dashboard() {
                     </div>
                     <button
                         onClick={() => router.push('/logs')}
-                        className={`w-full mt-4 py-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
+                        className={`w-full mt-4 py-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${family?.theme === 'jar' ? 'bg-purple-500/10 border-purple-500/20 text-purple-200 hover:bg-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10')}`}
                     >
                         <History className="w-4 h-4" /> 查看全部異動紀錄
                     </button>
@@ -1215,10 +1215,10 @@ export default function Dashboard() {
             {/* Settings Modal */}
             {showSettingsModal && (
                 <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-4">
-                    <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme !== 'neon' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30'} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
+                    <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30')} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
                         {/* Sticky Header */}
-                        <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md z-10`}>
-                            <h3 className={`text-2xl font-black ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400'} w-6 h-6`} /> {t.settings}</h3>
+                        <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'jar' ? 'bg-purple-900/10 border-purple-500/30' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20')} backdrop-blur-md z-10`}>
+                            <h3 className={`text-2xl font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400')} w-6 h-6`} /> {t.settings}</h3>
                             <button onClick={() => {
                                 const isChanged =
                                     tempSettings.weekday_limit !== family.weekday_limit ||
@@ -1519,9 +1519,9 @@ export default function Dashboard() {
                                             <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
                                                 <div className="flex items-center gap-3">
                                                     <div className={`w-8 h-8 rounded-full ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
-                                                    <div>
-                                                        <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
-                                                        <div className={`text-[10px] ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} font-black`}>{m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className={`font-bold text-sm mb-0.5 ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
+                                                        <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-300' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500')} flex items-center gap-1`}><User className="w-4 h-4" /> {m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
                                                     </div>
                                                 </div>
                                                 {m.id !== family.admin_id && m.id !== user.id && (

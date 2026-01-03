@@ -38,7 +38,7 @@ body {
   --panel-radius: 24px;
 }
 
-body:not(.theme-doodle) {
+body:not(.theme-doodle):not(.theme-jar) {
   background-image:
     radial-gradient(circle at 15% 50%, rgba(41, 121, 255, 0.12), transparent 30%),
     radial-gradient(circle at 85% 30%, rgba(255, 46, 147, 0.12), transparent 30%);
@@ -64,6 +64,37 @@ body:not(.theme-doodle) {
   background-size: 20px 20px;
 }
 
+/* Jar Theme (Cosmic Universe) */
+.theme-jar {
+    --primary: #fbbf24;
+    --secondary: #8b5cf6;
+    --accent: #fbbf24;
+    --bg-dark: #0f172a;
+    --text-color: #fff;
+    --panel-bg: rgba(30, 27, 75, 0.6);
+    --panel-border: rgba(139, 92, 246, 0.5);
+    --btn-radius: 1.5rem;
+    --panel-radius: 30px;
+}
+
+.theme-jar {
+    background-color: #0f172a;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+    background-size: 200px 200px;
+    animation: stars 100s linear infinite;
+}
+
+@keyframes stars {
+    from { background-position: 0 0; }
+    to { background-position: 0 1000px; }
+}
+
 h1,
 h2,
 h3,
@@ -85,6 +116,10 @@ h4 {
     border-width: 2px;
     box-shadow: 4px 4px 0px #d8c4b6;
     backdrop-filter: none;
+  }
+  
+  .theme-jar .glass-panel {
+      box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
   }
 
   .btn {
@@ -112,9 +147,20 @@ h4 {
     box-shadow: 4px 4px 0px var(--primary);
   }
 
+  .theme-jar .btn-primary {
+      color: white;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+      background: linear-gradient(to right, #fbbf24, #f59e0b);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
   .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 25px rgba(0, 229, 255, 0.4);
+  }
+  
+  .theme-jar .btn-primary:hover {
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
   }
 
   .btn-ghost {
@@ -142,6 +188,11 @@ h4 {
   .theme-doodle .bar-wrap {
     background: #eee;
     border: 2px solid #4a4a4a;
+  }
+  
+  .theme-jar .bar-wrap {
+      border: 1px solid rgba(139, 92, 246, 0.5);
+      background: rgba(15, 23, 42, 0.6);
   }
 
   .bar-fill {
