@@ -236,7 +236,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
                 // 當手機往後傾 (beta 正值)，重力應該往下 (gravityY 正值)
 
                 const gravityX = (event.gamma / 45) * 1.8; // 左右傾斜
-                const gravityY = baseGravityY - (event.beta / 60) * 1.5; // 前後傾斜，增強效果
+                const gravityY = baseGravityY + (event.beta / 60) * 1.5; // 前後傾斜，beta 越大重力越往下
 
                 engineRef.current.gravity.x = Math.max(-2, Math.min(2, gravityX));
                 engineRef.current.gravity.y = Math.max(-2, Math.min(3, gravityY)); // 允許負值（往上）
