@@ -70,8 +70,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
     }, [isContainer, containerSize.width, containerSize.height]);
 
     const visualStarCount = useMemo(() => {
-        if (points <= 100) return points;
-        return 100 + Math.floor((points - 100) / 4);
+        // Hard Cap to prevent crash on massive points (e.g. 9999999)
+        const MAX_VISUAL_STARS = 300;
+
+        if (points <= MAX_VISUAL_STARS) return points;
+
+        return MAX_VISUAL_STARS;
     }, [points]);
 
     const numericSeed = useMemo(() => {
