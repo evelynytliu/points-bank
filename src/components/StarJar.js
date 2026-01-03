@@ -96,7 +96,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         // Dynamic config
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
         const startY = isContainer ? height - 80 : 124;
-        const scaleBase = isContainer ? 2.0 : 0.65;
+        const scaleBase = isContainer ? 2.0 : 0.65; // Updated to 2.0
 
         // Adjust columns for wider containers
         const cols = isContainer ? Math.floor(width / 50) : 5.5;
@@ -191,7 +191,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const starBodies = starData.map((star) => {
             // Updated: Larger radius to match visual scale (Visual is ~60px, Radius 25 -> 50px diameter)
-            const radius = isContainer ? 20 : 6;
+            const radius = isContainer ? 20 : 6; // Updated to 20
             // Updated: Use Polygon (5 sides) instead of Circle for irregular stacking (less neat)
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180, // Sync initial angle
@@ -248,68 +248,93 @@ export default function StarJar({ points, theme, seed = 0 }) {
         };
     }, [starData, isDoodle, isContainer, containerSize]);
 
-    // Handle Device Orientation (Gravity)
+    // Handle Device Sensors (Gravity + Shake)
     useEffect(() => {
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
 
-            // Default gravity (container vs mini)
+            // Default gravity
             const baseGravityY = isContainer ? 1.2 : 0.8;
 
             if (event.beta !== null && event.gamma !== null) {
-                const maxTilt = 45;
-                const gravityStrength = 1.5; // Increased strength
+                // Amplify tilt effects
+                const gravityStrength = 1.8;
 
-                // Gamma: Left/Right tilt (-90 to 90)
-                const gravityX = (event.gamma / maxTilt) * gravityStrength;
+                // Gamma: Left/Right (-90 to 90)
+                const gravityX = (event.gamma / 45) * gravityStrength;
 
-                // Beta: Front/Back tilt (-180 to 180). Phone upright ~90. Flat ~0.
-                // We want: Upright -> Gravity Down (Y=1). Flat -> Gravity Down (Y=1)??
-                // Actually, if held upright, stars fall down relative to screen. Gravity Y=1.
-                // If tilted upside down, Y=-1.
-                // The MatterJS gravity is relative to the canvas coordinate system.
-                // Mobile screen Y is always "Down" visually.
-                // Changing Gravity Y based on Beta makes sense if we want stars to fall "towards earth" even if phone is inverted.
-                // Let's keep it simple: Map Beta relative to upright.
+                // Beta: Front/Back. 
+                // Map upright to normal gravity
+                const gravityY = baseGravityY + (event.beta / 90) * 0.5;
 
-                const gravityY = baseGravityY + (event.beta / 90) * 0.5; // Subtle Y change
-
-                // Clamp
                 engineRef.current.gravity.x = Math.max(-2, Math.min(2, gravityX));
-                engineRef.current.gravity.y = Math.max(0.2, Math.min(2, gravityY));
+                engineRef.current.gravity.y = Math.max(0.2, Math.min(3, gravityY));
+            }
+        };
+
+        const handleMotion = (event) => {
+            if (!engineRef.current || !event.acceleration) return;
+
+            const { x, y, z } = event.acceleration;
+            const magnitude = Math.sqrt(x * x + y * y + z * z);
+
+            // Shake Threshold (Sensitivity for shake)
+            if (magnitude > 15) {
+                // Apply random force to all bodies to simulate "shaking the jar"
+                const bodies = Matter.Composite.allBodies(engineRef.current.world);
+                bodies.forEach(body => {
+                    if (!body.isStatic) {
+                        Matter.Body.applyForce(body, body.position, {
+                            x: (Math.random() - 0.5) * 0.05 * (magnitude / 10),
+                            y: (Math.random() - 0.5) * 0.05 * (magnitude / 10)
+                        });
+                    }
+                });
             }
         };
 
         const initSensor = async () => {
+            // 1. Orientation (Tilt)
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                // iOS 13+ requires permission
                 try {
                     const permission = await DeviceOrientationEvent.requestPermission();
                     if (permission === 'granted') {
                         window.addEventListener('deviceorientation', handleOrientation);
                     }
                 } catch (e) {
-                    console.log("Orientation permission denied or error", e);
+                    // console.log("Orientation perm failed", e);
                 }
             } else {
-                // Android / Non-iOS
                 window.addEventListener('deviceorientation', handleOrientation);
+            }
+
+            // 2. Motion (Shake)
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const permission = await DeviceMotionEvent.requestPermission();
+                    if (permission === 'granted') {
+                        window.addEventListener('devicemotion', handleMotion);
+                    }
+                } catch (e) {
+                    // console.log("Motion perm failed", e);
+                }
+            } else {
+                window.addEventListener('devicemotion', handleMotion);
             }
         };
 
         const onInteraction = () => {
             initSensor();
-            // Remove listeners after first attempt
             window.removeEventListener('click', onInteraction);
             window.removeEventListener('touchstart', onInteraction);
         };
 
-        // Attach interaction listeners to trigger permission request
         window.addEventListener('click', onInteraction);
         window.addEventListener('touchstart', onInteraction);
 
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
+            window.removeEventListener('devicemotion', handleMotion);
             window.removeEventListener('click', onInteraction);
             window.removeEventListener('touchstart', onInteraction);
         };
