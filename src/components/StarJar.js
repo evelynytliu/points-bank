@@ -253,7 +253,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const baseGravityY = isContainer ? 1.2 : 0.8;
 
             if (event.beta !== null && event.gamma !== null) {
-                // Amplify tilt
                 const gravityStrength = 1.8;
                 const gravityX = (event.gamma / 45) * gravityStrength;
                 const gravityY = baseGravityY + (event.beta / 90) * 0.5;
@@ -265,26 +264,38 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const handleMotion = (event) => {
             if (!engineRef.current) return;
-            // Fallback for some iOS contexts if acc is null but accIncludingGravity has data
-            // But usually we want linear acceleration (without gravity).
-            // If acceleration is null, we can't do shake easily.
-            const acc = event.acceleration;
-            if (!acc) return;
 
-            const { x, y, z } = acc;
-            if (x === null || y === null) return; // Sometimes strict null check needed
+            // 1. Try Linear Acceleration (Gravity Removed)
+            let x = event.acceleration?.x;
+            let y = event.acceleration?.y;
+            let z = event.acceleration?.z;
+            let threshold = 5;
+
+            // 2. Fallback to Raw Acceleration (Includes Gravity ~9.8)
+            // iOS often returns null for #1 but provides data here
+            if (x === null || x === undefined) {
+                if (event.accelerationIncludingGravity) {
+                    x = event.accelerationIncludingGravity.x;
+                    y = event.accelerationIncludingGravity.y;
+                    z = event.accelerationIncludingGravity.z;
+                    threshold = 25; // Higher threshold to overcome static gravity (9.8)
+                }
+            }
+
+            if (x === null || x === undefined) return;
 
             const magnitude = Math.sqrt(x * x + y * y + z * z);
 
-            // Shake Threshold (Lowered to 8)
-            if (magnitude > 8) {
+            // Trigger Shake if threshold exceeded
+            if (magnitude > threshold) {
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
-                        // Stronger random force
+                        // Normalize force direction randomly but scaled by energy
+                        const forceMagnitude = 0.002 * magnitude;
                         Matter.Body.applyForce(body, body.position, {
-                            x: (Math.random() - 0.5) * 0.1 * (magnitude / 5),
-                            y: (Math.random() - 0.5) * 0.1 * (magnitude / 5)
+                            x: (Math.random() - 0.5) * forceMagnitude,
+                            y: -(Math.random() * forceMagnitude) // Bias upwards slightly
                         });
                     }
                 });
@@ -323,7 +334,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const onInteraction = () => {
             initSensor();
-            // Capture=true ensures we catch it
+            // Capture events to ensure we trigger permissions ASAP
             window.removeEventListener('click', onInteraction, true);
             window.removeEventListener('touchstart', onInteraction, true);
         };
