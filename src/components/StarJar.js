@@ -43,9 +43,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
     const bodiesRef = useRef([]);
     const [starPositions, setStarPositions] = useState([]);
 
-    // Debug State - Minimal
-    const [sensorStatus, setSensorStatus] = useState('Tap Jar to Start');
-    const [shakeCount, setShakeCount] = useState(0);
+    // Sensor State
+    const [hasPermission, setHasPermission] = useState(false);
+    const [showPermissionButton, setShowPermissionButton] = useState(false);
+    const [debugMsg, setDebugMsg] = useState('');
 
     // Track container size for responsive physics
     const [containerSize, setContainerSize] = useState({ width: 100, height: 150 });
@@ -149,7 +150,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
         render.canvas.style.left = '0';
         render.canvas.style.width = '100%';
         render.canvas.style.height = '100%';
-        render.canvas.style.pointerEvents = 'auto';
+        render.canvas.style.pointerEvents = 'auto'; // allow mouse interaction
         render.canvas.style.zIndex = '20';
         render.canvas.style.opacity = '0';
 
@@ -218,6 +219,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
     // Handle Device Sensors (Gravity + Shake)
     useEffect(() => {
+        // Only attach if permission granted or non-iOS
+        if (!hasPermission && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+            setShowPermissionButton(true);
+            return;
+        }
+
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
             const baseGravityY = isContainer ? 1.2 : 0.8;
@@ -247,7 +254,6 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const threshold = (event.acceleration && event.acceleration.x !== null) ? 5 : 20;
 
             if (magnitude > threshold) {
-                setShakeCount(prev => prev + 1);
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
@@ -261,58 +267,41 @@ export default function StarJar({ points, theme, seed = 0 }) {
             }
         };
 
-        // CRITICAL: Request Permission Response Handler
-        const onEnableSensors = (e) => {
-            // Remove listeners immediately to prevent multiple calls
-            window.removeEventListener('click', onEnableSensors, true);
-            window.removeEventListener('touchstart', onEnableSensors, true);
-
-            // iOS 13+ Check
-            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                // Motion Permission - DIRECT CHAIN
-                DeviceMotionEvent.requestPermission()
-                    .then(response => {
-                        if (response === 'granted') {
-                            setSensorStatus('Active');
-                            window.addEventListener('devicemotion', handleMotion);
-                        } else {
-                            setSensorStatus(`Denied: ${response}`);
-                        }
-                    })
-                    .catch(err => {
-                        // setSensorStatus(`Err: ${err}`);
-                        // Squelch error if not user interaction related to keep clean UI
-                    });
-
-                // Orientation Permission - Parallel Request
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission()
-                        .then(response => {
-                            if (response === 'granted') {
-                                window.addEventListener('deviceorientation', handleOrientation);
-                            }
-                        }).catch(e => { });
-                }
-
-            } else {
-                // Non-iOS / Standard API
-                setSensorStatus('Active');
-                window.addEventListener('devicemotion', handleMotion);
-                window.addEventListener('deviceorientation', handleOrientation);
-            }
-        };
-
-        // Attach listeners using CAPTURE phase to ensure we catch the first interaction
-        window.addEventListener('click', onEnableSensors, true);
-        window.addEventListener('touchstart', onEnableSensors, true);
+        window.addEventListener('devicemotion', handleMotion);
+        window.addEventListener('deviceorientation', handleOrientation);
 
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
             window.removeEventListener('devicemotion', handleMotion);
-            window.removeEventListener('click', onEnableSensors, true);
-            window.removeEventListener('touchstart', onEnableSensors, true);
         };
-    }, [isContainer]);
+    }, [isContainer, hasPermission]);
+
+    // Explicit Permission Request Handler
+    const requestPermission = () => {
+        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+            DeviceMotionEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        setHasPermission(true);
+                        setShowPermissionButton(false);
+                    } else {
+                        setDebugMsg('Permission Denied. Check Settings > Safari > Motion');
+                    }
+                })
+                .catch(err => {
+                    setDebugMsg(err.message);
+                });
+
+            // Also try orientation
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().catch(() => { });
+            }
+        } else {
+            // Non-iOS
+            setHasPermission(true);
+            setShowPermissionButton(false);
+        }
+    };
 
     // Falling stars logic
     useEffect(() => {
@@ -333,10 +322,17 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
     return (
         <div className={`relative ${isContainer ? 'w-full h-full' : 'w-24 h-32'} flex justify-center items-end`}>
-            {/* Minimal Status Text */}
-            {isContainer && sensorStatus !== 'Active' && (
-                <div className="absolute top-2 left-2 z-[100] bg-black/50 text-white text-[10px] px-2 py-1 rounded pointer-events-none font-mono">
-                    {sensorStatus}
+
+            {/* Explicit Permission Button for iOS */}
+            {isContainer && showPermissionButton && (
+                <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-3xl">
+                    <button
+                        onClick={requestPermission}
+                        className="bg-white/90 text-amber-600 px-4 py-2 rounded-full font-bold shadow-lg active:scale-95 transition-transform text-sm border-2 border-amber-200"
+                    >
+                        開啟搖晃感應 (Enable Shake)
+                    </button>
+                    {debugMsg && <div className="mt-2 text-[10px] text-white bg-red-500/80 px-2 py-1 rounded">{debugMsg}</div>}
                 </div>
             )}
 
