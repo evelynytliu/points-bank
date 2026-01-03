@@ -176,16 +176,17 @@ export default function JarThemeLayout({
                     </div>
                 </div>
 
-                {/* Floating Toggle Button (Persistent) */}
-                <div className="absolute bottom-6 right-6 z-[60] transition-all duration-300">
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className={`w-16 h-16 rounded-full shadow-[0_4px_0_#2d2d2d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center pointer-events-auto border-4 border-white ring-4 ring-[#4a4a4a]/10 ${isMenuOpen ? 'bg-[#ff8a80] text-white rotate-90' : 'bg-[#4a4a4a] text-white hover:scale-110 hover:bg-[#ff8a80]'}`}
-                    >
-                        {isMenuOpen ? <X className="w-8 h-8" /> : <PlusCircle className="w-8 h-8" />}
-                    </button>
-                </div>
-            </div>
+                {/* Floating Toggle Button (Only show when menu is closed) */}
+                {!isMenuOpen && (
+                    <div className="absolute bottom-6 right-6 z-[60] transition-all duration-300">
+                        <button
+                            onClick={() => setIsMenuOpen(true)}
+                            className="w-16 h-16 rounded-full shadow-[0_4px_0_#2d2d2d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center pointer-events-auto border-4 border-white ring-4 ring-[#4a4a4a]/10 bg-[#4a4a4a] text-white hover:scale-110 hover:bg-[#ff8a80]"
+                        >
+                            <PlusCircle className="w-8 h-8" />
+                        </button>
+                    </div>
+                )}            </div>
 
             {/* Important: Jar Theme Specific Modal Instance */}
             <WishGoalModal
