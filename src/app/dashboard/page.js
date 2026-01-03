@@ -1024,7 +1024,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'jar') ? 'bg-[#0f172a]' : (family?.theme !== 'neon' ? 'bg-[#fffbf0]' : 'bg-[#080812]')}`}>
+        <div className={`min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20 ${(family?.theme === 'jar') ? 'bg-gradient-to-b from-[#1e1b4b] to-black' : (family?.theme !== 'neon' ? 'bg-[#fffbf0]' : 'bg-[#080812]')}`}>
             <header className="flex flex-col md:flex-row justify-between items-center gap-4 py-6">
                 <div className="flex items-center gap-4 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div className="relative">
