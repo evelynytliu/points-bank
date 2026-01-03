@@ -43,8 +43,9 @@ export default function StarJar({ points, theme, seed = 0 }) {
     const bodiesRef = useRef([]);
     const [starPositions, setStarPositions] = useState([]);
 
-    // Debug State
-    const [sensorDebug, setSensorDebug] = useState({ status: 'Click Jar', x: 0, y: 0, z: 0, shake: 0 });
+    // Debug State - Minimal
+    const [sensorStatus, setSensorStatus] = useState('Tap Jar to Start');
+    const [shakeCount, setShakeCount] = useState(0);
 
     // Track container size for responsive physics
     const [containerSize, setContainerSize] = useState({ width: 100, height: 150 });
@@ -241,20 +242,13 @@ export default function StarJar({ points, theme, seed = 0 }) {
                 z = event.accelerationIncludingGravity.z;
             }
 
-            setSensorDebug(prev => ({
-                ...prev,
-                x: x ? x.toFixed(2) : 'null',
-                y: y ? y.toFixed(2) : 'null',
-                z: z ? z.toFixed(2) : 'null'
-            }));
-
             if (!engineRef.current || x === undefined || x === null) return;
 
             const magnitude = Math.sqrt(x * x + y * y + z * z);
             const threshold = (event.acceleration && event.acceleration.x !== null) ? 5 : 20;
 
             if (magnitude > threshold) {
-                setSensorDebug(prev => ({ ...prev, shake: prev.shake + 1 }));
+                setShakeCount(prev => prev + 1);
                 const bodies = Matter.Composite.allBodies(engineRef.current.world);
                 bodies.forEach(body => {
                     if (!body.isStatic) {
@@ -268,30 +262,37 @@ export default function StarJar({ points, theme, seed = 0 }) {
             }
         };
 
+        // CRITICAL: Request Permission must be direct response to click
         const requestPerms = async () => {
-            setSensorDebug(prev => ({ ...prev, status: 'Requesting...' }));
+            // NO pre-await state updates here!
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 // iOS 13+
                 try {
                     const pState = await DeviceMotionEvent.requestPermission();
-                    setSensorDebug(prev => ({ ...prev, status: `Motion: ${pState}` }));
                     if (pState === 'granted') {
                         window.addEventListener('devicemotion', handleMotion);
+                        setSensorStatus('Active');
+                    } else {
+                        setSensorStatus('Denied');
                     }
                 } catch (e) {
-                    setSensorDebug(prev => ({ ...prev, status: `Err: ${e.message}` }));
+                    setSensorStatus(`Err: ${e.message}`);
                 }
+
                 try {
-                    await DeviceOrientationEvent.requestPermission();
-                    window.addEventListener('deviceorientation', handleOrientation);
+                    const oState = await DeviceOrientationEvent.requestPermission();
+                    if (oState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
                 } catch (e) { }
             } else {
-                setSensorDebug(prev => ({ ...prev, status: 'Standard API' }));
+                setSensorStatus('Active');
                 window.addEventListener('devicemotion', handleMotion);
                 window.addEventListener('deviceorientation', handleOrientation);
             }
         };
 
+        // We attach this to a specific touch start to capture strict iOS gesture
         const onInteraction = () => {
             requestPerms();
             window.removeEventListener('click', onInteraction, true);
@@ -328,14 +329,16 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
     return (
         <div className={`relative ${isContainer ? 'w-full h-full' : 'w-24 h-32'} flex justify-center items-end`}>
-            {/* Visual Debug Overlay */}
-            {isContainer && (
+            {/* Minimal Status Text */}
+            {isContainer && sensorStatus !== 'Active' && (
                 <div className="absolute top-2 left-2 z-[100] bg-black/50 text-white text-[10px] p-2 rounded pointer-events-none font-mono">
-                    <div>Status: {sensorDebug.status}</div>
-                    <div>X: {sensorDebug.x}</div>
-                    <div>Y: {sensorDebug.y}</div>
-                    <div>Z: {sensorDebug.z}</div>
-                    <div>Shakes: {sensorDebug.shake}</div>
+                    {sensorStatus} {shakeCount > 0 && `(${shakeCount})`}
+                </div>
+            )}
+            {/* Show Shake Count if debugging */}
+            {isContainer && sensorStatus === 'Active' && shakeCount > 0 && (
+                <div className="absolute top-2 left-2 z-[100] bg-black/20 text-white text-[10px] p-1 rounded pointer-events-none font-mono opacity-50">
+                    Shake: {shakeCount}
                 </div>
             )}
 
