@@ -1049,7 +1049,7 @@ export default function Dashboard() {
                                 setShowSettingsModal(true);
                                 setHighlightSettings(false);
                             }}
-                            className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme !== 'neon' ? 'bg-white border-[#e0e0e0] hover:border-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border-white/10 hover:bg-cyan-500/20 text-slate-300'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md ${highlightSettings ? (family?.theme !== 'neon' ? 'ring-2 ring-[#ff8a80] border-[#ff8a80]' : 'ring-2 ring-cyan-500 border-cyan-500') : ''}`}
+                            className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white border-[#e0e0e0] hover:border-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border-white/10 hover:bg-cyan-500/20 text-slate-300')} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md ${highlightSettings ? (family?.theme === 'jar' ? 'ring-2 ring-purple-500 border-purple-500' : (family?.theme !== 'neon' ? 'ring-2 ring-[#ff8a80] border-[#ff8a80]' : 'ring-2 ring-cyan-500 border-cyan-500')) : ''}`}
                         >
                             <Settings className={`w-4 h-4 transition-transform duration-500 ${highlightSettings ? 'rotate-180 text-[#ff8a80]' : 'group-hover:rotate-90'}`} />
                             <span className="font-bold text-sm whitespace-nowrap">{t.settings}</span>
@@ -1057,7 +1057,7 @@ export default function Dashboard() {
                     )}
                     <button
                         onClick={handleLogout}
-                        className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme !== 'neon' ? 'bg-white border-[#e0e0e0] hover:border-[#ff8a80] text-[#4a4a4a] hover:text-[#ff8a80]' : 'bg-white/5 border-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400'} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md`}
+                        className={`flex items-center gap-2 px-4 py-2.5 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white hover:bg-purple-500/20 hover:text-red-400' : (family?.theme !== 'neon' ? 'bg-white border-[#e0e0e0] hover:border-[#ff8a80] text-[#4a4a4a] hover:text-[#ff8a80]' : 'bg-white/5 border-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400')} rounded-full border-2 transition-all shadow-sm active:scale-95 hover:shadow-md`}
                         title={t.logout}
                     >
                         <LogOut className="w-4 h-4" />
@@ -1175,11 +1175,11 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             logs.map(log => (
-                                <li key={log.id} className={`p-4 rounded-xl ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5'} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme !== 'neon' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20'}`}>
+                                <li key={log.id} className={`p-4 rounded-xl ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-white/[0.02] border-white/5')} border flex flex-col gap-2 list-none mb-4 font-bold border-l-2 ${family?.theme === 'jar' ? 'border-l-purple-500' : (family?.theme !== 'neon' ? 'border-l-[#ff8a80]' : 'border-l-cyan-500/20')}`}>
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
-                                            <span className={`font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-cyan-400'} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
-                                            <span className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600'} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
+                                            <span className={`font-bold ${family?.theme === 'jar' ? 'text-purple-300' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-cyan-400')} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
+                                            <span className={`text-sm ${family?.theme === 'jar' ? 'text-purple-200/60' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600')} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
                                         </div>
                                         {userRole === 'parent' && (
                                             <button
@@ -1191,13 +1191,13 @@ export default function Dashboard() {
                                             </button>
                                         )}
                                     </div>
-                                    <div className={`text-base ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-300'} font-medium`}>{log.reason || '調整'}</div>
+                                    <div className={`text-base ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-300')} font-medium`}>{log.reason || '調整'}</div>
                                     <div className="flex justify-between items-center mt-1">
                                         <div className="flex gap-2">
                                             {log.points_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} 點</span>}
                                             {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
                                         </div>
-                                        <div className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600'} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
+                                        <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-200/60' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600')} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
                                     </div>
                                 </li>
                             ))
@@ -1259,7 +1259,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="space-y-3">
                                         {familyHistory.map(hist => (
-                                            <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500') : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
+                                            <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme === 'jar' ? 'bg-purple-500/20 border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500')) : (family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'))}`}>
                                                 <div>
                                                     <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{hist.name}</div>
                                                     <div className="text-[10px] opacity-60 font-mono">ID: {hist.short_id}</div>
@@ -1281,13 +1281,13 @@ export default function Dashboard() {
                                             </div>
                                         ))}
                                         {showJoinInput && (
-                                            <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'}`}>
+                                            <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
                                                 <div className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.join_new_family_label || '加入新家庭'}</div>
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
                                                         placeholder={t.join_new_family_placeholder || '輸入家庭代碼'}
-                                                        className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
+                                                        className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme === 'jar' ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white')}`}
                                                         value={joinNewFamilyCode}
                                                         onChange={e => setJoinNewFamilyCode(e.target.value)}
                                                     />
@@ -1295,7 +1295,7 @@ export default function Dashboard() {
                                                         type="password"
                                                         maxLength={4}
                                                         placeholder="PIN"
-                                                        className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white'}`}
+                                                        className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme === 'jar' ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white')}`}
                                                         value={joinNewFamilyPin}
                                                         onChange={e => setJoinNewFamilyPin(e.target.value.replace(/\D/g, ''))}
                                                     />
@@ -1695,15 +1695,15 @@ export default function Dashboard() {
                                         <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
                                         <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.clear_history_desc}</div>
                                     </button>
-                                    <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme !== 'neon' ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30'} md:col-span-2`}>
+                                    <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-red-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30')} md:col-span-2`}>
                                         <div className="text-sm font-bold mb-1">{t.reset_family_data}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-red-400'}`}>{t.reset_family_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-red-400' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#ff8a80]' : 'text-red-400')}`}>{t.reset_family_desc}</div>
                                     </button>
                                 </div>
                             </section>
                         </div>
 
-                        <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20'} backdrop-blur-md`}>
+                        <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme === 'jar' ? 'border-purple-500/30 bg-[#0f172a]/90' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20')} backdrop-blur-md`}>
                             <button onClick={saveSettings} className="btn btn-primary w-full gap-2 font-black !py-4 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"><Save className="w-5 h-5" /> {t.save_changes}</button>
                         </div>
                     </div>
@@ -1722,7 +1722,7 @@ export default function Dashboard() {
 
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[110] p-6 animate-in fade-in duration-300">
-                    <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl'}`}>
+                    <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme === 'jar' ? 'bg-[#0f172a] border-purple-500/50 shadow-[0_0_30px_rgba(139,92,246,0.3)] rounded-3xl' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl')}`}>
                         <h3 className={`text-2xl font-black mb-8 italic flex items-center gap-3 uppercase tracking-tight ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}><Plus className="text-cyan-500" /> {t.add_member}</h3>
 
                         <div className="flex flex-col items-center gap-6 mb-8">
@@ -1731,7 +1731,7 @@ export default function Dashboard() {
                                     const nextIdx = (AVATARS.indexOf(newKidAvatar) + 1) % AVATARS.length;
                                     setNewKidAvatar(AVATARS[nextIdx]);
                                 }}
-                                className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30'}`}
+                                className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme === 'jar' ? 'bg-purple-500/10 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30')}`}
                             >
                                 {newKidAvatar}
                             </button>
@@ -1741,7 +1741,7 @@ export default function Dashboard() {
                                 autoFocus
                                 type="text"
                                 placeholder={t.enter_kid_name}
-                                className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500'}`}
+                                className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500')}`}
                                 value={newKidName}
                                 onChange={e => setNewKidName(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && addKid()}
