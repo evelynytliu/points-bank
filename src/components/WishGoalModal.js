@@ -149,7 +149,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
         }
     }, [isCompleted, isEditing, isOpen]);
 
-    if (!isOpen) return null;
+    const isJar = theme === 'jar';
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
@@ -157,13 +157,13 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className={`relative w-full max-w-sm overflow-hidden rounded-3xl ${theme === 'doodle' ? 'bg-[#fffbf0] border-4 border-[#4a4a4a] shadow-[8px_8px_0px_#4a4a4a]' : 'bg-[#0f172a] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)]'}`}
+                className={`relative w-full max-w-sm overflow-hidden rounded-3xl ${isJar ? 'bg-[#1e1b4b] border border-purple-500/30 shadow-[0_0_50px_rgba(139,92,246,0.3)]' : (theme === 'doodle' ? 'bg-[#fffbf0] border-4 border-[#4a4a4a] shadow-[8px_8px_0px_#4a4a4a]' : 'bg-[#0f172a] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)]')}`}
             >
                 {/* Close Button */}
                 <button
                     onClick={onClose}
                     disabled={isSaving}
-                    className={`absolute top-3 right-3 z-20 p-2 rounded-full transition-all ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#ff8a80] hover:text-white' : 'bg-black/50 text-white hover:bg-white/20'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`absolute top-3 right-3 z-20 p-2 rounded-full transition-all ${isJar ? 'bg-purple-500/10 text-purple-200 hover:bg-purple-500/20 hover:text-white' : (theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#ff8a80] hover:text-white' : 'bg-black/50 text-white hover:bg-white/20')} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -175,11 +175,11 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                         <motion.div
                             initial={{ y: -10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-2 text-2xl shadow-lg ${theme === 'doodle' ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a]' : 'bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-cyan-500/50'}`}
+                            className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-2 text-2xl shadow-lg ${isJar ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-purple-500/50' : (theme === 'doodle' ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a]' : 'bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-cyan-500/50')}`}
                         >
                             {isCompleted ? '🏆' : '🎯'}
                         </motion.div>
-                        <h2 className={`text-xl font-black uppercase tracking-tight ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                        <h2 className={`text-xl font-black uppercase tracking-tight ${isJar ? 'text-white' : (theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white')}`}>
                             {isEditing ? (goal ? t.wish_edit : t.wish_setup_new) : t.wish_progress}
                         </h2>
                     </div>
@@ -189,13 +189,13 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                         <div className="flex flex-col gap-4">
                             {/* Target Content */}
                             <div>
-                                <div className={`relative w-full rounded-2xl overflow-hidden group ${theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10'} ${imageUrl ? 'shadow-sm flex items-center justify-center bg-black/5' : 'aspect-[4/3] flex items-center justify-center p-4'}`}>
+                                <div className={`relative w-full rounded-2xl overflow-hidden group ${isJar ? 'bg-black/30 border border-purple-500/20' : (theme === 'doodle' ? 'bg-white border-2 border-[#4a4a4a]' : 'bg-black/30 border border-white/10')} ${imageUrl ? 'shadow-sm flex items-center justify-center bg-black/5' : 'aspect-[4/3] flex items-center justify-center p-4'}`}>
                                     {imageUrl ? (
                                         <img src={imageUrl} alt={title} className="max-w-full max-h-[200px] w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105" />
                                     ) : (
                                         <div className="relative z-10 flex flex-col items-center justify-center text-center w-full h-full">
                                             <Gift className={`w-16 h-16 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 opacity-5 pointer-events-none ${theme === 'doodle' ? 'text-black' : 'text-white'}`} />
-                                            <h3 className={`text-2xl font-black uppercase tracking-tight leading-tight break-words max-w-full relative z-10 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                            <h3 className={`text-2xl font-black uppercase tracking-tight leading-tight break-words max-w-full relative z-10 ${isJar ? 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' : (theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white')}`}>
                                                 {title}
                                             </h3>
                                         </div>
@@ -204,44 +204,67 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
 
                                 {/* External Title for Image Mode */}
                                 {imageUrl && (
-                                    <h3 className={`text-lg font-black uppercase tracking-tight text-center mt-3 mb-1 line-clamp-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white'}`}>
+                                    <h3 className={`text-lg font-black uppercase tracking-tight text-center mt-3 mb-1 line-clamp-1 ${isJar ? 'text-white' : (theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-white')}`}>
                                         {title}
                                     </h3>
                                 )}
                             </div>
 
-                            {/* Progress Bar */}
+                            {/* Progress Bar (Star Track for Jar) */}
                             <div className="space-y-1">
                                 <div className="flex justify-between items-end px-1">
-                                    <span className={`font-black text-xl ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}>
+                                    <span className={`font-black text-xl ${isJar ? 'text-purple-300' : (theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400')}`}>
                                         {kid.total_points} <span className="text-xs opacity-60">{t.pts}</span>
                                     </span>
-                                    <span className={`font-bold text-xs ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
+                                    <span className={`font-bold text-xs ${isJar ? 'text-purple-200/60' : (theme === 'doodle' ? 'text-[#888]' : 'text-slate-400')}`}>
                                         {t.goal_label} {targetPoints}
                                     </span>
                                 </div>
-                                <div className={`h-6 w-full rounded-full overflow-hidden p-1 ${theme === 'doodle' ? 'bg-[#eee] border-2 border-[#4a4a4a]' : 'bg-white/5 border border-white/10'}`}>
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${progress}%` }}
-                                        transition={{ duration: 1, ease: "easeOut" }}
-                                        className={`h-full rounded-full relative ${theme === 'doodle' ? 'bg-[#ff8a80]' : 'bg-gradient-to-r from-cyan-500 to-blue-500'}`}
-                                    >
-                                        <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
-                                    </motion.div>
-                                </div>
+
+                                {isJar ? (
+                                    /* Star Track Progress Bar */
+                                    <div className="relative py-2">
+                                        <div className="flex justify-between gap-1 text-purple-900/40 relative z-0">
+                                            {/* Background Skeleton Stars */}
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                                <Sparkles key={i} className="w-8 h-8 fill-current" strokeWidth={1.5} />
+                                            ))}
+                                        </div>
+                                        <div className="absolute top-2 left-0 h-8 overflow-hidden transition-all duration-1000 ease-out z-10" style={{ width: `${progress}%` }}>
+                                            <div className="flex justify-between gap-1 w-full min-w-[max-content]">
+                                                {/* Filled Gold Stars */}
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                    <Sparkles key={i} className="w-8 h-8 text-[#fbbf24] fill-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse" style={{ animationDuration: '3s' }} strokeWidth={0} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    /* Standard Linear Progress Bar */
+                                    <div className={`h-6 w-full rounded-full overflow-hidden p-1 ${theme === 'doodle' ? 'bg-[#eee] border-2 border-[#4a4a4a]' : 'bg-white/5 border border-white/10'}`}>
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${progress}%` }}
+                                            transition={{ duration: 1, ease: "easeOut" }}
+                                            className={`h-full rounded-full relative ${theme === 'doodle' ? 'bg-[#ff8a80]' : 'bg-gradient-to-r from-cyan-500 to-blue-500'}`}
+                                        >
+                                            <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                                        </motion.div>
+                                    </div>
+                                )}
+
                                 <div className="text-center mt-1">
                                     {isCompleted ? (
                                         <motion.div
                                             animate={{ scale: [1, 1.05, 1] }}
                                             transition={{ repeat: Infinity, duration: 2 }}
-                                            className={`font-black text-lg ${theme === 'doodle' ? 'text-green-500' : 'text-green-400'}`}
+                                            className={`font-black text-lg ${isJar ? 'text-green-400 drop-shadow-md' : (theme === 'doodle' ? 'text-green-500' : 'text-green-400')}`}
                                         >
                                             {t.wish_completed}
                                         </motion.div>
                                     ) : (
-                                        <div className={`font-bold text-sm ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-400'}`}>
-                                            {t.wish_remaining_prefix} <span className={`${theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'} text-base mx-1`}>{remaining}</span> {t.wish_remaining_suffix}
+                                        <div className={`font-bold text-sm ${isJar ? 'text-purple-200/60' : (theme === 'doodle' ? 'text-[#888]' : 'text-slate-400')}`}>
+                                            {t.wish_remaining_prefix} <span className={`${isJar ? 'text-[#fbbf24]' : (theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400')} text-base mx-1`}>{remaining}</span> {t.wish_remaining_suffix}
                                         </div>
                                     )}
                                 </div>
@@ -250,14 +273,14 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                             <div className="flex gap-2 pt-3 border-t border-dashed border-white/10">
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className={`flex-1 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/5 text-white hover:bg-white/10'}`}
+                                    className={`flex-1 py-2 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm ${isJar ? 'bg-purple-500/20 text-purple-200 hover:bg-purple-500/30' : (theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/5 text-white hover:bg-white/10')}`}
                                 >
                                     <Edit2 className="w-3.5 h-3.5" /> {t.wish_edit_btn}
                                 </button>
                                 {goal && (
                                     <button
                                         onClick={onDelete}
-                                        className={`px-3 py-2 rounded-xl font-bold transition-all text-sm ${theme === 'doodle' ? 'text-red-400 hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/10'}`}
+                                        className={`px-3 py-2 rounded-xl font-bold transition-all text-sm ${isJar ? 'text-red-300 hover:bg-red-500/20' : (theme === 'doodle' ? 'text-red-400 hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/10')}`}
                                     >
                                         {t.delete}
                                     </button>
@@ -268,43 +291,43 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                         /* Edit Mode */
                         <div className="space-y-4">
                             <div className="space-y-1">
-                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.wish_name_label}</label>
+                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isJar ? 'text-purple-300/60' : (theme === 'doodle' ? 'text-[#888]' : 'text-slate-500')}`}>{t.wish_name_label}</label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={e => setTitle(e.target.value)}
                                     placeholder={t.wish_name_placeholder}
-                                    className={`w-full p-3 rounded-xl font-bold outline-none transition-all text-sm ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
+                                    className={`w-full p-3 rounded-xl font-bold outline-none transition-all text-sm ${isJar ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500')}`}
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${theme === 'doodle' ? 'text-[#888]' : 'text-slate-500'}`}>{t.target_points_label}</label>
+                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${isJar ? 'text-purple-300/60' : (theme === 'doodle' ? 'text-[#888]' : 'text-slate-500')}`}>{t.target_points_label}</label>
                                 <div className="relative">
                                     <input
                                         type="number"
                                         value={targetPoints}
                                         onChange={e => setTargetPoints(parseFloat(e.target.value) || 0)}
-                                        className={`w-full p-3 pl-10 rounded-xl font-black text-lg outline-none transition-all ${theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500'}`}
+                                        className={`w-full p-3 pl-10 rounded-xl font-black text-lg outline-none transition-all ${isJar ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (theme === 'doodle' ? 'bg-[#f5f5f5] text-[#4a4a4a] border-2 border-[#eee] focus:border-[#ff8a80]' : 'bg-black/30 text-white border border-white/10 focus:border-cyan-500')}`}
                                     />
-                                    <Target className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${theme === 'doodle' ? 'text-[#bbb]' : 'text-slate-500'}`} />
+                                    <Target className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isJar ? 'text-purple-400' : (theme === 'doodle' ? 'text-[#bbb]' : 'text-slate-500')}`} />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className={`block text-xs font-bold ml-1 ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400'}`}>
+                                <label className={`block text-xs font-bold ml-1 ${isJar ? 'text-purple-300' : (theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-400')}`}>
                                     {t.wish_image_label}
                                 </label>
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
-                                        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${theme === 'doodle' ? 'text-[#4a4a4a]/40' : 'text-slate-500'}`}>
+                                        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${isJar ? 'text-purple-400' : (theme === 'doodle' ? 'text-[#4a4a4a]/40' : 'text-slate-500')}`}>
                                             <ImageIcon className="w-4 h-4" />
                                         </div>
                                         <input
                                             type="url"
                                             value={imageUrl}
                                             onChange={(e) => setImageUrl(e.target.value)}
-                                            className={`w-full pl-9 pr-3 py-2.5 rounded-xl outline-none transition-all text-sm ${theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500'}`}
+                                            className={`w-full pl-9 pr-3 py-2.5 rounded-xl outline-none transition-all text-sm ${isJar ? 'bg-purple-900/20 border border-purple-500/30 focus:border-purple-500 text-white placeholder-purple-300/40' : (theme === 'doodle' ? 'bg-[#f0f0f0] focus:ring-2 focus:ring-[#4a4a4a] text-[#4a4a4a]' : 'bg-white/5 border border-white/10 focus:border-cyan-400/50 text-white placeholder-slate-500')}`}
                                             placeholder={t.wish_image_placeholder}
                                         />
                                     </div>
@@ -321,7 +344,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                         type="button"
                                         onClick={handleUploadClick}
                                         disabled={isUploading}
-                                        className={`px-3 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10'}`}
+                                        className={`px-3 rounded-xl flex items-center justify-center transition-all disabled:opacity-50 ${isJar ? 'bg-purple-600 text-white hover:bg-purple-500 border border-purple-400/50' : (theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#2d2d2d]' : 'bg-white/10 text-cyan-400 hover:bg-white/20 border border-white/10')}`}
                                         title={t.upload_from_device}
                                     >
                                         {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
@@ -340,7 +363,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                     <button
                                         onClick={() => setIsEditing(false)}
                                         disabled={isSaving}
-                                        className={`px-4 py-2.5 rounded-xl font-bold text-sm ${theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5'} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2.5 rounded-xl font-bold text-sm ${isJar ? 'text-purple-300 hover:bg-purple-900/40' : (theme === 'doodle' ? 'text-[#888] hover:bg-gray-100' : 'text-slate-400 hover:bg-white/5')} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         {t.cancel}
                                     </button>
@@ -349,7 +372,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                     onClick={handleSave}
                                     disabled={isSaving}
                                     className={`flex-1 py-2.5 px-4 rounded-xl font-black shadow-lg transition-transform flex items-center justify-center gap-2 text-sm
-                                        ${theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#333]' : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'}
+                                        ${isJar ? 'bg-purple-600 text-white hover:bg-purple-500 shadow-purple-500/40' : (theme === 'doodle' ? 'bg-[#4a4a4a] text-white hover:bg-[#333]' : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white')}
                                         ${isSaving ? 'opacity-70 cursor-not-allowed scale-100' : 'active:scale-95'}
                                     `}
                                 >
