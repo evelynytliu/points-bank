@@ -136,8 +136,9 @@ export default function StarJar({ points, theme, seed = 0 }) {
         const engine = Engine.create({
             gravity: { x: 0, y: isContainer ? 1.8 : 0.8 },
             enableSleeping: true, // Allow stars to sleep to stop jittering
-            positionIterations: 16, // Smoother physics
-            velocityIterations: 12
+            positionIterations: 24, // Smoother physics (Combined with velocity cap)
+            velocityIterations: 16,
+            constraintIterations: 4
         });
         engineRef.current = engine;
 
@@ -181,10 +182,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const radius = isContainer ? 17 : 6; // Reduced radius for tighter packing
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180,
-                restitution: 0.6, // Restored bounce (互動度)
-                friction: 0.05,
-                density: 0.002, // Slightly heavier than original, but responsive
-                frictionAir: 0.005, // 大幅降低空氣阻力，反應更快
+                restitution: 0.4, // Reduced bounciness to prevent jitter accumulation
+                friction: 0.2, // Increased friction
+                density: 0.002,
+                frictionAir: 0.04, // Increased damping to stop perpetual motion
                 slop: 0.05,
                 render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
             });
@@ -205,11 +206,22 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         Events.on(engine, 'afterUpdate', () => {
             if (!engineRef.current) return;
-            const positions = starBodies.map(body => ({
-                x: body.position.x,
-                y: body.position.y,
-                angle: body.angle
-            }));
+            const positions = starBodies.map(body => {
+                // Velocity Cap to prevent explosion
+                if (body.speed > 15) {
+                    Matter.Body.setSpeed(body, 15);
+                }
+                // Angular Velocity Cap
+                if (Math.abs(body.angularVelocity) > 0.5) {
+                    Matter.Body.setAngularVelocity(body, Math.sign(body.angularVelocity) * 0.5);
+                }
+
+                return {
+                    x: body.position.x,
+                    y: body.position.y,
+                    angle: body.angle
+                };
+            });
             setStarPositions(positions);
         });
 
