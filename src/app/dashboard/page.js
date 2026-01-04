@@ -400,7 +400,11 @@ export default function Dashboard() {
             if (fError) console.error('獲取家庭失敗:', fError);
 
             if (familyData) {
-                setFamily(familyData);
+                // Load local settings (Star Size is local-only due to schema limits)
+                const localStarSize = typeof window !== 'undefined' ? parseInt(localStorage.getItem(`star_size_${familyData.id}`) || '5') : 5;
+                const familyWithLocal = { ...familyData, star_size: localStarSize };
+
+                setFamily(familyWithLocal);
 
                 // Update Family History
                 if (authUser) {
@@ -424,7 +428,7 @@ export default function Dashboard() {
                     use_parent_pin: familyData.use_parent_pin || false,
                     short_id: familyData.short_id || '',
                     theme: familyData.theme || 'cyber',
-                    star_size: familyData.star_size || 5
+                    star_size: localStarSize
                 });
                 localStorage.setItem('cached_theme', familyData.theme || 'doodle');
             }
@@ -595,7 +599,15 @@ export default function Dashboard() {
             }
         }
 
-        const { error } = await supabase.from('families').update(tempSettings).eq('id', family.id);
+        // Separate db settings and local settings
+        const { star_size, ...dbSettings } = tempSettings;
+
+        // Save local settings
+        if (star_size) {
+            localStorage.setItem(`star_size_${family.id}`, star_size);
+        }
+
+        const { error } = await supabase.from('families').update(dbSettings).eq('id', family.id);
         if (error) alert('儲存失敗: ' + error.message);
         else {
             alert('設定已更新！');
