@@ -134,10 +134,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
 
         const engine = Engine.create({
-            gravity: { x: 0, y: isContainer ? 1.2 : 0.8 },
-            enableSleeping: false,
-            positionIterations: 10,
-            velocityIterations: 8
+            gravity: { x: 0, y: isContainer ? 1.8 : 0.8 },
+            enableSleeping: true, // Allow stars to sleep to stop jittering
+            positionIterations: 16, // Smoother physics
+            velocityIterations: 12
         });
         engineRef.current = engine;
 
@@ -178,12 +178,12 @@ export default function StarJar({ points, theme, seed = 0 }) {
         }
 
         const starBodies = starData.map((star) => {
-            const radius = isContainer ? 20 : 6;
+            const radius = isContainer ? 17 : 6; // Reduced radius for tighter packing
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180,
-                restitution: 0.6, // 增加彈性，碰撞更活潑
-                friction: 0.05, // 降低摩擦力，移動更順暢
-                density: 0.001, // 降低密度，更輕盈
+                restitution: 0.2, // Less bounce (沉一些)
+                friction: 0.05,
+                density: 0.005, // Higher density (Heavier)
                 frictionAir: 0.005, // 大幅降低空氣阻力，反應更快
                 slop: 0.05,
                 render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
@@ -237,7 +237,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
-            const baseGravityY = isContainer ? 1.2 : 0.8;
+            const baseGravityY = isContainer ? 1.8 : 0.8; // Stronger gravity (沉一些)
             if (event.beta !== null && event.gamma !== null) {
                 // gamma: 左右傾斜 (-90 到 90)
                 // beta: 前後傾斜 (-180 到 180)
