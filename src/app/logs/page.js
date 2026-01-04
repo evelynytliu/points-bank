@@ -52,7 +52,7 @@ export default function LogsPage() {
             // Get Family Theme
             const { data: familyData } = await supabase.from('families').select('*').eq('id', familyId).single();
             setFamily(familyData || { theme: 'cyber' });
-            document.body.className = familyData?.theme === 'doodle' ? 'theme-doodle' : '';
+            document.body.className = familyData?.theme === 'doodle' ? 'theme-doodle' : (familyData?.theme === 'jar' ? 'theme-jar' : '');
 
             // Get Kids for filter
             const { data: kidsData } = await supabase.from('kids').select('*').eq('family_id', familyId);
@@ -89,7 +89,7 @@ export default function LogsPage() {
     });
 
     if (loading) return (
-        <div className={`min-h-screen flex items-center justify-center font-bold animate-pulse ${family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400'}`}>{t.loading}</div>
+        <div className={`min-h-screen flex items-center justify-center font-bold animate-pulse ${family?.theme === 'jar' ? 'text-purple-400' : (family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400')}`}>{t.loading}</div>
     );
 
     const theme = family?.theme || 'cyber';
@@ -121,14 +121,14 @@ export default function LogsPage() {
                         <input
                             type="text"
                             placeholder={t.search_placeholder_logs}
-                            className={`w-full pl-12 pr-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500'}`}
+                            className={`w-full pl-12 pr-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500 focus:ring-2' : (theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')}`}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="md:col-span-3">
                         <select
-                            className={`w-full px-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'}`}
+                            className={`w-full px-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500 focus:ring-2' : (theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white')}`}
                             value={filterKid}
                             onChange={(e) => setFilterKid(e.target.value)}
                         >
@@ -139,14 +139,14 @@ export default function LogsPage() {
                     <div className="md:col-span-5 flex items-center gap-2">
                         <input
                             type="date"
-                            className={`w-full px-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'}`}
+                            className={`w-full px-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500 focus:ring-2' : (theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white')}`}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                         />
                         <span className={theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-slate-500'}>-</span>
                         <input
                             type="date"
-                            className={`w-full px-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'}`}
+                            className={`w-full px-4 py-3 rounded-2xl border transition-all outline-none ${theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500 focus:ring-2' : (theme === 'doodle' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white')}`}
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                         />
@@ -175,7 +175,7 @@ export default function LogsPage() {
                                             {new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}
                                         </div>
                                     </td>
-                                    <td className={`p-4 font-bold ${theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400'}`}>{log.kids?.name}</td>
+                                    <td className={`p-4 font-bold ${theme === 'jar' ? 'text-purple-300' : (theme === 'doodle' ? 'text-[#4a4a4a]' : 'text-cyan-400')}`}>{log.kids?.name}</td>
                                     <td className={`p-4 text-sm ${theme === 'doodle' ? 'text-[#555]' : 'text-slate-300'}`}>{log.reason || t.default_reason}</td>
                                     <td className="p-4">
                                         <div className="flex flex-col gap-1">
@@ -185,7 +185,7 @@ export default function LogsPage() {
                                                 </span>
                                             )}
                                             {log.minutes_change !== 0 && (
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded w-fit ${log.minutes_change > 0 ? (theme === 'doodle' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded w-fit ${log.minutes_change > 0 ? (theme === 'jar' ? 'bg-purple-500/10 text-purple-300' : (theme === 'doodle' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400')) : 'bg-orange-500/10 text-orange-400'}`}>
                                                     {log.minutes_change > 0 ? '+' : ''}{log.minutes_change} {t.min_unit_short}
                                                 </span>
                                             )}

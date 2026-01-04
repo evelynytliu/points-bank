@@ -1315,20 +1315,20 @@ export default function Dashboard() {
 
                             {/* 1. 點數與時間規則 (最常用) */}
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
+                                <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <div className="space-y-2 text-center col-span-2 md:col-span-1">
                                         <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                            <input type="number" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
-                                            <span className={`pr-3 text-xs font-black ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                            <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
+                                            <span className={`pr-3 text-xs font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2 text-center col-span-2 md:col-span-1">
                                         <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.holiday_limit}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                            <input type="number" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
-                                            <span className={`pr-3 text-xs font-black ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                            <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
+                                            <span className={`pr-3 text-xs font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-1 text-center col-span-2 md:col-span-1">
@@ -1340,8 +1340,8 @@ export default function Dashboard() {
                                         <div className="flex items-center gap-2">
                                             <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
                                             <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
-                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                                <input type="number" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
+                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                                <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
                                             </div>
                                         </div>
                                     </div>
@@ -1354,8 +1354,8 @@ export default function Dashboard() {
                                         <div className="flex items-center gap-2">
                                             <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
                                             <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
-                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10'}`}>
-                                                <input type="number" step="0.1" className={`w-full ${family?.theme !== 'neon' ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
+                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                                <input type="number" step="0.1" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
                                             </div>
                                         </div>
                                     </div>
