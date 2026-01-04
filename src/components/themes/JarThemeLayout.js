@@ -38,7 +38,7 @@ export default function JarThemeLayout({
 
                 {/* Physics Background Layer */}
                 <div className="absolute inset-x-0 bottom-0 top-[20px] z-0">
-                    <StarJar points={visualPoints} theme="container" seed={kid.id} />
+                    <StarJar points={visualPoints} theme="container" seed={kid.id} starSize={familySettings?.star_size || 5} />
                 </div>
 
                 {/* Interactive Content Layer */}

@@ -31,7 +31,7 @@ const FallingStar = ({ delay, onComplete, seed }) => {
     );
 };
 
-export default function StarJar({ points, theme, seed = 0 }) {
+export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
     const isDoodle = theme === 'doodle';
     const isContainer = theme === 'container';
     const [fallingStars, setFallingStars] = useState([]);
@@ -103,7 +103,10 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         // Mobile Star Size Adjustment (80% of desktop)
         const isMobileWidth = width < 600;
-        const scaleBase = isContainer ? (isMobileWidth ? 1.6 : 2.0) : 0.65;
+
+        // Scale based on starSize (1-10, default 5)
+        const userScaleFactor = Math.max(0.2, starSize / 5.0);
+        const scaleBase = (isContainer ? (isMobileWidth ? 1.6 : 2.0) : 0.65) * userScaleFactor;
         const cols = isContainer ? Math.floor(width / 50) : 5.5;
 
         for (let i = 0; i < visualStarCount; i++) {

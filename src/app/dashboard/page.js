@@ -203,7 +203,8 @@ export default function Dashboard() {
         parent_pin: '0000',
         use_parent_pin: false,
         short_id: '',
-        theme: 'doodle'
+        theme: 'doodle',
+        star_size: 5
     });
 
     const [modal, setModal] = useState({
@@ -422,7 +423,8 @@ export default function Dashboard() {
                     parent_pin: familyData.parent_pin || '0000',
                     use_parent_pin: familyData.use_parent_pin || false,
                     short_id: familyData.short_id || '',
-                    theme: familyData.theme || 'cyber'
+                    theme: familyData.theme || 'cyber',
+                    star_size: familyData.star_size || 5
                 });
                 localStorage.setItem('cached_theme', familyData.theme || 'doodle');
             }
@@ -1228,7 +1230,8 @@ export default function Dashboard() {
                                     tempSettings.parent_pin !== family.parent_pin ||
                                     tempSettings.use_parent_pin !== family.use_parent_pin ||
                                     tempSettings.short_id !== family.short_id ||
-                                    tempSettings.theme !== family.theme;
+                                    tempSettings.theme !== family.theme ||
+                                    tempSettings.star_size !== (family.star_size || 5);
 
                                 if (isChanged) {
                                     showModal({
@@ -1646,6 +1649,32 @@ export default function Dashboard() {
                                                 <div className="text-[10px] uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
                                             </button>
                                         </div>
+
+                                        {/* Star Size Slider for Jar Theme */}
+                                        {tempSettings.theme === 'jar' && (
+                                            <div className="mt-4 p-4 rounded-xl bg-purple-900/10 border border-purple-500/20 animate-in slide-in-from-top-2 duration-300">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <label className="text-sm font-bold text-purple-300">星星尺寸 (Star Size)</label>
+                                                    <span className="text-sm font-black text-[#fbbf24] bg-purple-900/40 px-3 py-1 rounded-lg border border-purple-500/30">
+                                                        Lv. {tempSettings.star_size || 5}
+                                                    </span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min="1"
+                                                    max="10"
+                                                    step="1"
+                                                    value={tempSettings.star_size || 5}
+                                                    onChange={(e) => setTempSettings({ ...tempSettings, star_size: parseInt(e.target.value) })}
+                                                    className="w-full h-2 bg-purple-900/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                                />
+                                                <div className="flex justify-between text-[10px] text-purple-300/60 font-bold mt-1 px-1">
+                                                    <span>Tiny</span>
+                                                    <span>Normal</span>
+                                                    <span>Giant</span>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </section>
