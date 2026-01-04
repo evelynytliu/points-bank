@@ -68,6 +68,14 @@ export default function JarThemeLayout({
 
                 </div>
 
+                {/* Low-profile Progress Bar (Visible when menu is closed) */}
+                <div className={`absolute bottom-0 inset-x-0 h-1.5 bg-black/20 z-40 transition-all duration-500 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}>
+                    <div
+                        className={`h-full transition-all duration-1000 ${isDanger ? 'bg-[#ff8a80] shadow-[0_0_10px_#ff8a80]' : isWarning ? 'bg-[#ffd180] shadow-[0_0_10px_#ffd180]' : 'bg-[#a78bfa] shadow-[0_0_10px_#a78bfa]'}`}
+                        style={{ width: `${timePercent}%` }}
+                    />
+                </div>
+
                 {/* Collapsible Action Tray (Moved Outside Content Padding) */}
                 <div
                     className="absolute bottom-0 inset-x-0 z-50 transition-transform duration-500 ease-in-out"
@@ -121,7 +129,7 @@ export default function JarThemeLayout({
                         <div className="flex flex-col gap-2">
                             {/* Row A: Quick Deduct (4 items) */}
                             <div className="grid grid-cols-4 gap-2">
-                                {[5, 15, 30].map(val => (
+                                {[10, 20, 30].map(val => (
                                     <button key={val} onClick={() => {
                                         showModal({ type: 'confirm', title: t.quick_deduct, message: `${t.confirm_deduct} ${val} ${t.minutes_unit}?`, onConfirm: () => onUpdate(kid, 0, -val, t.quick_deduct, actorName) });
                                     }} className="bg-[#450a0a]/60 hover:bg-[#7f1d1d]/80 text-red-200 border border-red-500/20 active:scale-95 py-2.5 rounded-xl text-sm font-black transition-all shadow-sm backdrop-blur-sm">
