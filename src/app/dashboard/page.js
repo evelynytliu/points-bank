@@ -75,7 +75,7 @@ function SortableKidItem({
                             placeholder={t.enter_kid_name}
                         />
                     ) : (
-                        <span className={`font-bold truncate text-lg ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{kid.name}</span>
+                        <span className={`font-bold truncate text-lg ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white')}`}>{kid.name}</span>
                     )}
                 </div>
 
@@ -1166,7 +1166,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="lg:col-span-4 space-y-8">
-                    <h2 className={`text-2xl font-black italic ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
+                    <h2 className={`text-2xl font-black italic ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white')} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
                     <div className="min-h-[500px]">
                         {logs.length === 0 ? (
                             <div className={`flex flex-col items-center justify-center h-[450px] text-center ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-600'}`}>
@@ -1599,7 +1599,7 @@ export default function Dashboard() {
                                         {/* Row 2: Enable Toggle */}
                                         <div className="space-y-2">
                                             <div className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee]' : 'bg-black/40 border-white/5')} rounded-2xl border`}>
-                                                <div className={`font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
+                                                <div className={`font-bold ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white')}`}>{t.enable_parent_pin}</div>
                                                 <button
                                                     onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
                                                     className={`w-16 h-8 rounded-full transition-all relative flex items-center shadow-inner shrink-0 ${tempSettings.use_parent_pin
@@ -1689,15 +1689,15 @@ export default function Dashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20')}`}>
                                         <div className="flex justify-between items-start w-full"><div className="text-sm font-bold mb-1">{t.export_full_history}</div><Download className="w-4 h-4 text-cyan-500" /></div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.csv_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-purple-200' : (family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400')}`}>{t.csv_desc}</div>
                                     </button>
                                     <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10')}`}>
                                         <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.clear_history_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-purple-200' : (family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400')}`}>{t.clear_history_desc}</div>
                                     </button>
                                     <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-red-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30')} md:col-span-2`}>
                                         <div className="text-sm font-bold mb-1">{t.reset_family_data}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-red-400' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#ff8a80]' : 'text-red-400')}`}>{t.reset_family_desc}</div>
+                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-red-300' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#ff8a80]' : 'text-red-400')}`}>{t.reset_family_desc}</div>
                                     </button>
                                 </div>
                             </section>
