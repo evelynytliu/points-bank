@@ -181,7 +181,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
             const radius = isContainer ? 17 : 6; // Reduced radius for tighter packing
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180,
-                restitution: 0.2, // Less bounce (沉一些)
+                restitution: 0.6, // Restored bounce (互動度)
                 friction: 0.05,
                 density: 0.005, // Higher density (Heavier)
                 frictionAir: 0.005, // 大幅降低空氣阻力，反應更快
@@ -237,18 +237,15 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
-            const baseGravityY = isContainer ? 1.8 : 0.8; // Stronger gravity (沉一些)
+            const baseGravityY = isContainer ? 1.5 : 0.8; // User requested 1.5 (interaction balance)
             if (event.beta !== null && event.gamma !== null) {
                 // gamma: 左右傾斜 (-90 到 90)
                 // beta: 前後傾斜 (-180 到 180)
-                // 當手機往前傾 (beta 負值)，重力應該往上 (gravityY 負值)
-                // 當手機往後傾 (beta 正值)，重力應該往下 (gravityY 正值)
+                const gravityX = (event.gamma / 45) * 2.0;
+                const gravityY = baseGravityY + (event.beta / 45) * 2.5; // Increased sensitivity to allow strong negative gravity (upside down)
 
-                const gravityX = (event.gamma / 45) * 1.8; // 左右傾斜
-                const gravityY = baseGravityY + (event.beta / 60) * 1.5; // 前後傾斜，beta 越大重力越往下
-
-                engineRef.current.gravity.x = Math.max(-2, Math.min(2, gravityX));
-                engineRef.current.gravity.y = Math.max(-2, Math.min(3, gravityY)); // 允許負值（往上）
+                engineRef.current.gravity.x = Math.max(-3, Math.min(3, gravityX));
+                engineRef.current.gravity.y = Math.max(-3, Math.min(4, gravityY)); // Allow stronger negative gravity to fall to mouth
             }
         };
 
