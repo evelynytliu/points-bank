@@ -128,7 +128,7 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
             });
         }
         return stars;
-    }, [visualStarCount, isDoodle, isContainer, numericSeed, containerSize]);
+    }, [visualStarCount, isDoodle, isContainer, numericSeed, containerSize, starSize]);
 
     // Initialize Matter.js
     useEffect(() => {
