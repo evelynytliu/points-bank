@@ -183,7 +183,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
                 angle: (star.rotate * Math.PI) / 180,
                 restitution: 0.6, // Restored bounce (互動度)
                 friction: 0.05,
-                density: 0.005, // Higher density (Heavier)
+                density: 0.002, // Slightly heavier than original, but responsive
                 frictionAir: 0.005, // 大幅降低空氣阻力，反應更快
                 slop: 0.05,
                 render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
@@ -237,7 +237,7 @@ export default function StarJar({ points, theme, seed = 0 }) {
 
         const handleOrientation = (event) => {
             if (!engineRef.current) return;
-            const baseGravityY = isContainer ? 1.5 : 0.8; // User requested 1.5 (interaction balance)
+            const baseGravityY = isContainer ? 1.2 : 0.8; // Reverted to 1.2 for better shake response
             if (event.beta !== null && event.gamma !== null) {
                 // gamma: 左右傾斜 (-90 到 90)
                 // beta: 前後傾斜 (-180 到 180)
