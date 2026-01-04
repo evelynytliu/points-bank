@@ -1513,12 +1513,12 @@ export default function Dashboard() {
 
                                 {/* 4. 家長與管理員 */}
                                 <section>
-                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
+                                    <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
                                     <div className="space-y-3">
                                         {familyMembers.map(m => (
-                                            <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5'} rounded-2xl border`}>
+                                            <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5')} rounded-2xl border`}>
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400'} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
+                                                    <div className={`w-8 h-8 rounded-full ${family?.theme === 'jar' ? 'bg-purple-500/20 text-purple-300' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400')} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className={`font-bold text-sm mb-0.5 ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
                                                         <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-300' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500')} flex items-center gap-1`}><User className="w-4 h-4" /> {m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
@@ -1535,21 +1535,21 @@ export default function Dashboard() {
 
                             {/* 5. 安全與偏好設定 */}
                             <section>
-                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
+                                <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
                                 <div className="space-y-8">
                                     {/* Security - PIN */}
                                     <div className="space-y-6">
                                         {/* Row 1: PIN Input (Masked) + Eye Icon */}
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
+                                                <div className={`text-sm font-bold ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
                                             </div>
                                             <div className="relative">
                                                 <input
                                                     type={isPinVisible ? "text" : "password"}
                                                     maxLength={4}
                                                     placeholder={t.four_digit_pin}
-                                                    className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white'} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
+                                                    className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white')} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
                                                     value={tempSettings.parent_pin}
                                                     onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })}
                                                 />
