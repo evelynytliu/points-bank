@@ -223,21 +223,29 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                 </div>
 
                                 {isJar ? (
-                                    /* Star Track Progress Bar */
-                                    <div className="relative py-2">
-                                        <div className="flex justify-between gap-1 text-purple-900/40 relative z-0">
-                                            {/* Background Skeleton Stars */}
-                                            {Array.from({ length: 5 }).map((_, i) => (
-                                                <Sparkles key={i} className="w-8 h-8 fill-current" strokeWidth={1.5} />
-                                            ))}
+                                    /* Star Jar: Linear Track with Moving Star Indicator */
+                                    <div className="relative h-8 w-full flex items-center">
+                                        {/* Track Background */}
+                                        <div className="absolute inset-x-0 h-3 bg-purple-900/40 rounded-full border border-purple-500/20 overflow-hidden">
+                                            {/* Fill Gradient */}
+                                            <div className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-amber-400 transition-all duration-1000 ease-out" style={{ width: `${progress}%` }} />
                                         </div>
-                                        <div className="absolute top-2 left-0 h-8 overflow-hidden transition-all duration-1000 ease-out z-10" style={{ width: `${progress}%` }}>
-                                            <div className="flex justify-between gap-1 w-full min-w-[max-content]">
-                                                {/* Filled Gold Stars */}
-                                                {Array.from({ length: 5 }).map((_, i) => (
-                                                    <Sparkles key={i} className="w-8 h-8 text-[#fbbf24] fill-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-pulse" style={{ animationDuration: '3s' }} strokeWidth={0} />
-                                                ))}
+
+                                        {/* Moving Star Indicator */}
+                                        <div
+                                            className="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 ease-out z-10"
+                                            style={{ left: `calc(${progress}% - 12px)` }}
+                                        >
+                                            <div className="relative">
+                                                <Sparkles className="w-8 h-8 text-[#fbbf24] fill-[#fbbf24] drop-shadow-[0_0_15px_rgba(251,191,36,0.8)] animate-pulse" />
+                                                {/* Glow effect */}
+                                                <div className="absolute inset-0 bg-yellow-400/30 blur-xl rounded-full animate-pulse" />
                                             </div>
+                                        </div>
+
+                                        {/* End Goal Marker (Trophy/Flag) */}
+                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/3 z-0 opacity-50">
+                                            <Target className="w-5 h-5 text-purple-300" />
                                         </div>
                                     </div>
                                 ) : (
