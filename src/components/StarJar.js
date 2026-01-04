@@ -182,7 +182,7 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
         }
 
         const starBodies = starData.map((star) => {
-            const radius = isContainer ? 17 : 6; // Reduced radius for tighter packing
+            const radius = 9 * star.scale; // Physics radius matches visual scale (approx 0.75 of visual radius)
             const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
                 angle: (star.rotate * Math.PI) / 180,
                 restitution: 0.4, // Reduced bounciness to prevent jitter accumulation
