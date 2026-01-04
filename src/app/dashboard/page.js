@@ -50,7 +50,7 @@ function SortableKidItem({
             dragListener={false}
             dragControls={dragControls}
         >
-            <div className={`p-4 rounded-2xl border ${family?.theme !== 'neon' ? 'bg-[#fdfbf7] border-[#eee]' : 'bg-white/5 border-white/5'} cursor-default select-none flex flex-col md:flex-row md:items-center gap-3 md:gap-4`}>
+            <div className={`p-4 rounded-2xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-[#fdfbf7] border-[#eee]' : 'bg-white/5 border-white/5')} cursor-default select-none flex flex-col md:flex-row md:items-center gap-3 md:gap-4`}>
                 {/* Left: Avatar & Name */}
                 <div className="flex items-center gap-3 w-full md:w-auto md:flex-1 min-w-0">
                     <div
@@ -62,14 +62,14 @@ function SortableKidItem({
                     </div>
                     <button
                         onClick={() => setShowAvatarPicker(showAvatarPicker === kid.id ? null : kid.id)}
-                        className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 ${family?.theme !== 'neon' ? 'bg-white shadow-sm border-[#eee]' : 'bg-black/40 border-white/10'} border`}
+                        className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-500/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white shadow-sm border-[#eee]' : 'bg-black/40 border-white/10')} border`}
                     >
                         {kid.avatar || '👶'}
                     </button>
                     {editingKidId === kid.id ? (
                         <input
                             autoFocus
-                            className={`flex-1 min-w-0 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-cyan-500 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'text-white'}`}
+                            className={`flex-1 min-w-0 rounded-lg px-3 py-2 text-sm font-bold outline-none border focus:ring-2 ${family?.theme === 'jar' ? 'bg-purple-900/40 border-purple-500/30 text-white focus:ring-purple-500' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/20 border-white/10 text-white focus:ring-cyan-500')}`}
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
                             placeholder={t.enter_kid_name}
@@ -88,7 +88,7 @@ function SortableKidItem({
                             <input
                                 type="text"
                                 maxLength={4}
-                                className={`w-16 text-center font-mono text-sm py-1.5 rounded-lg border focus:outline-none focus:ring-1 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-cyan-400 focus:ring-cyan-500'}`}
+                                className={`w-16 text-center font-mono text-sm py-1.5 rounded-lg border focus:outline-none focus:ring-1 ${family?.theme === 'jar' ? 'bg-purple-900/40 border-purple-500/30 text-white focus:ring-purple-500' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-cyan-400 focus:ring-cyan-500')}`}
                                 value={editPin}
                                 onChange={(e) => setEditPin(e.target.value.replace(/\D/g, ''))}
                             />
@@ -1598,13 +1598,13 @@ export default function Dashboard() {
 
                                         {/* Row 2: Enable Toggle */}
                                         <div className="space-y-2">
-                                            <div className={`flex items-center justify-between p-4 ${family?.theme !== 'neon' ? 'bg-white' : 'bg-black/40'} rounded-2xl border ${family?.theme !== 'neon' ? 'border-[#eee]' : 'border-white/5'}`}>
+                                            <div className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee]' : 'bg-black/40 border-white/5')} rounded-2xl border`}>
                                                 <div className={`font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.enable_parent_pin}</div>
                                                 <button
                                                     onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
                                                     className={`w-16 h-8 rounded-full transition-all relative flex items-center shadow-inner shrink-0 ${tempSettings.use_parent_pin
-                                                        ? (family?.theme !== 'neon' ? 'bg-orange-400' : 'bg-cyan-500')
-                                                        : (family?.theme !== 'neon' ? 'bg-[#eee]' : 'bg-white/10')
+                                                        ? (family?.theme === 'jar' ? 'bg-purple-500' : (family?.theme !== 'neon' ? 'bg-orange-400' : 'bg-cyan-500'))
+                                                        : (family?.theme === 'jar' ? 'bg-purple-900/40' : (family?.theme !== 'neon' ? 'bg-[#eee]' : 'bg-white/10'))
                                                         }`}
                                                 >
                                                     <div className={`text-[10px] font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
@@ -1662,16 +1662,18 @@ export default function Dashboard() {
                                     </button>
 
                                     <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
-                                    <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20'}`}>
+                                    <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme === 'jar' ? 'bg-purple-500/5 border-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20')}`}>
                                         <div className="text-center md:text-left">
                                             <h5 className={`font-black text-lg mb-1 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.install_app}</h5>
                                             <p className={`text-xs opacity-70 mb-0 max-w-xs ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.install_app_desc}</p>
                                         </div>
                                         <button
                                             onClick={handleInstallClick}
-                                            className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme !== 'neon'
-                                                ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:bg-[#ff8a80] hover:border-[#ff8a80]'
-                                                : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
+                                            className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme === 'jar'
+                                                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500'
+                                                : (family?.theme !== 'neon'
+                                                    ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:bg-[#ff8a80] hover:border-[#ff8a80]'
+                                                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400')
                                                 }`}
                                         >
                                             <Download className="w-5 h-5" />
@@ -1682,14 +1684,14 @@ export default function Dashboard() {
                             )}
 
                             {/* 7. 資料重設與匯出 */}
-                            <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5'}`}>
+                            <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme === 'jar' ? 'border-purple-500/20 bg-purple-900/10' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5')}`}>
                                 <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-red-500'} uppercase tracking-[0.2em] mb-4 flex items-center gap-2`}><Trash2 className="w-3 h-3" /> {t.data_mgmt_export}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20'}`}>
+                                    <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20')}`}>
                                         <div className="flex justify-between items-start w-full"><div className="text-sm font-bold mb-1">{t.export_full_history}</div><Download className="w-4 h-4 text-cyan-500" /></div>
                                         <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.csv_desc}</div>
                                     </button>
-                                    <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10'}`}>
+                                    <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10')}`}>
                                         <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
                                         <div className={`text-xs font-medium opacity-60 ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.clear_history_desc}</div>
                                     </button>
