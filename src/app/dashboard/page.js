@@ -1089,8 +1089,8 @@ export default function Dashboard() {
                                         key={k.id}
                                         onClick={() => toggleKidSelection(k.id)}
                                         className={`px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 border ${selectedKids.includes(k.id)
-                                            ? (family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white border-[#4a4a4a] shadow-[4px_4px_0px_#d8c4b6]' : 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]')
-                                            : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white')}`}
+                                            ? (family?.theme === 'jar' ? 'bg-purple-500 text-white border-purple-400 shadow-[0_0_15px_#8b5cf6]' : (family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white border-[#4a4a4a] shadow-[4px_4px_0px_#d8c4b6]' : 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]'))
+                                            : (family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-white'))}`}
                                     >
                                         {selectedKids.includes(k.id) && <CheckCircle2 className="w-4 h-4" />}
                                         {k.name}
@@ -1101,15 +1101,15 @@ export default function Dashboard() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div className="space-y-1">
                                     <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
-                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
+                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
-                                    <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
+                                    <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
-                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a]' : 'bg-black/40 border border-white/10 text-white'} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 focus:ring-cyan-500 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
+                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
                                 </div>
                             </div>
 
@@ -1121,7 +1121,7 @@ export default function Dashboard() {
                                         setMinChange(family?.weekday_limit || 0);
                                         setCustomReason(t.weekday_alloc_reason || '平日分配');
                                     }}
-                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10')}`}
                                 >
                                     🏢 {t.weekday} ({family?.weekday_limit}m)
                                 </button>
@@ -1131,7 +1131,7 @@ export default function Dashboard() {
                                         setMinChange(family?.holiday_limit || 0);
                                         setCustomReason(t.holiday_alloc_reason || '假日分配');
                                     }}
-                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10'}`}
+                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10')}`}
                                 >
                                     🏖️ {t.holiday} ({family?.holiday_limit}m)
                                 </button>
@@ -1967,7 +1967,7 @@ function TourOverlay({ step, onNext, onFinish, t, familyTheme }) {
 // Custom Modal Component
 function CustomModal({ config, onClose, familyTheme, t = {} }) {
     const [inputValue, setInputValue] = useState(config.value || '');
-    const isDoodle = familyTheme !== 'neon';
+    const isDoodle = familyTheme !== 'neon' && familyTheme !== 'jar'; // Update Logic: Jar is Dark
 
     // Reset local value when modal opens/changes
     useEffect(() => {
@@ -1978,8 +1978,8 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[200] p-6 animate-in fade-in duration-300">
-            <div className={`glass-panel p-8 max-w-sm w-full border-2 shadow-2xl scale-in-center overflow-hidden relative ${isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30'}`}>
-                {!isDoodle && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />}
+            <div className={`glass-panel p-8 max-w-sm w-full border-2 shadow-2xl scale-in-center overflow-hidden relative ${familyTheme === 'jar' ? 'bg-[#0f172a] border-purple-500/50 shadow-[0_0_30px_rgba(139,92,246,0.3)]' : (isDoodle ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30')}`}>
+                {!isDoodle && <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent ${familyTheme === 'jar' ? 'via-purple-500/50' : 'via-cyan-500/50'} to-transparent`} />}
 
                 <h3 className={`text-xl font-black italic mb-2 uppercase tracking-tight ${isDoodle ? 'text-[#4a4a4a]' : 'text-white'}`}>{config.title}</h3>
                 <p className={`text-sm font-medium mb-6 leading-relaxed whitespace-pre-line ${isDoodle ? 'text-[#666]' : 'text-slate-400'}`}>{config.message}</p>
@@ -1990,7 +1990,7 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
                         <input
                             autoFocus
                             type="text"
-                            className={`w-full border rounded-xl p-4 font-black text-center outline-none transition-all ${isDoodle ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-white focus:ring-2 focus:ring-cyan-500'}`}
+                            className={`w-full border rounded-xl p-4 font-black text-center outline-none transition-all ${familyTheme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (isDoodle ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border-white/10 text-white focus:ring-2 focus:ring-cyan-500')}`}
                             value={inputValue}
                             onChange={e => setInputValue(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && config.onConfirm(inputValue)}
@@ -2025,7 +2025,7 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
                                         <div className="flex items-center justify-center gap-2">
                                             <span className="text-red-500">-{val} {t.points_label}</span>
                                             <span className="opacity-30">➔</span>
-                                            <span className="text-cyan-500">+{val * rate} {t.minutes_unit}</span>
+                                            <span className={familyTheme === 'jar' ? 'text-purple-400' : 'text-cyan-500'}>+{val * rate} {t.minutes_unit}</span>
                                         </div>
                                     );
                                 }
@@ -2042,7 +2042,7 @@ function CustomModal({ config, onClose, familyTheme, t = {} }) {
                             onClose();
                         }} className={`flex-1 py-3 text-xs font-bold rounded-xl border transition-all ${isDoodle ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-black/5' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>{config.cancelText || t.cancel || '取消'}</button>
                     )}
-                    <button onClick={() => config.onConfirm(inputValue)} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg ${isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400 font-black'}`}>
+                    <button onClick={() => config.onConfirm(inputValue)} className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg ${familyTheme === 'jar' ? 'bg-purple-600 hover:bg-purple-500 text-white' : (isDoodle ? 'bg-[#ff8a80] text-white border-2 border-[#4a4a4a] hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400 font-black')}`}>
                         {config.confirmText || t.confirm || '確定'}
                     </button>
                 </div>
