@@ -45,20 +45,21 @@ export default function JarThemeLayout({
                 <div className="relative z-10 p-4 pt-6 flex flex-col flex-1 h-full justify-start pointer-events-none gap-2">
 
                     {/* Header: Avatar & Name */}
+
                     <div className="flex items-center justify-center gap-3 mt-0 pointer-events-auto">
                         <div className="w-12 h-12 rounded-full bg-[#1e1b4b] border-2 border-[#8b5cf6] flex items-center justify-center shadow-[0_0_15px_#8b5cf6] text-2xl text-white relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-transparent"></div>
                             <span className="relative z-10">{kid.avatar || '👶'}</span>
                         </div>
-                        <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-200 italic uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-none">{kid.name}</h3>
+                        <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-200 italic uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-none pr-4">{kid.name}</h3>
                     </div>
 
                     {/* Main Body: Points Only (Move to top) */}
                     <div className="flex flex-col items-center font-['M_PLUS_Rounded_1c'] pointer-events-none">
                         <div className="text-center pointer-events-auto">
-                            <div className="inline-block px-8 py-6 bg-[#0f172a]/60 backdrop-blur-md rounded-[2rem] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] ring-1 ring-white/5 relative z-20">
-                                <div className="text-xs font-black text-purple-200/80 uppercase tracking-[0.2em] mb-1">{t.current_points}</div>
-                                <div className="text-8xl font-black text-[#fbbf24] drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)] tabular-nums tracking-tighter leading-none" style={{ textShadow: '0 0 30px rgba(251, 191, 36, 0.3)' }}>
+                            <div className="inline-block px-4 py-2 relative z-20">
+                                <div className="text-sm font-black text-purple-200 uppercase tracking-widest mb-1 drop-shadow-md">{t.current_points}</div>
+                                <div className="text-8xl font-black text-[#fbbf24] tabular-nums tracking-tighter leading-none" style={{ textShadow: '4px 4px 0px #2e1065, 0 0 20px rgba(251, 191, 36, 0.4)' }}>
                                     <AnimatedCounter value={visualPoints} />
                                 </div>
                             </div>
