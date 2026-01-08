@@ -3,39 +3,44 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Matter from 'matter-js';
 
-const FallingStar = ({ delay, onComplete, seed }) => {
-    const randomX = (seed % 10) - 5;
-    const randomRotate = (seed % 360);
 
-    return (
-        <motion.div
-            initial={{ y: -30, x: randomX, opacity: 0, scale: 0.5, rotate: randomRotate }}
-            animate={{
-                y: [null, 100],
-                opacity: [0, 1, 1, 0],
-                scale: [1.2, 1],
-                rotate: [randomRotate, randomRotate + 180]
-            }}
-            transition={{
-                duration: 0.6,
-                ease: "backIn",
-                delay
-            }}
-            onAnimationComplete={onComplete}
-            className="absolute top-0 left-1/2 -ml-3 text-[#ffd740] z-50 pointer-events-none filter drop-shadow-md"
-        >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-        </motion.div>
-    );
-};
+
+const RisingStar = ({ x, y, color, scale, onComplete }) => (
+    <motion.div
+        initial={{ x, y, opacity: 1, scale, rotate: Math.random() * 360 }}
+        animate={{
+            y: y - 100,
+            opacity: 0,
+            scale: scale * 0.5,
+            rotate: Math.random() * 360
+        }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        onAnimationComplete={onComplete}
+        style={{ position: 'absolute', left: 0, top: 0, color: color, zIndex: 40, pointerEvents: 'none' }}
+    >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#d4a373" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round">
+            <path d="M12 2c.6 0 1.1.4 1.4.9l2.5 5.7 6.2.7c1 .1 1.4 1.3.6 2l-4.7 4.3 1.3 6.1c.2 1-.9 1.8-1.7 1.3L12 19.9l-5.6 3.1c-.9.5-1.9-.3-1.7-1.3l1.3-6.1-4.7-4.3c-.8-.7-.4-1.9.6-2l6.2-.7 2.5-5.7c.3-.5.8-.9 1.4-.9z" />
+        </svg>
+    </motion.div>
+);
 
 export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
     const isDoodle = theme === 'doodle';
     const isContainer = theme === 'container';
-    const [fallingStars, setFallingStars] = useState([]);
-    const prevPointsRef = useRef(points);
+
+    const [exitStars, setExitStars] = useState([]);
+    const [stablePoints, setStablePoints] = useState(points);
+    // Debounce points to prevent rapid fluctuations triggering double animations
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setStablePoints(points);
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [points]);
+
+    const prevPointsRef = useRef(stablePoints);
+    const ignoreGlitchRef = useRef(0);
+    const prevCountRef = useRef(0);
 
     const sceneRef = useRef(null);
     const engineRef = useRef(null);
@@ -50,12 +55,35 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
 
     // Track container size for responsive physics
     const [containerSize, setContainerSize] = useState({ width: 100, height: 150 });
+    const [isVisible, setIsVisible] = useState(false);
+
+    // Visibility Observer (90% threshold)
+    useEffect(() => {
+        if (!sceneRef.current) return;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            });
+        }, { threshold: 0.9 }); // 90% visible
+
+        // Observe the parent container for better context
+        const target = sceneRef.current.parentElement || sceneRef.current;
+        observer.observe(target);
+
+        return () => observer.disconnect();
+    }, []);
 
     // Auto-resize observer
     useEffect(() => {
         if (!isContainer || !sceneRef.current) return;
+
+        const currentRef = sceneRef.current; // access ref in effect
+
         const updateSize = () => {
-            const parent = sceneRef.current.parentElement;
+            if (!currentRef) return;
+            const parent = currentRef.parentElement;
             if (parent) {
                 const { offsetWidth, offsetHeight } = parent;
                 if (Math.abs(offsetWidth - containerSize.width) > 5 || Math.abs(offsetHeight - containerSize.height) > 5) {
@@ -64,19 +92,23 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
             }
         };
         updateSize();
-        const observer = new ResizeObserver(updateSize);
-        observer.observe(sceneRef.current.parentElement);
-        return () => observer.disconnect();
+
+        // Safety check before observing
+        if (currentRef.parentElement) {
+            const observer = new ResizeObserver(updateSize);
+            observer.observe(currentRef.parentElement);
+            return () => observer.disconnect();
+        }
     }, [isContainer, containerSize.width, containerSize.height]);
 
     const visualStarCount = useMemo(() => {
         // Hard Cap to prevent crash on massive points (e.g. 9999999)
         const MAX_VISUAL_STARS = 300;
 
-        if (points <= MAX_VISUAL_STARS) return points;
+        if (stablePoints <= MAX_VISUAL_STARS) return stablePoints;
 
         return MAX_VISUAL_STARS;
-    }, [points]);
+    }, [stablePoints]);
 
     const numericSeed = useMemo(() => {
         if (typeof seed === 'number') return seed;
@@ -128,23 +160,25 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
             });
         }
         return stars;
-    }, [visualStarCount, isDoodle, isContainer, numericSeed, containerSize, starSize]);
+    }, [visualStarCount, isDoodle, isContainer, numericSeed, containerSize.width, containerSize.height, starSize]);
 
-    // Initialize Matter.js
+    // Initialize Matter.js Engine & Walls (Run once or on layout change)
     useEffect(() => {
         if (!sceneRef.current) return;
         const { Engine, Render, World, Bodies, Mouse, MouseConstraint, Events, Runner } = Matter;
         const { width, height } = isContainer ? containerSize : { width: 100, height: 140 };
 
+        // 1. Setup Engine
         const engine = Engine.create({
-            gravity: { x: 0, y: isContainer ? 1.8 : 0.8 },
-            enableSleeping: true, // Allow stars to sleep to stop jittering
-            positionIterations: 24, // Smoother physics (Combined with velocity cap)
+            gravity: { x: 0, y: isContainer ? 1.0 : 0.8 },
+            enableSleeping: true,
+            positionIterations: 24,
             velocityIterations: 16,
             constraintIterations: 4
         });
         engineRef.current = engine;
 
+        // 2. Setup Render
         const render = Render.create({
             element: sceneRef.current,
             engine: engine,
@@ -158,47 +192,42 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
         });
         renderRef.current = render;
 
+        // Render Style
         render.canvas.style.position = 'absolute';
         render.canvas.style.top = '0';
         render.canvas.style.left = '0';
         render.canvas.style.width = '100%';
         render.canvas.style.height = '100%';
-        render.canvas.style.pointerEvents = 'auto'; // allow mouse interaction
+        render.canvas.style.pointerEvents = 'auto';
         render.canvas.style.zIndex = '20';
         render.canvas.style.opacity = '0';
 
-        const wallOpts = { isStatic: true, friction: 0.8, render: { fillStyle: 'transparent' } };
+        // 3. Setup Walls
+        const wallOpts = { isStatic: true, friction: 0.8, render: { fillStyle: 'transparent' }, label: 'wall' };
         const walls = [];
 
         if (isContainer) {
             walls.push(Bodies.rectangle(width / 2, height, width, 60, wallOpts)); // Floor
             walls.push(Bodies.rectangle(0, height / 2, 60, height, wallOpts)); // Left
             walls.push(Bodies.rectangle(width, height / 2, 60, height, wallOpts)); // Right
-            walls.push(Bodies.rectangle(width / 2, 0, width, 60, wallOpts)); // Ceiling (天花板)
+            walls.push(Bodies.rectangle(width / 2, 0, width, 60, wallOpts)); // Ceiling
+
+            // Central Obstacle
+            walls.push(Bodies.rectangle(width / 2, 110, 180, 80, {
+                isStatic: true,
+                render: { visible: false },
+                chamfer: { radius: 10 },
+                label: 'wall'
+            }));
         } else {
             walls.push(Bodies.rectangle(50, 127, 65, 2, wallOpts));
             walls.push(Bodies.rectangle(15, 85, 2, 90, { ...wallOpts, friction: 0.5 }));
             walls.push(Bodies.rectangle(85, 85, 2, 90, { ...wallOpts, friction: 0.5 }));
         }
 
-        const starBodies = starData.map((star) => {
-            const radius = 9 * star.scale; // Physics radius matches visual scale (approx 0.75 of visual radius)
-            const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
-                angle: (star.rotate * Math.PI) / 180,
-                restitution: 0.4, // Reduced bounciness to prevent jitter accumulation
-                friction: 0.2, // Increased friction
-                density: 0.002,
-                frictionAir: 0.04, // Increased damping to stop perpetual motion
-                slop: 0.05,
-                render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
-            });
-            body.starData = star;
-            return body;
-        });
+        World.add(engine.world, walls);
 
-        bodiesRef.current = starBodies;
-        World.add(engine.world, [...walls, ...starBodies]);
-
+        // 4. Interaction
         const mouse = Mouse.create(render.canvas);
         mouse.pixelRatio = window.devicePixelRatio || 1;
         const mouseConstraint = MouseConstraint.create(engine, {
@@ -207,27 +236,37 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
         });
         World.add(engine.world, mouseConstraint);
 
+        // 5. Update Loop
         Events.on(engine, 'afterUpdate', () => {
             if (!engineRef.current) return;
-            const positions = starBodies.map(body => {
-                // Velocity Cap to prevent explosion
-                if (body.speed > 15) {
-                    Matter.Body.setSpeed(body, 15);
-                }
-                // Angular Velocity Cap
-                if (Math.abs(body.angularVelocity) > 0.5) {
-                    Matter.Body.setAngularVelocity(body, Math.sign(body.angularVelocity) * 0.5);
-                }
+            // Only sync dynamic bodies (stars)
+            const bodies = Matter.Composite.allBodies(engine.world).filter(b => b.label === 'star');
+            const positions = bodies.map(body => {
+                // Caps
+                if (body.speed > 15) Matter.Body.setSpeed(body, 15);
+                if (Math.abs(body.angularVelocity) > 0.5) Matter.Body.setAngularVelocity(body, Math.sign(body.angularVelocity) * 0.5);
 
                 return {
+                    id: body.starId, // Map back to starData via ID attached to body
                     x: body.position.x,
                     y: body.position.y,
                     angle: body.angle
                 };
             });
+            // We need to map positions back to index order? 
+            // setStarPositions expects array matching starData index? 
+            // Actually previous implementation used map(body => ...). bodiesRef was ordered.
+            // Now bodies might be unordered.
+            // But starData is ordered by ID (0..N).
+            // Let's store a map of id -> pos.
+            // Or just update specific indices.
+            // For simplicity, let's use a dict or find by ID.
+            // But React state needs array.
+            // We'll fix this in the state usage.
             setStarPositions(positions);
         });
 
+        // 6. Run
         const runner = Runner.create();
         Runner.run(runner, engine);
         Render.run(render);
@@ -240,7 +279,78 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
             render.canvas.remove();
             engineRef.current = null;
         };
-    }, [starData, isDoodle, isContainer, containerSize]);
+    }, [isContainer, isDoodle, containerSize.width, containerSize.height]);
+
+    // Sync Stars (Run when points change)
+    useEffect(() => {
+        if (!engineRef.current) return;
+
+        const { World, Bodies } = Matter;
+        // Check current bodies to decide if this is an initial load or an update
+        const currentBodies = Matter.Composite.allBodies(engineRef.current.world).filter(b => b.label === 'star');
+
+        // Gate: ONLY return if invisible AND we already have stars (meaning this is an update animation)
+        // If currentBodies.length is 0, we MUST run creating stars so the jar isn't empty initially.
+        if (!isVisible && currentBodies.length > 0) return;
+
+        const engine = engineRef.current;
+        const currentIds = new Set(currentBodies.map(b => b.starId));
+
+        // Find stars to add
+        const starsToAdd = starData.filter(s => !currentIds.has(s.id));
+
+        // Find stars to remove
+        const targetIds = new Set(starData.map(s => s.id));
+        const bodiesToRemove = currentBodies.filter(b => !targetIds.has(b.starId));
+
+        // Check for net decrease in star count
+        const isNetDecrease = starData.length < prevCountRef.current;
+        prevCountRef.current = starData.length;
+
+        // Execute Remove
+        const isAdding = starsToAdd.length > 0;
+        const isRemoving = bodiesToRemove.length > 0;
+
+        if (isRemoving) {
+            // Only animate exit if we strictly have fewer stars than before
+            // AND we are not adding (double safety, though isNetDecrease should handle it)
+            if (isNetDecrease && !isAdding) {
+                // Trigger exit animation
+                const exiting = bodiesToRemove.map(b => ({
+                    id: b.starId + '_' + Date.now(), // Ensure unique key for animation
+                    x: b.position.x,
+                    y: b.position.y,
+                    color: b.render.fillStyle,
+                    scale: (b.bounds.max.x - b.bounds.min.x) / 18 // Approx scale recovery
+                }));
+                setExitStars(prev => [...prev, ...exiting]);
+            }
+            // Always remove the bodies from physics even if silent
+            World.remove(engine.world, bodiesToRemove);
+        }
+
+        // Execute Add
+        if (isAdding) {
+            const newBodies = starsToAdd.map(star => {
+                const radius = 9 * star.scale;
+                const body = Bodies.polygon(star.initialX, star.initialY, 5, radius, {
+                    angle: (star.rotate * Math.PI) / 180,
+                    restitution: 0.4,
+                    friction: 0.2,
+                    density: 0.002,
+                    frictionAir: 0.04,
+                    slop: 0.05,
+                    label: 'star',
+                    render: { fillStyle: star.color, strokeStyle: "#d4a373", lineWidth: 1 }
+                });
+                body.starId = star.id;
+                // Add initial velocity? No, let them fall.
+                return body;
+            });
+            World.add(engine.world, newBodies);
+        }
+
+    }, [starData]);
 
     // Handle Device Sensors (Gravity + Shake)
     useEffect(() => {
@@ -332,22 +442,15 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
         }
     };
 
-    // Falling stars logic
+    // Falling stars logic (Triggered by STABLE points increase)
+    // Falling stars logic REMOVED.
+    // We strictly use physics simulation for adding stars now.
     useEffect(() => {
-        const currentPoints = Math.floor(points);
-        const prevPoints = Math.floor(prevPointsRef.current);
-        if (currentPoints > prevPoints) {
-            const count = Math.min(currentPoints - prevPoints, 5);
-            const batchSeed = Date.now();
-            const newStars = Array.from({ length: count }).map((_, i) => ({
-                id: batchSeed + i, delay: i * 0.15
-            }));
-            setFallingStars(prev => [...prev, ...newStars]);
-        }
-        prevPointsRef.current = points;
-    }, [points]);
+        const currentPoints = Math.floor(stablePoints);
+        prevPointsRef.current = currentPoints;
+    }, [stablePoints]);
 
-    const removeFallingStar = (id) => setFallingStars(prev => prev.filter(s => s.id !== id));
+
 
     return (
         <div className={`relative ${isContainer ? 'w-full h-full' : 'w-24 h-32'} flex justify-center items-end`}>
@@ -367,18 +470,20 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
 
             <div ref={sceneRef} className="absolute inset-0" style={{ zIndex: 20 }} />
 
-            <div className="absolute inset-0 overflow-visible pointer-events-none z-50">
+            <div className="absolute inset-0 overflow-visible pointer-events-none z-40">
                 <AnimatePresence>
-                    {fallingStars.map(star => (
-                        <FallingStar key={star.id} seed={star.id} delay={star.delay} onComplete={() => removeFallingStar(star.id)} />
+                    {exitStars.map(star => (
+                        <RisingStar key={star.id} {...star} onComplete={() => setExitStars(prev => prev.filter(s => s.id !== star.id))} />
                     ))}
                 </AnimatePresence>
             </div>
 
+
+
             <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-[inherit]">
-                {starPositions.map((pos, i) => {
-                    const star = starData[i];
-                    if (!star) return null;
+                {starData.map((star) => {
+                    const pos = starPositions.find(p => p.id === star.id);
+                    if (!pos) return null;
                     return (
                         <div key={star.id} style={{
                             position: 'absolute',

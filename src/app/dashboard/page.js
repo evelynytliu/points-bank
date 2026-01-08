@@ -166,6 +166,11 @@ export default function Dashboard() {
     const [newKidAvatar, setNewKidAvatar] = useState(AVATARS[0]);
     const [allocPlan, setAllocPlan] = useState('weekday');
 
+    // Reset Admin Console state on mount (ensure it's collapsed when returning from other pages like History)
+    useEffect(() => {
+        setIsAdminExpanded(false);
+    }, []);
+
     // 自動判斷平日/假日
     useEffect(() => {
         const day = new Date().getDay();
@@ -181,7 +186,9 @@ export default function Dashboard() {
     const [selectedKids, setSelectedKids] = useState([]);
     const [ptsChange, setPtsChange] = useState('');
     const [minChange, setMinChange] = useState('');
+    const [bonusChange, setBonusChange] = useState('');
     const [customReason, setCustomReason] = useState('');
+    const [updateSuccess, setUpdateSuccess] = useState(false);
 
     // Onboarding
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -204,7 +211,11 @@ export default function Dashboard() {
         use_parent_pin: false,
         short_id: '',
         theme: 'doodle',
-        star_size: 5
+        star_size: 5,
+        bonus_enabled: false,
+        bonus_weekday_limit: 30,
+        bonus_holiday_limit: 60,
+        bonus_point_to_minutes: 10
     });
 
     const [modal, setModal] = useState({
@@ -428,7 +439,11 @@ export default function Dashboard() {
                     use_parent_pin: familyData.use_parent_pin || false,
                     short_id: familyData.short_id || '',
                     theme: familyData.theme || 'cyber',
-                    star_size: localStarSize
+                    star_size: localStarSize,
+                    bonus_enabled: familyData.bonus_enabled || false,
+                    bonus_weekday_limit: familyData.bonus_weekday_limit || 30,
+                    bonus_holiday_limit: familyData.bonus_holiday_limit || 60,
+                    bonus_point_to_minutes: familyData.bonus_point_to_minutes || 10
                 });
                 localStorage.setItem('cached_theme', familyData.theme || 'doodle');
             }
@@ -549,21 +564,27 @@ export default function Dashboard() {
         if (selectedKids.length === 0) return alert('請選擇對象');
         const p = parseInt(ptsChange) || 0;
         const m = parseInt(minChange) || 0;
-        if (p === 0 && m === 0) return alert('請輸入調整數值');
+        const b = parseInt(bonusChange) || 0;
+        if (p === 0 && m === 0 && b === 0) return alert('請輸入調整數值');
 
         const actor = getActorName();
         for (const kidId of selectedKids) {
             const kid = kids.find(k => k.id === kidId);
             if (kid) {
-                await updateKidAction(kid, p, m, customReason || '後台批次調整', actor, false);
+                await updateKidAction(kid, p, m, b, customReason || '後台批次調整', actor, false);
             }
         }
 
         setPtsChange('');
         setMinChange('');
+        setBonusChange('');
         setCustomReason('');
         setSelectedKids([]);
-        alert('更新完成！');
+
+        // Collapse admin panel immediately to show dashboard animations
+        setIsAdminExpanded(false);
+        setUpdateSuccess(false);
+
         fetchData();
     };
 
@@ -573,6 +594,7 @@ export default function Dashboard() {
             title: t.logout_confirm_title,
             message: t.logout_confirm_msg,
             onConfirm: async () => {
+                setLoading(true); // Show loading spinner immediately
                 if (userRole === 'parent') {
                     await supabase.auth.signOut();
                 } else {
@@ -612,6 +634,7 @@ export default function Dashboard() {
         else {
             alert('設定已更新！');
             setShowSettingsModal(false);
+            setIsAdminExpanded(false); // Collapse Admin Console on save
             fetchData();
         }
     };
@@ -728,9 +751,9 @@ export default function Dashboard() {
         });
     };
 
-    const updateKidAction = async (kid, pChange, mChange, reason, actor, shouldFetch = true) => {
+    const updateKidAction = async (kid, pChange, mChange, bChange = 0, reason, actor, shouldFetch = true) => {
         // 如果是減少時間/點數且開啟了家長密碼，則需要檢查
-        if (userRole === 'kid' && (pChange > 0 || mChange > 0)) {
+        if (userRole === 'kid' && (pChange > 0 || mChange > 0 || bChange > 0)) {
             if (!await checkParentPin()) return;
         }
 
@@ -739,6 +762,7 @@ export default function Dashboard() {
             target_kid_id: kid.id,
             p_change: pChange,
             m_change: mChange,
+            b_change: bChange,
             p_reason: reason,
             p_actor: actor,
             p_parent_id: family.admin_id
@@ -765,7 +789,7 @@ export default function Dashboard() {
             onConfirm: async () => {
                 const actor = getActorName();
                 for (const kid of kids) {
-                    await updateKidAction(kid, 0, minutes, reason, actor, false);
+                    await updateKidAction(kid, 0, minutes, 0, reason, actor, false);
                 }
                 showModal({ title: '完成', message: '分配完成！' });
                 fetchData();
@@ -822,10 +846,16 @@ export default function Dashboard() {
             title: '撤銷並刪除紀錄',
             message: '確定要刪除並撤銷此紀錄嗎？這會自動還原該次異動的點數與時間。',
             onConfirm: async () => {
+                // Optimistic UI update for logs list
+                setLogs(prev => prev.filter(l => l.id !== logId));
+
                 const { error } = await supabase.rpc('delete_and_revert_log', { target_log_id: logId });
-                if (error) showModal({ title: '撤銷失敗', message: error.message });
-                else {
+                if (error) {
+                    showModal({ title: '撤銷失敗', message: error.message });
+                    // Revert optimistic update if failed (optional, but good practice)
                     fetchData();
+                } else {
+                    fetchData(); // Sync everything else (kid stats)
                 }
             }
         });
@@ -1085,7 +1115,7 @@ export default function Dashboard() {
 
                     {/* Only show Admin Panel to parents or if needed */}
                     {/* Admin Panel available to all, but actions may require PIN */}
-                    <div className={`glass-panel ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a]' : 'border-cyan-500/20')} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
+                    <div className={`glass-panel relative ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a]' : 'border-cyan-500/20')} overflow-hidden transition-all duration-500 ${isAdminExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-[70px] opacity-90'}`}>
                         <button
                             onClick={() => setIsAdminExpanded(!isAdminExpanded)}
                             className={`w-full flex justify-between items-center p-6 ${family?.theme === 'jar' ? 'bg-purple-900/10 hover:bg-purple-900/30' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/5 hover:bg-[#ff8a80]/10' : 'bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20')} transition-all`}
@@ -1097,6 +1127,8 @@ export default function Dashboard() {
                         </button>
 
                         <div className="p-8 pt-2">
+
+
                             <div className="flex flex-wrap gap-3 mb-8">
                                 {kids.map(k => (
                                     <button
@@ -1115,39 +1147,62 @@ export default function Dashboard() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div className="space-y-1">
                                     <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>⭐ {t.points_adjust}</label>
-                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
+                                    <input type="number" placeholder={t.pts_change_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none h-[74px]`} value={ptsChange} onChange={e => setPtsChange(e.target.value)} />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📺 {t.minutes_adjust}</label>
-                                    <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none`} value={minChange} onChange={e => setMinChange(e.target.value)} />
+
+                                <div className="flex gap-2">
+                                    <div className="space-y-1 flex-1">
+                                        <label className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-wider ml-1 truncate`}>📺 {t.minutes_adjust}</label>
+                                        <input type="number" placeholder={t.min_change_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none h-[74px]`} value={minChange} onChange={e => setMinChange(e.target.value)} />
+                                    </div>
+                                    {family?.bonus_enabled && (
+                                        <div className="space-y-1 flex-1">
+                                            <label className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#ffb74d]' : (family?.theme !== 'neon' ? 'text-amber-500' : 'text-amber-400')} uppercase tracking-wider ml-1 truncate`}>⭐ {t.focus_time || '精選'}</label>
+                                            <input type="number" placeholder={t.bonus_change_placeholder || '變更'} className={`w-full ${family?.theme === 'jar' ? 'bg-amber-900/20 border-amber-500/30 text-white focus:ring-amber-500' : (family?.theme !== 'neon' ? 'bg-amber-50 border-amber-400 text-amber-900 focus:ring-amber-500' : 'bg-amber-900/10 border-amber-500/30 text-amber-400 focus:ring-amber-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none h-[74px]`} value={bonusChange} onChange={e => setBonusChange(e.target.value)} />
+                                        </div>
+                                    )}
                                 </div>
+
                                 <div className="space-y-1">
                                     <label className={`text-base font-black ${family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-500'} uppercase tracking-widest ml-2`}>📝 {t.reason_desc}</label>
-                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
+                                    <input type="text" placeholder={t.reason_placeholder} className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] focus:ring-cyan-500' : 'bg-black/40 border-white/10 text-white focus:ring-cyan-500')} border p-5 text-lg rounded-2xl font-black text-center focus:ring-2 outline-none h-[74px]`} value={customReason} onChange={e => setCustomReason(e.target.value)} />
                                 </div>
                             </div>
 
                             {/* Preset Buttons for Time Allocation */}
-                            <div className="flex gap-4 mb-6 justify-center">
+                            {/* Preset Buttons for Time Allocation */}
+                            <div className="grid grid-cols-2 gap-4 mb-6">
                                 <button
                                     onClick={() => {
                                         if (selectedKids.length === 0) setSelectedKids(kids.map(k => k.id));
                                         setMinChange(family?.weekday_limit || 0);
+                                        if (family?.bonus_enabled) {
+                                            setBonusChange(family?.bonus_weekday_limit || 0);
+                                        }
                                         setCustomReason(t.weekday_alloc_reason || '平日分配');
                                     }}
-                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10')}`}
+                                    className={`w-full px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border-2 border-[#4a4a4a] hover:bg-[#f5f5f5]' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10')}`}
                                 >
-                                    🏢 {t.weekday} ({family?.weekday_limit}m)
+                                    <div>🏢 {t.weekday}</div>
+                                    <div className="text-xs opacity-70 mt-1 font-normal">
+                                        {family?.weekday_limit} 📺 {family?.bonus_enabled ? ` + ${family?.bonus_weekday_limit} ⭐` : ''}
+                                    </div>
                                 </button>
                                 <button
                                     onClick={() => {
                                         if (selectedKids.length === 0) setSelectedKids(kids.map(k => k.id));
                                         setMinChange(family?.holiday_limit || 0);
+                                        if (family?.bonus_enabled) {
+                                            setBonusChange(family?.bonus_holiday_limit || 0);
+                                        }
                                         setCustomReason(t.holiday_alloc_reason || '假日分配');
                                     }}
-                                    className={`px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10')}`}
+                                    className={`w-full px-6 py-3 rounded-xl text-lg font-bold uppercase tracking-widest transition-all shadow-sm active:scale-95 ${family?.theme === 'jar' ? 'bg-purple-900/20 text-purple-200 border border-purple-500/30 hover:bg-purple-500/20' : (family?.theme !== 'neon' ? 'bg-white text-[#ff8a80] border-2 border-[#ff8a80] hover:bg-[#fff8e1]' : 'bg-white/5 text-purple-400 border border-purple-500/30 hover:bg-purple-500/10')}`}
                                 >
-                                    🏖️ {t.holiday} ({family?.holiday_limit}m)
+                                    <div>🏖️ {t.holiday}</div>
+                                    <div className="text-xs opacity-70 mt-1 font-normal">
+                                        {family?.holiday_limit} 📺 {family?.bonus_enabled ? ` + ${family?.bonus_holiday_limit} ⭐` : ''}
+                                    </div>
                                 </button>
                             </div>
 
@@ -1169,6 +1224,7 @@ export default function Dashboard() {
                                 onUpdate={updateKidAction}
                                 onDelete={deleteKid}
                                 currentLimit={allocPlan === 'weekday' ? family?.weekday_limit : family?.holiday_limit}
+                                currentBonusLimit={allocPlan === 'weekday' ? family?.bonus_weekday_limit : family?.bonus_holiday_limit}
                                 familySettings={family}
                                 actorName={getActorName()}
                                 hideSensitive={userRole === 'kid'}
@@ -1227,529 +1283,585 @@ export default function Dashboard() {
             </div>
 
             {/* Settings Modal */}
-            {showSettingsModal && (
-                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-4">
-                    <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30')} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
-                        {/* Sticky Header */}
-                        <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'jar' ? 'bg-purple-900/10 border-purple-500/30' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20')} backdrop-blur-md z-10`}>
-                            <h3 className={`text-2xl font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400')} w-6 h-6`} /> {t.settings}</h3>
-                            <button onClick={() => {
-                                const isChanged =
-                                    tempSettings.weekday_limit !== family.weekday_limit ||
-                                    tempSettings.holiday_limit !== family.holiday_limit ||
-                                    tempSettings.point_to_minutes !== family.point_to_minutes ||
-                                    tempSettings.point_to_cash !== family.point_to_cash ||
-                                    tempSettings.parent_pin !== family.parent_pin ||
-                                    tempSettings.use_parent_pin !== family.use_parent_pin ||
-                                    tempSettings.short_id !== family.short_id ||
-                                    tempSettings.theme !== family.theme ||
-                                    tempSettings.star_size !== (family.star_size || 5);
+            {
+                showSettingsModal && (
+                    <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-[100] p-4">
+                        <div className={`glass-panel flex flex-col max-w-2xl w-full ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] border-2 shadow-[8px_8px_0px_#d8c4b6]' : 'border-cyan-500/30')} max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300`}>
+                            {/* Sticky Header */}
+                            <div className={`flex justify-between items-center p-8 md:px-10 pb-6 border-b ${family?.theme === 'jar' ? 'bg-purple-900/10 border-purple-500/30' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20')} backdrop-blur-md z-10`}>
+                                <h3 className={`text-2xl font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'} italic flex items-center gap-3`}><Settings className={`${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-400')} w-6 h-6`} /> {t.settings}</h3>
+                                <button onClick={() => {
+                                    const isChanged =
+                                        tempSettings.weekday_limit !== family.weekday_limit ||
+                                        tempSettings.holiday_limit !== family.holiday_limit ||
+                                        tempSettings.point_to_minutes !== family.point_to_minutes ||
+                                        tempSettings.point_to_cash !== family.point_to_cash ||
+                                        tempSettings.parent_pin !== family.parent_pin ||
+                                        tempSettings.use_parent_pin !== family.use_parent_pin ||
+                                        tempSettings.short_id !== family.short_id ||
+                                        tempSettings.theme !== family.theme ||
+                                        tempSettings.star_size !== (family.star_size || 5) ||
+                                        tempSettings.bonus_enabled !== (family.bonus_enabled || false) ||
+                                        tempSettings.bonus_weekday_limit !== (family.bonus_weekday_limit || 30) ||
+                                        tempSettings.bonus_holiday_limit !== (family.bonus_holiday_limit || 60) ||
+                                        tempSettings.bonus_point_to_minutes !== (family.bonus_point_to_minutes || 10);
 
-                                if (isChanged) {
-                                    showModal({
-                                        type: 'confirm',
-                                        title: t.unsaved_changes_title,
-                                        message: t.unsaved_changes_msg,
-                                        confirmText: t.discard,
-                                        cancelText: t.keep_editing,
-                                        onConfirm: () => setShowSettingsModal(false)
-                                    });
-                                } else {
-                                    setShowSettingsModal(false);
-                                }
-                            }} className={`${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
-                        </div>
+                                    if (isChanged) {
+                                        showModal({
+                                            type: 'confirm',
+                                            title: t.unsaved_changes_title,
+                                            message: t.unsaved_changes_msg,
+                                            confirmText: t.discard,
+                                            cancelText: t.keep_editing,
+                                            onConfirm: () => {
+                                                setShowSettingsModal(false);
+                                                setIsAdminExpanded(false);
+                                            }
+                                        });
+                                    } else {
+                                        setShowSettingsModal(false);
+                                        setIsAdminExpanded(false);
+                                    }
+                                }} className={`${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-500'} hover:opacity-70 transition-transform active:scale-90`}><X /></button>
+                            </div>
 
-                        {/* Scrollable Content */}
-                        <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-10 scroll-smooth">
-                            {/* 0. Family Switcher (New) */}
-                            {/* 0. Family Switcher (New) */}
-                            {APP_CONFIG.ENABLE_FAMILY_SWITCHING && familyHistory.length > 0 && (
-                                <section>
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.switch_family || '切換家庭'}</h4>
-                                        <button onClick={() => setShowJoinInput(!showJoinInput)} className={`p-1.5 rounded-lg transition-all ${family?.theme !== 'neon' ? 'text-[#888] hover:bg-black/5 hover:text-[#4a4a4a]' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}>
-                                            <Plus className={`w-4 h-4 transition-transform duration-300 ${showJoinInput ? 'rotate-45' : ''}`} />
-                                        </button>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {familyHistory.map(hist => (
-                                            <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme === 'jar' ? 'bg-purple-500/20 border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500')) : (family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'))}`}>
-                                                <div>
-                                                    <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{hist.name}</div>
-                                                    <div className="text-[10px] opacity-60 font-mono">ID: {hist.short_id}</div>
-                                                </div>
-                                                {hist.id === family?.id ? (
-                                                    <span className={`text-xs font-black px-3 py-1 rounded-full ${family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'}`}>{t.current_family || '目前'}</span>
-                                                ) : (
-                                                    <button onClick={() => {
-                                                        showModal({
-                                                            type: 'prompt',
-                                                            title: '輸入 PIN 碼',
-                                                            message: `請輸入「${hist.name}」的家庭 PIN 碼：`,
-                                                            onConfirm: (val) => handleJoinFamily(hist.short_id, val)
-                                                        });
-                                                    }} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
-                                                        {t.switch_button || '切換'}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                        {showJoinInput && (
-                                            <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
-                                                <div className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.join_new_family_label || '加入新家庭'}</div>
-                                                <div className="flex gap-2">
-                                                    <input
-                                                        type="text"
-                                                        placeholder={t.join_new_family_placeholder || '輸入家庭代碼'}
-                                                        className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme === 'jar' ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white')}`}
-                                                        value={joinNewFamilyCode}
-                                                        onChange={e => setJoinNewFamilyCode(e.target.value)}
-                                                    />
-                                                    <input
-                                                        type="password"
-                                                        maxLength={4}
-                                                        placeholder="PIN"
-                                                        className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme === 'jar' ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white')}`}
-                                                        value={joinNewFamilyPin}
-                                                        onChange={e => setJoinNewFamilyPin(e.target.value.replace(/\D/g, ''))}
-                                                    />
-                                                    <button
-                                                        onClick={() => handleJoinFamily(joinNewFamilyCode, joinNewFamilyPin)}
-                                                        disabled={!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim()}
-                                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme !== 'neon' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
-                                                    >
-                                                        {t.join_btn_short || '加入'}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* 1. 點數與時間規則 (最常用) */}
-                            <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
-                                        <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
-                                            <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: parseInt(e.target.value) })} />
-                                            <span className={`pr-3 text-xs font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2 text-center col-span-2 md:col-span-1">
-                                        <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.holiday_limit}</label>
-                                        <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
-                                            <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: parseInt(e.target.value) })} />
-                                            <span className={`pr-3 text-xs font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1 text-center col-span-2 md:col-span-1">
-                                        <div className={`flex items-end gap-2 px-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
-                                            <div className="w-[30px] text-center pb-1">{t.pts_to_time_rate?.split(':')[0]?.trim() || 'Points'}</div>
-                                            <div className="w-[10px] text-center pb-1">:</div>
-                                            <div className="flex-1 text-center pb-1">{t.pts_to_time_rate?.split(':')[1]?.trim() || 'Minutes'}</div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
-                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
-                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
-                                                <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: parseInt(e.target.value) })} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1 text-center col-span-2 md:col-span-1">
-                                        <div className={`flex items-end gap-2 px-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
-                                            <div className="w-[30px] text-center pb-1">{t.pts_to_cash_rate?.split(':')[0]?.trim() || 'Points'}</div>
-                                            <div className="w-[10px] text-center pb-1">:</div>
-                                            <div className="flex-1 text-center pb-1">{t.pts_to_cash_rate?.split(':')[1]?.trim() || 'Cash'}</div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
-                                            <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
-                                            <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
-                                                <input type="number" step="0.1" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: parseFloat(e.target.value) })} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section>
-                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.kids_mgmt}</h4>
-                                <div className={`text-xs ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} opacity-60 mb-3`}>{t.kid_sort_hint}</div>
-                                <Reorder.Group axis="y" values={kids} onReorder={handleReorderKids} className="space-y-3 mb-4">
-                                    {kids.map(kid => (
-                                        <SortableKidItem
-                                            key={kid.id}
-                                            kid={kid}
-                                            family={family}
-                                            t={t}
-                                            editingKidId={editingKidId}
-                                            editName={editName}
-                                            setEditName={setEditName}
-                                            editPin={editPin}
-                                            setEditPin={setEditPin}
-                                            saveEditKid={saveEditKid}
-                                            cancelEditKid={cancelEditKid}
-                                            startEditKid={startEditKid}
-                                            deleteKid={deleteKid}
-                                            showAvatarPicker={showAvatarPicker}
-                                            setShowAvatarPicker={setShowAvatarPicker}
-                                            updateKidAvatar={updateKidAvatar}
-                                        />
-                                    ))}
-                                </Reorder.Group>
-                                <button onClick={() => { setShowAddModal(true); setShowSettingsModal(false); }} className={`w-full py-4 rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 font-black transition-all ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30 text-[#ff8a80] hover:bg-[#ff8a80]/5' : 'border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10'}`}>
-                                    <Plus className="w-5 h-5" /> {t.add_kid_member}
-                                </button>
-                            </section>
-
-                            <div className="flex flex-col gap-6">
-                                {/* 3. 家庭邀請碼 */}
-                                <section className={`p-4 md:p-6 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
-                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center flex-wrap gap-2">
-                                            <div className="flex items-center gap-2">
-                                                <label className={`text-xs font-black ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {/* Invite Parent */}
-                                                <button
-                                                    onClick={() => {
-                                                        const url = 'https://points-bank.vercel.app/';
-                                                        const code = tempSettings.short_id;
-
-                                                        let msg = t.invite_parent_msg_template;
-                                                        const pinSection = tempSettings.use_parent_pin
-                                                            ? t.invite_parent_pin_section.replace('{pin}', tempSettings.parent_pin)
-                                                            : '';
-
-                                                        msg = msg.replace('{url}', url)
-                                                            .replace('{code}', code)
-                                                            .replace('{pin_section}', pinSection);
-
-                                                        showModal({
-                                                            type: 'confirm',
-                                                            title: '📋 ' + t.invite_msg_title,
-                                                            message: msg,
-                                                            confirmText: t.copy_invite,
-                                                            cancelText: t.cancel,
-                                                            onConfirm: () => {
-                                                                navigator.clipboard.writeText(msg);
-                                                                alert(t.copied);
-                                                            }
-                                                        });
-                                                    }}
-                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
-                                                >
-                                                    <Share2 className="w-3.5 h-3.5" />
-                                                    {t.invite_parent_btn}
-                                                </button>
-
-                                                {/* Invite Kid */}
-                                                <button
-                                                    onClick={() => {
-                                                        if (kids.length === 0) {
-                                                            alert(t.no_kids_alert);
-                                                            return;
-                                                        }
-
-                                                        showModal({
-                                                            type: 'alert',
-                                                            title: t.invite_kid_msg_title,
-                                                            message: t.select_kid_invite,
-                                                            content: (
-                                                                <div className="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1">
-                                                                    {kids.map(kid => (
-                                                                        <button
-                                                                            key={kid.id}
-                                                                            onClick={() => {
-                                                                                const url = 'https://points-bank.vercel.app/';
-                                                                                const code = tempSettings.short_id;
-                                                                                let msg = t.invite_kid_msg_template;
-                                                                                msg = msg.replace('{url}', url)
-                                                                                    .replace('{code}', code)
-                                                                                    .replace(/{name}/g, kid.name)
-                                                                                    .replace('{pin}', kid.login_pin || '1234');
-
-                                                                                showModal({
-                                                                                    type: 'confirm',
-                                                                                    title: '📋 ' + t.invite_kid_msg_title,
-                                                                                    message: msg,
-                                                                                    confirmText: t.copy_invite,
-                                                                                    cancelText: t.cancel,
-                                                                                    onConfirm: () => {
-                                                                                        navigator.clipboard.writeText(msg);
-                                                                                        alert(t.copied);
-                                                                                    }
-                                                                                });
-                                                                            }}
-                                                                            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all active:scale-95 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
-                                                                        >
-                                                                            <span className="text-2xl">{kid.avatar || '👶'}</span>
-                                                                            <span className="font-bold text-sm truncate w-full text-center">{kid.name}</span>
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
-                                                            ),
-                                                            confirmText: t.cancel || '取消',
-                                                        });
-                                                    }}
-                                                    className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-[#ffccbc] text-[#d84315] hover:bg-[#ffab91]' : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'}`}
-                                                >
-                                                    <UserPlus className="w-3.5 h-3.5" />
-                                                    {t.invite_kid_btn}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="text"
-                                                className={`w-full flex-1 ${family?.theme !== 'neon' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-3 md:p-4 pr-12 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                                                value={tempSettings.short_id}
-                                                onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
-                                                placeholder="例如: FAMILY123"
-                                            />
-                                            <button
-                                                onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }}
-                                                className={`absolute right-2 p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-[#ccc] hover:text-[#4a4a4a] hover:bg-black/5' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
-                                                title={t.copy_code || 'Copy'}
-                                            >
-                                                <Copy className="w-5 h-5" />
+                            {/* Scrollable Content */}
+                            <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-10 scroll-smooth">
+                                {/* 0. Family Switcher (New) */}
+                                {/* 0. Family Switcher (New) */}
+                                {APP_CONFIG.ENABLE_FAMILY_SWITCHING && familyHistory.length > 0 && (
+                                    <section>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.switch_family || '切換家庭'}</h4>
+                                            <button onClick={() => setShowJoinInput(!showJoinInput)} className={`p-1.5 rounded-lg transition-all ${family?.theme !== 'neon' ? 'text-[#888] hover:bg-black/5 hover:text-[#4a4a4a]' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}>
+                                                <Plus className={`w-4 h-4 transition-transform duration-300 ${showJoinInput ? 'rotate-45' : ''}`} />
                                             </button>
                                         </div>
-                                        <p className="text-xs text-slate-500 italic opacity-60">{t.access_code_hint}</p>
+                                        <div className="space-y-3">
+                                            {familyHistory.map(hist => (
+                                                <div key={hist.id} className={`flex items-center justify-between p-4 rounded-2xl border ${hist.id === family?.id ? (family?.theme === 'jar' ? 'bg-purple-500/20 border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 border-[#ff8a80]' : 'bg-cyan-500/10 border-cyan-500')) : (family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5'))}`}>
+                                                    <div>
+                                                        <div className={`text-sm font-bold ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{hist.name}</div>
+                                                        <div className="text-[10px] opacity-60 font-mono">ID: {hist.short_id}</div>
+                                                    </div>
+                                                    {hist.id === family?.id ? (
+                                                        <span className={`text-xs font-black px-3 py-1 rounded-full ${family?.theme !== 'neon' ? 'bg-[#ff8a80] text-white' : 'bg-cyan-500 text-black'}`}>{t.current_family || '目前'}</span>
+                                                    ) : (
+                                                        <button onClick={() => {
+                                                            showModal({
+                                                                type: 'prompt',
+                                                                title: '輸入 PIN 碼',
+                                                                message: `請輸入「${hist.name}」的家庭 PIN 碼：`,
+                                                                onConfirm: (val) => handleJoinFamily(hist.short_id, val)
+                                                            });
+                                                        }} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                                                            {t.switch_button || '切換'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {showJoinInput && (
+                                                <div className={`p-4 rounded-2xl border flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-300 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#eee]' : 'bg-white/5 border-white/5')}`}>
+                                                    <div className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.join_new_family_label || '加入新家庭'}</div>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder={t.join_new_family_placeholder || '輸入家庭代碼'}
+                                                            className={`flex-1 p-2 rounded-xl text-sm font-bold outline-none ${family?.theme === 'jar' ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white')}`}
+                                                            value={joinNewFamilyCode}
+                                                            onChange={e => setJoinNewFamilyCode(e.target.value)}
+                                                        />
+                                                        <input
+                                                            type="password"
+                                                            maxLength={4}
+                                                            placeholder="PIN"
+                                                            className={`w-20 p-2 rounded-xl text-sm font-bold outline-none text-center ${family?.theme === 'jar' ? 'bg-black/30 text-white border border-purple-500/30 focus:border-purple-500' : (family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a]' : 'bg-black/30 text-white')}`}
+                                                            value={joinNewFamilyPin}
+                                                            onChange={e => setJoinNewFamilyPin(e.target.value.replace(/\D/g, ''))}
+                                                        />
+                                                        <button
+                                                            onClick={() => handleJoinFamily(joinNewFamilyCode, joinNewFamilyPin)}
+                                                            disabled={!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim()}
+                                                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${!joinNewFamilyCode.trim() || !joinNewFamilyPin.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${family?.theme !== 'neon' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-cyan-500 text-black hover:bg-cyan-400'}`}
+                                                        >
+                                                            {t.join_btn_short || '加入'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* 1. 點數與時間規則 (最常用) */}
+                                <section>
+                                    <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.points_time_rules}</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <div className="space-y-2 text-center col-span-2 md:col-span-1">
+                                            <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.weekday_limit}</label>
+                                            <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                                <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.weekday_limit} onChange={e => setTempSettings({ ...tempSettings, weekday_limit: e.target.value === '' ? '' : parseInt(e.target.value) })} />
+                                                <span className={`pr-3 text-xs font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2 text-center col-span-2 md:col-span-1">
+                                            <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase block mb-1`}>{t.holiday_limit}</label>
+                                            <div className={`flex items-center gap-2 p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                                <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1 pl-3`} value={tempSettings.holiday_limit} onChange={e => setTempSettings({ ...tempSettings, holiday_limit: e.target.value === '' ? '' : parseInt(e.target.value) })} />
+                                                <span className={`pr-3 text-xs font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#888]' : 'text-slate-500'} whitespace-nowrap`}>{t.minutes_unit}</span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1 text-center col-span-2 md:col-span-1">
+                                            <div className={`flex items-end gap-2 px-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
+                                                <div className="w-[30px] text-center pb-1">{t.pts_to_time_rate?.split(':')[0]?.trim() || 'Points'}</div>
+                                                <div className="w-[10px] text-center pb-1">:</div>
+                                                <div className="flex-1 text-center pb-1">{t.pts_to_time_rate?.split(':')[1]?.trim() || 'Minutes'}</div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
+                                                <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
+                                                <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                                    <input type="number" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, point_to_minutes: e.target.value === '' ? '' : parseInt(e.target.value) })} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1 text-center col-span-2 md:col-span-1">
+                                            <div className={`flex items-end gap-2 px-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} text-xs font-bold uppercase`}>
+                                                <div className="w-[30px] text-center pb-1">{t.pts_to_cash_rate?.split(':')[0]?.trim() || 'Points'}</div>
+                                                <div className="w-[10px] text-center pb-1">:</div>
+                                                <div className="flex-1 text-center pb-1">{t.pts_to_cash_rate?.split(':')[1]?.trim() || 'Cash'}</div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-[30px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>1</div>
+                                                <div className={`w-[10px] text-center text-xl font-black ${family?.theme !== 'neon' ? 'text-[#aaa]' : 'text-slate-500'}`}>:</div>
+                                                <div className={`flex-1 flex items-center p-1 rounded-xl border ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-black/40 border-white/10')}`}>
+                                                    <input type="number" step="0.1" className={`w-full ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-transparent text-[#4a4a4a]' : 'bg-transparent text-white'} font-bold text-center focus:outline-none p-1`} value={tempSettings.point_to_cash} onChange={e => setTempSettings({ ...tempSettings, point_to_cash: e.target.value === '' ? '' : parseFloat(e.target.value) })} />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </section>
 
-                                {/* 4. 家長與管理員 */}
+                                {/* 1.5. Focus Mode Config (New) */}
                                 <section>
-                                    <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
-                                    <div className="space-y-3">
-                                        {familyMembers.map(m => (
-                                            <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5')} rounded-2xl border`}>
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-full ${family?.theme === 'jar' ? 'bg-purple-500/20 text-purple-300' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400')} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className={`font-bold text-sm mb-0.5 ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
-                                                        <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-300' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500')} flex items-center gap-1`}><User className="w-4 h-4" /> {m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#ffb74d]' : (family?.theme !== 'neon' ? 'text-[#f59e0b]' : 'text-amber-400')} uppercase tracking-[0.2em] flex items-center gap-2`}>
+                                                <Star className="w-4 h-4 fill-current" /> {t.bonus_mode_title}
+                                            </h4>
+                                            <p className={`text-xs mt-1 ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.bonus_mode_desc}</p>
+                                        </div>
+                                        <div
+                                            onClick={() => setTempSettings({ ...tempSettings, bonus_enabled: !tempSettings.bonus_enabled })}
+                                            className={`w-14 h-8 rounded-full p-1 cursor-pointer transition-colors duration-300 ${tempSettings.bonus_enabled ? 'bg-amber-400' : (family?.theme !== 'neon' ? 'bg-gray-300' : 'bg-white/10')}`}
+                                        >
+                                            <div className={`w-6 h-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${tempSettings.bonus_enabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                                        </div>
+                                    </div>
+
+                                    {tempSettings.bonus_enabled && (
+                                        <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2 fade-in duration-300 p-4 rounded-2xl border ${family?.theme === 'jar' ? 'bg-amber-900/10 border-amber-500/30' : (family?.theme !== 'neon' ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/30')}`}>
+                                            <div className="space-y-2 text-center">
+                                                <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'} uppercase block mb-1`}>{t.bonus_weekday_limit}</label>
+                                                <div className="flex items-center gap-2">
+                                                    <input type="number" className={`w-full p-2 rounded-xl font-bold text-center outline-none ${family?.theme === 'jar' ? 'bg-black/30 text-white' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border border-[#d1d5db]' : 'bg-black/30 text-white border border-white/10')}`} value={tempSettings.bonus_weekday_limit} onChange={e => setTempSettings({ ...tempSettings, bonus_weekday_limit: e.target.value === '' ? '' : parseInt(e.target.value) })} />
+                                                    <span className="text-xs font-black opacity-50 whitespace-nowrap">{t.minutes_unit}</span>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2 text-center">
+                                                <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'} uppercase block mb-1`}>{t.bonus_holiday_limit}</label>
+                                                <div className="flex items-center gap-2">
+                                                    <input type="number" className={`w-full p-2 rounded-xl font-bold text-center outline-none ${family?.theme === 'jar' ? 'bg-black/30 text-white' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border border-[#d1d5db]' : 'bg-black/30 text-white border border-white/10')}`} value={tempSettings.bonus_holiday_limit} onChange={e => setTempSettings({ ...tempSettings, bonus_holiday_limit: e.target.value === '' ? '' : parseInt(e.target.value) })} />
+                                                    <span className="text-xs font-black opacity-50 whitespace-nowrap">{t.minutes_unit}</span>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2 text-center">
+                                                <label className={`text-xs font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'} uppercase block mb-1`}>{t.bonus_exchange_rate}</label>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs font-bold whitespace-nowrap">1 :</span>
+                                                    <input type="number" className={`w-full p-2 rounded-xl font-bold text-center outline-none ${family?.theme === 'jar' ? 'bg-black/30 text-white' : (family?.theme !== 'neon' ? 'bg-white text-[#4a4a4a] border border-[#d1d5db]' : 'bg-black/30 text-white border border-white/10')}`} value={tempSettings.bonus_point_to_minutes} onChange={e => setTempSettings({ ...tempSettings, bonus_point_to_minutes: e.target.value === '' ? '' : parseInt(e.target.value) })} />
+                                                    <span className="text-xs font-black opacity-50 whitespace-nowrap">{t.minutes_unit}</span>
+                                                </div>
+                                                <div className="text-[10px] opacity-60">{t.bonus_exchange_rate_desc}</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </section>
+
+                                <section>
+                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.kids_mgmt}</h4>
+                                    <div className={`text-xs ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} opacity-60 mb-3`}>{t.kid_sort_hint}</div>
+                                    <Reorder.Group axis="y" values={kids} onReorder={handleReorderKids} className="space-y-3 mb-4">
+                                        {kids.map(kid => (
+                                            <SortableKidItem
+                                                key={kid.id}
+                                                kid={kid}
+                                                family={family}
+                                                t={t}
+                                                editingKidId={editingKidId}
+                                                editName={editName}
+                                                setEditName={setEditName}
+                                                editPin={editPin}
+                                                setEditPin={setEditPin}
+                                                saveEditKid={saveEditKid}
+                                                cancelEditKid={cancelEditKid}
+                                                startEditKid={startEditKid}
+                                                deleteKid={deleteKid}
+                                                showAvatarPicker={showAvatarPicker}
+                                                setShowAvatarPicker={setShowAvatarPicker}
+                                                updateKidAvatar={updateKidAvatar}
+                                            />
+                                        ))}
+                                    </Reorder.Group>
+                                    <button onClick={() => { setShowAddModal(true); setShowSettingsModal(false); }} className={`w-full py-4 rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 font-black transition-all ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30 text-[#ff8a80] hover:bg-[#ff8a80]/5' : 'border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10'}`}>
+                                        <Plus className="w-5 h-5" /> {t.add_kid_member}
+                                    </button>
+                                </section>
+
+                                <div className="flex flex-col gap-6">
+                                    {/* 3. 家庭邀請碼 */}
+                                    <section className={`p-4 md:p-6 ${family?.theme !== 'neon' ? 'bg-[#ff8a80]/5' : 'bg-cyan-500/5'} rounded-3xl border-2 border-dashed ${family?.theme !== 'neon' ? 'border-[#ff8a80]/30' : 'border-cyan-500/20 shadow-[0_0_20px_rgba(0,255,255,0.05)]'}`}>
+                                        <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.family_conn_center}</h4>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center flex-wrap gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <label className={`text-xs font-black ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-slate-400'} uppercase`}>{t.family_access_code}</label>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {/* Invite Parent */}
+                                                    <button
+                                                        onClick={() => {
+                                                            const url = 'https://points-bank.vercel.app/';
+                                                            const code = tempSettings.short_id;
+
+                                                            let msg = t.invite_parent_msg_template;
+                                                            const pinSection = tempSettings.use_parent_pin
+                                                                ? t.invite_parent_pin_section.replace('{pin}', tempSettings.parent_pin)
+                                                                : '';
+
+                                                            msg = msg.replace('{url}', url)
+                                                                .replace('{code}', code)
+                                                                .replace('{pin_section}', pinSection);
+
+                                                            showModal({
+                                                                type: 'confirm',
+                                                                title: '📋 ' + t.invite_msg_title,
+                                                                message: msg,
+                                                                confirmText: t.copy_invite,
+                                                                cancelText: t.cancel,
+                                                                onConfirm: () => {
+                                                                    navigator.clipboard.writeText(msg);
+                                                                    alert(t.copied);
+                                                                }
+                                                            });
+                                                        }}
+                                                        className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-[#e3f2fd] text-[#1976d2] hover:bg-[#bbdefb]' : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'}`}
+                                                    >
+                                                        <Share2 className="w-3.5 h-3.5" />
+                                                        {t.invite_parent_btn}
+                                                    </button>
+
+                                                    {/* Invite Kid */}
+                                                    <button
+                                                        onClick={() => {
+                                                            if (kids.length === 0) {
+                                                                alert(t.no_kids_alert);
+                                                                return;
+                                                            }
+
+                                                            showModal({
+                                                                type: 'alert',
+                                                                title: t.invite_kid_msg_title,
+                                                                message: t.select_kid_invite,
+                                                                content: (
+                                                                    <div className="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1">
+                                                                        {kids.map(kid => (
+                                                                            <button
+                                                                                key={kid.id}
+                                                                                onClick={() => {
+                                                                                    const url = 'https://points-bank.vercel.app/';
+                                                                                    const code = tempSettings.short_id;
+                                                                                    let msg = t.invite_kid_msg_template;
+                                                                                    msg = msg.replace('{url}', url)
+                                                                                        .replace('{code}', code)
+                                                                                        .replace(/{name}/g, kid.name)
+                                                                                        .replace('{pin}', kid.login_pin || '1234');
+
+                                                                                    showModal({
+                                                                                        type: 'confirm',
+                                                                                        title: '📋 ' + t.invite_kid_msg_title,
+                                                                                        message: msg,
+                                                                                        confirmText: t.copy_invite,
+                                                                                        cancelText: t.cancel,
+                                                                                        onConfirm: () => {
+                                                                                            navigator.clipboard.writeText(msg);
+                                                                                            alert(t.copied);
+                                                                                        }
+                                                                                    });
+                                                                                }}
+                                                                                className={`p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all active:scale-95 ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
+                                                                            >
+                                                                                <span className="text-2xl">{kid.avatar || '👶'}</span>
+                                                                                <span className="font-bold text-sm truncate w-full text-center">{kid.name}</span>
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                ),
+                                                                confirmText: t.cancel || '取消',
+                                                            });
+                                                        }}
+                                                        className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 ${family?.theme !== 'neon' ? 'bg-[#ffccbc] text-[#d84315] hover:bg-[#ffab91]' : 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'}`}
+                                                    >
+                                                        <UserPlus className="w-3.5 h-3.5" />
+                                                        {t.invite_kid_btn}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="text"
+                                                    className={`w-full flex-1 ${family?.theme !== 'neon' ? 'bg-white border-[#eee] text-[#ff8a80]' : 'bg-black/40 border-white/5 text-cyan-400'} border-2 rounded-2xl p-3 md:p-4 pr-12 text-lg font-black font-mono text-center uppercase shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                                                    value={tempSettings.short_id}
+                                                    onChange={(e) => setTempSettings({ ...tempSettings, short_id: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
+                                                    placeholder="例如: FAMILY123"
+                                                />
+                                                <button
+                                                    onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }}
+                                                    className={`absolute right-2 p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-[#ccc] hover:text-[#4a4a4a] hover:bg-black/5' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
+                                                    title={t.copy_code || 'Copy'}
+                                                >
+                                                    <Copy className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                            <p className="text-xs text-slate-500 italic opacity-60">{t.access_code_hint}</p>
+                                        </div>
+                                    </section>
+
+                                    {/* 4. 家長與管理員 */}
+                                    <section>
+                                        <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.parent_team_center}</h4>
+                                        <div className="space-y-3">
+                                            {familyMembers.map(m => (
+                                                <div key={m.id} className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a]' : 'bg-white/5 border-white/5')} rounded-2xl border`}>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-8 h-8 rounded-full ${family?.theme === 'jar' ? 'bg-purple-500/20 text-purple-300' : (family?.theme !== 'neon' ? 'bg-[#ff8a80]/20 text-[#ff8a80]' : 'bg-cyan-500/20 text-cyan-400')} flex items-center justify-center font-bold text-xs uppercase`}>{m.email?.charAt(0)}</div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className={`font-bold text-sm mb-0.5 ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{m.email}</div>
+                                                            <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-300' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500')} flex items-center gap-1`}><User className="w-4 h-4" /> {m.id === family.admin_id ? t.admin_label : t.parent_label}</div>
+                                                        </div>
+                                                    </div>
+                                                    {m.id !== family.admin_id && m.id !== user.id && (
+                                                        <button onClick={() => kickMember(m.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </div>
+
+                                {/* 5. 安全與偏好設定 */}
+                                <section>
+                                    <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
+                                    <div className="space-y-8">
+                                        {/* Security - PIN */}
+                                        <div className="space-y-6">
+                                            {/* Row 1: PIN Input (Masked) + Eye Icon */}
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <div className={`text-sm font-bold ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
+                                                </div>
+                                                <div className="relative">
+                                                    <input
+                                                        type={isPinVisible ? "text" : "password"}
+                                                        maxLength={4}
+                                                        placeholder={t.four_digit_pin}
+                                                        className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white')} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
+                                                        value={tempSettings.parent_pin}
+                                                        onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            if (isPinVisible) {
+                                                                setIsPinVisible(false);
+                                                            } else {
+                                                                // Enhance: Use number words for challenge
+                                                                const numsZh = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖', '拾'];
+                                                                const numsEn = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+                                                                const isZh = language === 'zh';
+                                                                const n1 = Math.floor(Math.random() * 5) + 1; // 1-5
+                                                                const n2 = Math.floor(Math.random() * 5) + 1; // 1-5
+                                                                const op = Math.random() > 0.5 ? '+' : '-';
+
+                                                                // Ensure result is positive for subtraction
+                                                                const [a, b] = (op === '-' && n1 < n2) ? [n2, n1] : [n1, n2];
+
+                                                                const qText = isZh
+                                                                    ? `${numsZh[a]} ${op === '+' ? '加' : '減'} ${numsZh[b]} = ?`
+                                                                    : `${numsEn[a]} ${op === '+' ? 'plus' : 'minus'} ${numsEn[b]} = ?`;
+                                                                const ans = op === '+' ? a + b : a - b;
+
+                                                                showModal({
+                                                                    type: 'prompt',
+                                                                    title: t.show_pin,
+                                                                    message: `${t.verify_math}\n\n${qText}`,
+                                                                    onConfirm: (val) => {
+                                                                        if (parseInt(val) === ans) {
+                                                                            setIsPinVisible(true);
+                                                                        } else {
+                                                                            alert(t.math_error);
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                        }}
+                                                        className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${family?.theme !== 'neon' ? 'hover:bg-gray-100 text-gray-400' : 'hover:bg-white/10 text-slate-500'}`}
+                                                    >
+                                                        {isPinVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5 opacity-70" />}
+                                                    </button>
+                                                </div>
+                                                <div className={`text-xs text-center ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_sub}</div>
+                                            </div>
+
+                                            {/* Row 2: Enable Toggle */}
+                                            <div className="space-y-2">
+                                                <div className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee]' : 'bg-black/40 border-white/5')} rounded-2xl border`}>
+                                                    <div className={`font-bold ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white')}`}>{t.enable_parent_pin}</div>
+                                                    <button
+                                                        onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
+                                                        className={`w-16 h-8 rounded-full transition-all relative flex items-center shadow-inner shrink-0 ${tempSettings.use_parent_pin
+                                                            ? (family?.theme === 'jar' ? 'bg-purple-500' : (family?.theme !== 'neon' ? 'bg-orange-400' : 'bg-cyan-500'))
+                                                            : (family?.theme === 'jar' ? 'bg-purple-900/40' : (family?.theme !== 'neon' ? 'bg-[#eee]' : 'bg-white/10'))
+                                                            }`}
+                                                    >
+                                                        <div className={`text-[10px] font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
+                                                            {tempSettings.use_parent_pin ? 'ON' : 'OFF'}
+                                                        </div>
+                                                        <div className={`w-6 h-6 bg-white rounded-full transition-all shadow-md z-10 transform ${tempSettings.use_parent_pin ? 'translate-x-9' : 'translate-x-1'}`} />
+                                                    </button>
+                                                </div>
+                                                <div className={`text-xs text-center ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.enable_pin_sub}</div>
+                                            </div>
+                                        </div>
+
+
+                                        {/* UI Style */}
+                                        <div className="space-y-4">
+                                            <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.ui_style_selection}</h4>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <button onClick={() => setTempSettings({ ...tempSettings, theme: 'jar' })} className={`col-span-2 h-full min-h-[100px] p-4 rounded-xl border-2 transition-all text-center flex flex-row items-center justify-center gap-4 bg-[#fff9c4] border-[#ffd54f] text-[#f57f17] hover:scale-[1.02] active:scale-95 ${tempSettings.theme === 'jar' ? 'ring-2 ring-[#fbc02d] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
+                                                    <div className="w-10 h-10 rounded-full border-2 border-[#fbc02d] flex items-center justify-center bg-white text-[#fbc02d]">
+                                                        <Star className="w-5 h-5 fill-current" />
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <div className="text-sm font-black mb-0.5">Star Jar</div>
+                                                        <div className="text-[10px] uppercase tracking-widest opacity-80">Interactive Hero</div>
+                                                    </div>
+                                                </button>
+                                                <button onClick={() => setTempSettings({ ...tempSettings, theme: 'neon' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'neon' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
+                                                    <div className="w-12 h-12 rounded-full border-2 border-cyan-500 flex items-center justify-center mb-2 bg-black shadow-[0_0_10px_#06b6d4]">
+                                                        <Zap className="w-6 h-6" />
+                                                    </div>
+                                                    <div className="text-sm font-bold mb-1">Cyber Neon</div>
+                                                    <div className="text-[10px] uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
+                                                </button>
+                                                <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
+                                                    <div className="w-12 h-12 rounded-full border-2 border-[#ff8a80] flex items-center justify-center mb-2 bg-white text-[#ff8a80]">
+                                                        <Smile className="w-6 h-6" />
+                                                    </div>
+                                                    <div className="text-sm font-bold mb-1">Warm Doodle</div>
+                                                    <div className="text-[10px] uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
+                                                </button>
+                                            </div>
+
+                                            {/* Star Size Slider for Jar Theme */}
+                                            {tempSettings.theme === 'jar' && (
+                                                <div className="mt-4 p-4 rounded-xl bg-purple-900/10 border border-purple-500/20 animate-in slide-in-from-top-2 duration-300">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <label className="text-sm font-bold text-purple-300">星星尺寸 (Star Size)</label>
+                                                        <span className="text-sm font-black text-[#fbbf24] bg-purple-900/40 px-3 py-1 rounded-lg border border-purple-500/30">
+                                                            Lv. {tempSettings.star_size || 5}
+                                                        </span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        min="1"
+                                                        max="10"
+                                                        step="1"
+                                                        value={tempSettings.star_size || 5}
+                                                        onChange={(e) => setTempSettings({ ...tempSettings, star_size: e.target.value === '' ? 5 : parseInt(e.target.value) })}
+                                                        className="w-full h-2 bg-purple-900/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                                    />
+                                                    <div className="flex justify-between text-[10px] text-purple-300/60 font-bold mt-1 px-1">
+                                                        <span>Tiny</span>
+                                                        <span>Normal</span>
+                                                        <span>Giant</span>
                                                     </div>
                                                 </div>
-                                                {m.id !== family.admin_id && m.id !== user.id && (
-                                                    <button onClick={() => kickMember(m.id)} className="p-2 text-slate-500 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                                )}
+                                            )}
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* 6. Install App (Mobile Only) */}
+                                {isMobile && !isStandalone && (deferredPrompt || isIOS) && !dismissedInstallPrompt && (
+                                    <section className="relative group">
+                                        <button
+                                            onClick={dismissInstallPrompt}
+                                            className={`absolute top-0 right-0 p-2 rounded-full z-10 opacity-50 hover:opacity-100 transition-all ${family?.theme !== 'neon' ? 'text-[#4a4a4a] hover:bg-black/5' : 'text-white hover:bg-white/10'}`}
+                                            title={t.dismiss || 'Dismiss'}
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+
+                                        <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
+                                        <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme === 'jar' ? 'bg-purple-500/5 border-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20')}`}>
+                                            <div className="text-center md:text-left">
+                                                <h5 className={`font-black text-lg mb-1 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.install_app}</h5>
+                                                <p className={`text-xs opacity-70 mb-0 max-w-xs ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.install_app_desc}</p>
                                             </div>
-                                        ))}
+                                            <button
+                                                onClick={handleInstallClick}
+                                                className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme === 'jar'
+                                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500'
+                                                    : (family?.theme !== 'neon'
+                                                        ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:bg-[#ff8a80] hover:border-[#ff8a80]'
+                                                        : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400')
+                                                    }`}
+                                            >
+                                                <Download className="w-5 h-5" />
+                                                {t.add_to_home_btn}
+                                            </button>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* 7. 資料重設與匯出 */}
+                                <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme === 'jar' ? 'border-purple-500/20 bg-purple-900/10' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5')}`}>
+                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-red-500'} uppercase tracking-[0.2em] mb-4 flex items-center gap-2`}><Trash2 className="w-3 h-3" /> {t.data_mgmt_export}</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20')}`}>
+                                            <div className="flex justify-between items-start w-full"><div className="text-sm font-bold mb-1">{t.export_full_history}</div><Download className="w-4 h-4 text-cyan-500" /></div>
+                                            <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-purple-200' : (family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400')}`}>{t.csv_desc}</div>
+                                        </button>
+                                        <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10')}`}>
+                                            <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
+                                            <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-purple-200' : (family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400')}`}>{t.clear_history_desc}</div>
+                                        </button>
+                                        <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-red-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30')} md:col-span-2`}>
+                                            <div className="text-sm font-bold mb-1">{t.reset_family_data}</div>
+                                            <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-red-300' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#ff8a80]' : 'text-red-400')}`}>{t.reset_family_desc}</div>
+                                        </button>
                                     </div>
                                 </section>
                             </div>
 
-                            {/* 5. 安全與偏好設定 */}
-                            <section>
-                                <h4 className={`text-sm font-black ${family?.theme === 'jar' ? 'text-[#fbbf24]' : (family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500')} uppercase tracking-[0.2em] mb-4`}>{t.security_settings}</h4>
-                                <div className="space-y-8">
-                                    {/* Security - PIN */}
-                                    <div className="space-y-6">
-                                        {/* Row 1: PIN Input (Masked) + Eye Icon */}
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <div className={`text-sm font-bold ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.parent_pin_label}</div>
-                                            </div>
-                                            <div className="relative">
-                                                <input
-                                                    type={isPinVisible ? "text" : "password"}
-                                                    maxLength={4}
-                                                    placeholder={t.four_digit_pin}
-                                                    className={`w-full ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee] text-[#4a4a4a]' : 'bg-black/40 border-white/10 text-white')} p-4 pr-12 rounded-2xl border font-mono font-bold text-center tracking-[0.5em] focus:outline-none focus:ring-1 focus:ring-[#ff8a80] transition-colors`}
-                                                    value={tempSettings.parent_pin}
-                                                    onChange={e => setTempSettings({ ...tempSettings, parent_pin: e.target.value })}
-                                                />
-                                                <button
-                                                    onClick={() => {
-                                                        if (isPinVisible) {
-                                                            setIsPinVisible(false);
-                                                        } else {
-                                                            // Enhance: Use number words for challenge
-                                                            const numsZh = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖', '拾'];
-                                                            const numsEn = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
-                                                            const isZh = language === 'zh';
-                                                            const n1 = Math.floor(Math.random() * 5) + 1; // 1-5
-                                                            const n2 = Math.floor(Math.random() * 5) + 1; // 1-5
-                                                            const op = Math.random() > 0.5 ? '+' : '-';
-
-                                                            // Ensure result is positive for subtraction
-                                                            const [a, b] = (op === '-' && n1 < n2) ? [n2, n1] : [n1, n2];
-
-                                                            const qText = isZh
-                                                                ? `${numsZh[a]} ${op === '+' ? '加' : '減'} ${numsZh[b]} = ?`
-                                                                : `${numsEn[a]} ${op === '+' ? 'plus' : 'minus'} ${numsEn[b]} = ?`;
-                                                            const ans = op === '+' ? a + b : a - b;
-
-                                                            showModal({
-                                                                type: 'prompt',
-                                                                title: t.show_pin,
-                                                                message: `${t.verify_math}\n\n${qText}`,
-                                                                onConfirm: (val) => {
-                                                                    if (parseInt(val) === ans) {
-                                                                        setIsPinVisible(true);
-                                                                    } else {
-                                                                        alert(t.math_error);
-                                                                    }
-                                                                }
-                                                            });
-                                                        }
-                                                    }}
-                                                    className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${family?.theme !== 'neon' ? 'hover:bg-gray-100 text-gray-400' : 'hover:bg-white/10 text-slate-500'}`}
-                                                >
-                                                    {isPinVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5 opacity-70" />}
-                                                </button>
-                                            </div>
-                                            <div className={`text-xs text-center ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.parent_pin_sub}</div>
-                                        </div>
-
-                                        {/* Row 2: Enable Toggle */}
-                                        <div className="space-y-2">
-                                            <div className={`flex items-center justify-between p-4 ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#eee]' : 'bg-black/40 border-white/5')} rounded-2xl border`}>
-                                                <div className={`font-bold ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white')}`}>{t.enable_parent_pin}</div>
-                                                <button
-                                                    onClick={() => setTempSettings({ ...tempSettings, use_parent_pin: !tempSettings.use_parent_pin })}
-                                                    className={`w-16 h-8 rounded-full transition-all relative flex items-center shadow-inner shrink-0 ${tempSettings.use_parent_pin
-                                                        ? (family?.theme === 'jar' ? 'bg-purple-500' : (family?.theme !== 'neon' ? 'bg-orange-400' : 'bg-cyan-500'))
-                                                        : (family?.theme === 'jar' ? 'bg-purple-900/40' : (family?.theme !== 'neon' ? 'bg-[#eee]' : 'bg-white/10'))
-                                                        }`}
-                                                >
-                                                    <div className={`text-[10px] font-black absolute transition-all duration-300 ${tempSettings.use_parent_pin ? 'left-2 text-white' : 'right-2 text-slate-400'}`}>
-                                                        {tempSettings.use_parent_pin ? 'ON' : 'OFF'}
-                                                    </div>
-                                                    <div className={`w-6 h-6 bg-white rounded-full transition-all shadow-md z-10 transform ${tempSettings.use_parent_pin ? 'translate-x-9' : 'translate-x-1'}`} />
-                                                </button>
-                                            </div>
-                                            <div className={`text-xs text-center ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'}`}>{t.enable_pin_sub}</div>
-                                        </div>
-                                    </div>
-
-
-                                    {/* UI Style */}
-                                    <div className="space-y-4">
-                                        <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em]`}>{t.ui_style_selection}</h4>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'jar' })} className={`col-span-2 h-full min-h-[100px] p-4 rounded-xl border-2 transition-all text-center flex flex-row items-center justify-center gap-4 bg-[#fff9c4] border-[#ffd54f] text-[#f57f17] hover:scale-[1.02] active:scale-95 ${tempSettings.theme === 'jar' ? 'ring-2 ring-[#fbc02d] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
-                                                <div className="w-10 h-10 rounded-full border-2 border-[#fbc02d] flex items-center justify-center bg-white text-[#fbc02d]">
-                                                    <Star className="w-5 h-5 fill-current" />
-                                                </div>
-                                                <div className="text-left">
-                                                    <div className="text-sm font-black mb-0.5">Star Jar</div>
-                                                    <div className="text-[10px] uppercase tracking-widest opacity-80">Interactive Hero</div>
-                                                </div>
-                                            </button>
-                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'neon' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#0a0a0a] border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 ${tempSettings.theme === 'neon' ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100'}`}>
-                                                <div className="w-12 h-12 rounded-full border-2 border-cyan-500 flex items-center justify-center mb-2 bg-black shadow-[0_0_10px_#06b6d4]">
-                                                    <Zap className="w-6 h-6" />
-                                                </div>
-                                                <div className="text-sm font-bold mb-1">Cyber Neon</div>
-                                                <div className="text-[10px] uppercase tracking-widest opacity-80">{t.ui_style_cyber}</div>
-                                            </button>
-                                            <button onClick={() => setTempSettings({ ...tempSettings, theme: 'doodle' })} className={`h-full min-h-[120px] p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center justify-center bg-[#fff8e1] border-[#ff8a80] text-[#4a4a4a] hover:scale-105 active:scale-95 ${tempSettings.theme === 'doodle' ? 'ring-2 ring-[#4a4a4a] ring-offset-2' : 'opacity-60 hover:opacity-100'}`}>
-                                                <div className="w-12 h-12 rounded-full border-2 border-[#ff8a80] flex items-center justify-center mb-2 bg-white text-[#ff8a80]">
-                                                    <Smile className="w-6 h-6" />
-                                                </div>
-                                                <div className="text-sm font-bold mb-1">Warm Doodle</div>
-                                                <div className="text-[10px] uppercase tracking-widest opacity-60">{t.ui_style_doodle}</div>
-                                            </button>
-                                        </div>
-
-                                        {/* Star Size Slider for Jar Theme */}
-                                        {tempSettings.theme === 'jar' && (
-                                            <div className="mt-4 p-4 rounded-xl bg-purple-900/10 border border-purple-500/20 animate-in slide-in-from-top-2 duration-300">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <label className="text-sm font-bold text-purple-300">星星尺寸 (Star Size)</label>
-                                                    <span className="text-sm font-black text-[#fbbf24] bg-purple-900/40 px-3 py-1 rounded-lg border border-purple-500/30">
-                                                        Lv. {tempSettings.star_size || 5}
-                                                    </span>
-                                                </div>
-                                                <input
-                                                    type="range"
-                                                    min="1"
-                                                    max="10"
-                                                    step="1"
-                                                    value={tempSettings.star_size || 5}
-                                                    onChange={(e) => setTempSettings({ ...tempSettings, star_size: parseInt(e.target.value) })}
-                                                    className="w-full h-2 bg-purple-900/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                                                />
-                                                <div className="flex justify-between text-[10px] text-purple-300/60 font-bold mt-1 px-1">
-                                                    <span>Tiny</span>
-                                                    <span>Normal</span>
-                                                    <span>Giant</span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* 6. Install App (Mobile Only) */}
-                            {isMobile && !isStandalone && (deferredPrompt || isIOS) && !dismissedInstallPrompt && (
-                                <section className="relative group">
-                                    <button
-                                        onClick={dismissInstallPrompt}
-                                        className={`absolute top-0 right-0 p-2 rounded-full z-10 opacity-50 hover:opacity-100 transition-all ${family?.theme !== 'neon' ? 'text-[#4a4a4a] hover:bg-black/5' : 'text-white hover:bg-white/10'}`}
-                                        title={t.dismiss || 'Dismiss'}
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
-
-                                    <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-cyan-500'} uppercase tracking-[0.2em] mb-4`}>{t.install_app}</h4>
-                                    <div className={`p-6 rounded-2xl border-2 border-dashed flex flex-col md:flex-row items-center justify-between gap-4 ${family?.theme === 'jar' ? 'bg-purple-500/5 border-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-[#fff5e6] border-[#ff8a80]' : 'bg-cyan-500/5 border-cyan-500/20')}`}>
-                                        <div className="text-center md:text-left">
-                                            <h5 className={`font-black text-lg mb-1 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.install_app}</h5>
-                                            <p className={`text-xs opacity-70 mb-0 max-w-xs ${family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400'}`}>{t.install_app_desc}</p>
-                                        </div>
-                                        <button
-                                            onClick={handleInstallClick}
-                                            className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 whitespace-nowrap ${family?.theme === 'jar'
-                                                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500'
-                                                : (family?.theme !== 'neon'
-                                                    ? 'bg-[#4a4a4a] text-white border-2 border-[#4a4a4a] hover:bg-[#ff8a80] hover:border-[#ff8a80]'
-                                                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400')
-                                                }`}
-                                        >
-                                            <Download className="w-5 h-5" />
-                                            {t.add_to_home_btn}
-                                        </button>
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* 7. 資料重設與匯出 */}
-                            <section className={`p-6 rounded-3xl border-2 border-dashed ${family?.theme === 'jar' ? 'border-purple-500/20 bg-purple-900/10' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'border-[#ff8a80]/30 bg-[#ff8a80]/5' : 'border-red-500/20 bg-red-500/5')}`}>
-                                <h4 className={`text-sm font-black ${family?.theme !== 'neon' ? 'text-[#ff8a80]' : 'text-red-500'} uppercase tracking-[0.2em] mb-4 flex items-center gap-2`}><Trash2 className="w-3 h-3" /> {t.data_mgmt_export}</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <button onClick={exportLogsToCSV} className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-cyan-50' : 'bg-white/5 border-white/5 hover:bg-cyan-500/20')}`}>
-                                        <div className="flex justify-between items-start w-full"><div className="text-sm font-bold mb-1">{t.export_full_history}</div><Download className="w-4 h-4 text-cyan-500" /></div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-purple-200' : (family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400')}`}>{t.csv_desc}</div>
-                                    </button>
-                                    <button onClick={resetLogsOnly} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-purple-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-orange-50' : 'bg-white/5 border-white/5 hover:bg-red-500/10')}`}>
-                                        <div className="text-sm font-bold mb-1">{t.clear_history_only}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-purple-200' : (family?.theme !== 'neon' ? 'text-[#666]' : 'text-slate-400')}`}>{t.clear_history_desc}</div>
-                                    </button>
-                                    <button onClick={resetFamilyData} className={`p-4 rounded-2xl border transition-all text-left ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 hover:bg-red-500/20' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'bg-white border-[#ff8a80] text-[#ff8a80] hover:bg-red-50' : 'bg-red-500/10 border-red-500/20 hover:bg-red-500/30')} md:col-span-2`}>
-                                        <div className="text-sm font-bold mb-1">{t.reset_family_data}</div>
-                                        <div className={`text-xs font-medium opacity-60 ${family?.theme === 'jar' ? 'text-red-300' : ((family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#ff8a80]' : 'text-red-400')}`}>{t.reset_family_desc}</div>
-                                    </button>
-                                </div>
-                            </section>
-                        </div>
-
-                        <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme === 'jar' ? 'border-purple-500/30 bg-[#0f172a]/90' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20')} backdrop-blur-md`}>
-                            <button onClick={saveSettings} className="btn btn-primary w-full gap-2 font-black !py-4 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"><Save className="w-5 h-5" /> {t.save_changes}</button>
+                            <div className={`p-8 md:px-10 pt-6 border-t ${family?.theme === 'jar' ? 'border-purple-500/30 bg-[#0f172a]/90' : (family?.theme !== 'neon' ? 'border-[#4a4a4a] bg-[#fcfbf9]' : 'border-white/5 bg-black/20')} backdrop-blur-md`}>
+                                <button onClick={saveSettings} className="btn btn-primary w-full gap-2 font-black !py-4 shadow-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"><Save className="w-5 h-5" /> {t.save_changes}</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <CustomModal config={modal} onClose={() => setModal(prev => ({ ...prev, isOpen: false }))} familyTheme={family?.theme} t={t} />
 
@@ -1761,108 +1873,112 @@ export default function Dashboard() {
                 familyTheme={family?.theme}
             />
 
-            {showAddModal && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[110] p-6 animate-in fade-in duration-300">
-                    <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme === 'jar' ? 'bg-[#0f172a] border-purple-500/50 shadow-[0_0_30px_rgba(139,92,246,0.3)] rounded-3xl' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl')}`}>
-                        <h3 className={`text-2xl font-black mb-8 italic flex items-center gap-3 uppercase tracking-tight ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}><Plus className="text-cyan-500" /> {t.add_member}</h3>
+            {
+                showAddModal && (
+                    <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[110] p-6 animate-in fade-in duration-300">
+                        <div className={`p-8 md:p-10 max-w-sm w-full border-2 ${family?.theme === 'jar' ? 'bg-[#0f172a] border-purple-500/50 shadow-[0_0_30px_rgba(139,92,246,0.3)] rounded-3xl' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6] rounded-[30px_15px_40px_10px]' : 'bg-black border-cyan-500/30 rounded-3xl')}`}>
+                            <h3 className={`text-2xl font-black mb-8 italic flex items-center gap-3 uppercase tracking-tight ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}><Plus className="text-cyan-500" /> {t.add_member}</h3>
 
-                        <div className="flex flex-col items-center gap-6 mb-8">
-                            <button
-                                onClick={() => {
-                                    const nextIdx = (AVATARS.indexOf(newKidAvatar) + 1) % AVATARS.length;
-                                    setNewKidAvatar(AVATARS[nextIdx]);
-                                }}
-                                className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme === 'jar' ? 'bg-purple-500/10 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30')}`}
-                            >
-                                {newKidAvatar}
-                            </button>
-                            <p className={`text-[10px] font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase tracking-widest`}>{t.click_to_change_avatar}</p>
+                            <div className="flex flex-col items-center gap-6 mb-8">
+                                <button
+                                    onClick={() => {
+                                        const nextIdx = (AVATARS.indexOf(newKidAvatar) + 1) % AVATARS.length;
+                                        setNewKidAvatar(AVATARS[nextIdx]);
+                                    }}
+                                    className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 transition-all hover:scale-110 active:scale-90 ${family?.theme === 'jar' ? 'bg-purple-500/10 border-purple-500/30' : (family?.theme !== 'neon' ? 'bg-[#fff5e6] border-[#4a4a4a]' : 'bg-cyan-500/10 border-cyan-500/30')}`}
+                                >
+                                    {newKidAvatar}
+                                </button>
+                                <p className={`text-[10px] font-bold ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-500'} uppercase tracking-widest`}>{t.click_to_change_avatar}</p>
 
-                            <input
-                                autoFocus
-                                type="text"
-                                placeholder={t.enter_kid_name}
-                                className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500')}`}
-                                value={newKidName}
-                                onChange={e => setNewKidName(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && addKid()}
-                            />
-                        </div>
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder={t.enter_kid_name}
+                                    className={`w-full border rounded-2xl p-4 font-black text-center outline-none transition-all ${family?.theme === 'jar' ? 'bg-purple-900/20 border-purple-500/30 text-white focus:ring-purple-500' : (family?.theme !== 'neon' ? 'bg-[#fcfbf9] border-[#4a4a4a] text-[#4a4a4a] focus:ring-2 focus:ring-[#ff8a80]' : 'bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500')}`}
+                                    value={newKidName}
+                                    onChange={e => setNewKidName(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && addKid()}
+                                />
+                            </div>
 
-                        <div className="flex gap-4">
-                            <button onClick={() => setShowAddModal(false)} className={`flex-1 py-4 px-6 rounded-xl font-bold transition-all ${family?.theme !== 'neon' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-500 hover:text-white'}`}>{t.cancel}</button>
-                            <button onClick={addKid} className="btn btn-primary flex-1 font-black shadow-xl">{t.join_member} 🚀</button>
+                            <div className="flex gap-4">
+                                <button onClick={() => setShowAddModal(false)} className={`flex-1 py-4 px-6 rounded-xl font-bold transition-all ${family?.theme !== 'neon' ? 'text-[#888] hover:text-[#4a4a4a]' : 'text-slate-500 hover:text-white'}`}>{t.cancel}</button>
+                                <button onClick={addKid} className="btn btn-primary flex-1 font-black shadow-xl">{t.join_member} 🚀</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {showOnboarding && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-[120] p-6 animate-in fade-in duration-500">
-                    <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Option 1: Create New */}
-                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500'}`}>
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme !== 'neon' ? 'bg-[#fff5e6]' : 'bg-cyan-500/20 text-cyan-400'}`}>🏠</div>
-                            <div>
-                                <h3 className={`text-2xl font-black mb-2 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_create_title}</h3>
-                                <p className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_create_desc}</p>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder={t.onboarding_family_name_placeholder}
-                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-cyan-500'}`}
-                                value={newFamilyName}
-                                onChange={e => setNewFamilyName(e.target.value)}
-                            />
-                            <button onClick={handleCreateFamily} className="btn btn-primary w-full py-4 text-sm font-black uppercase tracking-widest mt-auto">{t.onboarding_create_btn}</button>
-                        </div>
-
-                        {/* Option 2: Join Existing */}
-                        <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500'}`}>
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme !== 'neon' ? 'bg-[#f3e5f5]' : 'bg-purple-500/20 text-purple-400'}`}>🔗</div>
-                            <div>
-                                <h3 className={`text-2xl font-black mb-2 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_join_title}</h3>
-                                <p className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_join_desc}</p>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder={t.onboarding_join_placeholder}
-                                className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
-                                value={joinCode}
-                                onChange={e => setJoinCode(e.target.value)}
-                            />
-                            <div className="relative">
+            {
+                showOnboarding && (
+                    <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-[120] p-6 animate-in fade-in duration-500">
+                        <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Option 1: Create New */}
+                            <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500'}`}>
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme !== 'neon' ? 'bg-[#fff5e6]' : 'bg-cyan-500/20 text-cyan-400'}`}>🏠</div>
+                                <div>
+                                    <h3 className={`text-2xl font-black mb-2 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_create_title}</h3>
+                                    <p className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_create_desc}</p>
+                                </div>
                                 <input
                                     type="text"
-                                    maxLength={4}
-                                    placeholder={t.four_digit_pin}
-                                    className={`w-full p-4 rounded-xl font-bold font-mono outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
-                                    value={joinPin}
-                                    onChange={e => setJoinPin(e.target.value.replace(/\D/g, ''))}
+                                    placeholder={t.onboarding_family_name_placeholder}
+                                    className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-cyan-500'}`}
+                                    value={newFamilyName}
+                                    onChange={e => setNewFamilyName(e.target.value)}
                                 />
-                                <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${family?.theme !== 'neon' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                <button onClick={handleCreateFamily} className="btn btn-primary w-full py-4 text-sm font-black uppercase tracking-widest mt-auto">{t.onboarding_create_btn}</button>
                             </div>
-                            <button onClick={() => handleJoinFamily(joinCode, joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme !== 'neon' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
+
+                            {/* Option 2: Join Existing */}
+                            <div className={`p-8 rounded-3xl border-2 flex flex-col gap-6 group hover:scale-[1.02] transition-all cursor-default ${family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] shadow-[8px_8px_0px_#d8c4b6]' : 'bg-black/40 border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-500'}`}>
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-2 ${family?.theme !== 'neon' ? 'bg-[#f3e5f5]' : 'bg-purple-500/20 text-purple-400'}`}>🔗</div>
+                                <div>
+                                    <h3 className={`text-2xl font-black mb-2 ${family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.onboarding_join_title}</h3>
+                                    <p className={`text-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.onboarding_join_desc}</p>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={t.onboarding_join_placeholder}
+                                    className={`w-full p-4 rounded-xl font-bold outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
+                                    value={joinCode}
+                                    onChange={e => setJoinCode(e.target.value)}
+                                />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        maxLength={4}
+                                        placeholder={t.four_digit_pin}
+                                        className={`w-full p-4 rounded-xl font-bold font-mono outline-none transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] border border-[#eee] focus:border-[#4a4a4a]' : 'bg-black/50 text-white border border-white/10 focus:border-purple-500'}`}
+                                        value={joinPin}
+                                        onChange={e => setJoinPin(e.target.value.replace(/\D/g, ''))}
+                                    />
+                                    <Lock className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${family?.theme !== 'neon' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                </div>
+                                <button onClick={() => handleJoinFamily(joinCode, joinPin)} className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest mt-auto transition-all ${family?.theme !== 'neon' ? 'bg-[#4a4a4a] text-white hover:opacity-90' : 'bg-purple-600 text-white hover:bg-purple-500'}`}>{t.onboarding_join_btn}</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
 
 
 
-function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, currentLimit, familySettings, actorName, hideSensitive, showModal, t }) {
+function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpdate, onDelete, currentLimit, currentBonusLimit, familySettings, actorName, hideSensitive, showModal, t }) {
     const timeLimit = currentLimit || 60;
-
-
+    const bonusTimeLimit = currentBonusLimit || 30;
 
     // Visual states to control animation timing
     const [isInView, setIsInView] = useState(false);
     const [isReady, setIsReady] = useState(false);
     const [visualPoints, setVisualPoints] = useState(kid.total_points);
     const [visualMinutes, setVisualMinutes] = useState(kid.total_minutes);
+    const [visualBonusMinutes, setVisualBonusMinutes] = useState(kid.bonus_minutes || 0);
     const prevPointsRef = useRef(kid.total_points);
     const cardRef = useRef(null);
 
@@ -1924,9 +2040,17 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
             setVisualMinutes(kid.total_minutes);
         }
 
-    }, [kid.total_points, kid.total_minutes, isReady, familySettings?.theme, visualPoints, visualMinutes]);
+        // Check for bonus minutes update
+        if (visualBonusMinutes !== (kid.bonus_minutes || 0)) {
+            setVisualBonusMinutes(kid.bonus_minutes || 0);
+        }
+
+    }, [kid.total_points, kid.total_minutes, kid.bonus_minutes, isReady, familySettings?.theme, visualPoints, visualMinutes, visualBonusMinutes]);
 
     const timePercent = Math.min(100, (visualMinutes / timeLimit) * 100);
+    const bonusTimePercent = Math.min(100, (visualBonusMinutes / bonusTimeLimit) * 100);
+
+    // Warning logic can be combined or separate. For now, we track main time for general warning
     const isWarning = timePercent > 0 && timePercent <= 30;
     const isDanger = timePercent <= 10;
 
@@ -1938,14 +2062,25 @@ function KidCard({ kid, goal, isUpdatingGoal, onUpdateGoal, onDeleteGoal, onUpda
         goal,
         visualPoints,
         visualMinutes,
+        visualBonusMinutes, // New
         timePercent,
+        bonusTimePercent, // New
         isDanger,
         isWarning,
         timeLimit,
+        bonusTimeLimit, // New
         familySettings,
         t,
         actorName,
-        onUpdate,
+        onUpdate: (kid, pts, mins, bonus, reason, actor) => {
+            // Optimistic update
+            if (pts !== 0) setVisualPoints(prev => prev + pts);
+            if (mins !== 0) setVisualMinutes(prev => prev + mins);
+            if (bonus !== 0) setVisualBonusMinutes(prev => prev + bonus);
+
+            // Call actual update
+            onUpdate(kid, pts, mins, bonus, reason, actor);
+        },
         onUpdateGoal,
         onDeleteGoal,
         showModal,

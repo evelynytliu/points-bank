@@ -163,6 +163,19 @@ const rawTranslations = {
     onboarding_join_placeholder: ['輸入家庭代碼', 'Enter Family Code'],
     onboarding_join_btn: ['加入家庭 🚀', 'Join Family 🚀'],
 
+    // Focus Mode (Bonus Time)
+    bonus_mode_title: ['精選時間模式', 'Focus Mode'],
+    bonus_mode_desc: ['啟用精選時間 (Focus Time) 功能，鼓勵孩子觀看優質內容。', 'Enable Focus Time to encourage watching educational content.'],
+    bonus_weekday_limit: ['平日精選額度', 'Weekday Focus'],
+    bonus_holiday_limit: ['假日精選額度', 'Holiday Focus'],
+    bonus_exchange_rate: ['精選兌換匯率', 'Focus Exchange Rate'],
+    bonus_exchange_rate_desc: ['1 點數 = ? 分鐘精選時間', '1 Point = ? Mins Focus Time'],
+    focus_time: ['精選時間', 'Focus Time'],
+    play_time: ['一般時間', 'Play Time'],
+    focus_label: ['精選', 'Focus'],
+    play_label: ['一般', 'Play'],
+    bonus_ratio_hint: ['設定兌換率，例如 10，代表 1 點可換 10 分鐘精選時間 (比一般時間更優惠！)', 'Set rate, e.g., 10 means 1 point = 10 mins focus time (More value!)'],
+
     // Logs Page
     full_logs_title: ['完整異動紀錄', 'Full Transaction Logs'],
     total_records_prefix: ['共 ', 'Total '],

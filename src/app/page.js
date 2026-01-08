@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { LogIn, Sparkles, ShieldCheck, UserCheck, Shield, ChevronRight, ArrowLeft, Palette, Globe } from 'lucide-react';
+import { LogIn, ShieldCheck, UserCheck, Shield, ChevronRight, ArrowLeft, Globe } from 'lucide-react';
 import { dictionaries } from '@/lib/dictionaries';
 import Logo from '@/components/Logo';
 
@@ -21,7 +21,7 @@ export default function Home() {
   // Theme & Language
 
   // Theme & Language
-  const [theme, setTheme] = useState('doodle');
+  const theme = 'doodle';
   const [language, setLanguage] = useState('zh');
   // Avoid errors if dictionary is missing for some reason, fallback to zh
   const t = dictionaries[language] || dictionaries['zh'];
@@ -36,8 +36,6 @@ export default function Home() {
   useEffect(() => {
     // Wrap in setTimeout to avoid 'setState synchronously within effect' lint error
     const timer = setTimeout(() => {
-      const savedTheme = localStorage.getItem('family_theme') || 'doodle';
-      setTheme(savedTheme);
       const savedLang = localStorage.getItem('app_language') || 'zh';
       setLanguage(savedLang);
     }, 0);
@@ -45,19 +43,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (theme === 'doodle') {
-      document.body.classList.add('theme-doodle');
-    } else {
-      document.body.classList.remove('theme-doodle');
-    }
-    localStorage.setItem('family_theme', theme);
-  }, [theme]);
-
-  useEffect(() => {
     localStorage.setItem('app_language', language);
   }, [language]);
 
-  const toggleTheme = () => setTheme(prev => prev === 'cyber' ? 'doodle' : 'cyber');
+
   const toggleLanguage = () => setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
 
   const handleParentLogin = async () => {
@@ -141,7 +130,7 @@ export default function Home() {
 
       <div className="glass-panel w-full max-w-[480px] p-8 md:p-12 text-center z-10">
         <div className={`inline-flex items-center justify-center w-28 h-28 mb-6 transition-all duration-500 overflow-hidden ${theme === 'cyber' ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30' : 'bg-white border-2 border-[#4a4a4a] rounded-full shadow-[4px_4px_0px_#ff8a80]'}`}>
-          <Logo className="w-20 h-20" />
+          <Logo className={`w-20 h-20 ${theme === 'cyber' ? 'text-white' : 'text-[#4a4a4a]'}`} />
         </div>
 
         <h1 className="text-4xl font-black mb-6 tracking-tight flex items-center justify-center gap-2">
@@ -272,14 +261,7 @@ export default function Home() {
           </div>
 
           <div className="flex gap-3">
-            <button
-              onClick={toggleTheme}
-              className={`px-5 py-2.5 rounded-full transition-all border flex items-center gap-2.5 font-black text-xs tracking-[0.15em] ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#d8c4b6]'}`}
-              title="Change Theme"
-            >
-              {theme === 'cyber' ? <Sparkles className="w-4 h-4" /> : <Palette className="w-4 h-4" />}
-              <span>STYLE</span>
-            </button>
+
             <button
               onClick={toggleLanguage}
               className={`px-5 py-2.5 rounded-full transition-all border flex items-center gap-2.5 font-black text-xs tracking-[0.15em] ${theme === 'cyber' ? 'bg-white/10 border-white/20 text-cyan-400 hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-white border-2 border-[#4a4a4a] text-[#4a4a4a] hover:scale-105 shadow-[4px_4px_0px_#d8c4b6]'}`}

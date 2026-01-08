@@ -9,11 +9,14 @@ export default function JarThemeLayout({
     kid,
     goal,
     visualPoints,
-    visualMinutes,
+    visualMinutes, // Added this back
+    visualBonusMinutes, // New
     timePercent,
+    bonusTimePercent, // New
     isDanger,
     isWarning,
     timeLimit,
+    bonusTimeLimit, // New
     familySettings,
     t,
     actorName,
@@ -24,9 +27,24 @@ export default function JarThemeLayout({
 }) {
     const [showGoalModal, setShowGoalModal] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [timeType, setTimeType] = useState(null); // null (Both) | 'general' | 'bonus'
+
+    // Reset timeType if bonus is disabled
+    React.useEffect(() => {
+        if (!familySettings?.bonus_enabled) {
+            setTimeType('general');
+        }
+    }, [familySettings?.bonus_enabled]);
 
     return (
-        <div ref={cardRef} className="relative w-full md:max-w-2xl mx-auto my-4 group transition-all duration-500 font-['M_PLUS_Rounded_1c']">
+        <div
+            ref={cardRef}
+            onClick={() => {
+                setTimeType(null); // Click background to reset selection
+                setIsMenuOpen(false); // Also close menu
+            }}
+            className="w-full md:max-w-2xl mx-auto my-4 relative font-['M_PLUS_Rounded_1c']"
+        >
 
             {/* The Responsive Mason Jar Container */}
             <div className="relative bg-gradient-to-b from-[#2e1065] via-[#1e1b4b] to-[#0f172a] border-4 border-[#8b5cf6] rounded-[3rem] shadow-[0_0_40px_rgba(139,92,246,0.5)] overflow-hidden min-h-[480px] flex flex-col ring-4 ring-[#8b5cf6]/20">
@@ -69,19 +87,27 @@ export default function JarThemeLayout({
                 </div>
 
                 {/* Low-profile Progress Bar (Visible when menu is closed) */}
-                <div className={`absolute bottom-0 inset-x-0 h-1.5 bg-black/20 z-40 transition-all duration-500 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}>
-                    <div
-                        className={`h-full transition-all duration-1000 ${isDanger ? 'bg-[#ff8a80] shadow-[0_0_10px_#ff8a80]' : isWarning ? 'bg-[#ffd180] shadow-[0_0_10px_#ffd180]' : 'bg-[#a78bfa] shadow-[0_0_10px_#a78bfa]'}`}
-                        style={{ width: `${timePercent}%` }}
-                    />
+                <div className={`absolute bottom-0 inset-x-0 transition-all duration-500 flex flex-col justify-end ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}>
+                    {familySettings?.bonus_enabled && visualBonusMinutes > 0 && (
+                        <div className="h-1.5 bg-black/40 w-full relative">
+                            <div className="absolute inset-0 bg-[#fbbf24] shadow-[0_0_10px_#fbbf24]" style={{ width: `${bonusTimePercent}%` }} />
+                        </div>
+                    )}
+                    <div className="h-1.5 bg-black/20 w-full relative">
+                        <div
+                            className={`h-full transition-all duration-1000 ${isDanger ? 'bg-[#ff8a80] shadow-[0_0_10px_#ff8a80]' : isWarning ? 'bg-[#ffd180] shadow-[0_0_10px_#ffd180]' : 'bg-[#a78bfa] shadow-[0_0_10px_#a78bfa]'}`}
+                            style={{ width: `${timePercent}%` }}
+                        />
+                    </div>
                 </div>
 
                 {/* Collapsible Action Tray (Moved Outside Content Padding) */}
                 <div
+                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside menu
                     className="absolute bottom-0 inset-x-0 z-50 transition-transform duration-500 ease-in-out"
                     style={{ transform: isMenuOpen ? 'translateY(0)' : 'translateY(110%)' }} // Move slightly further down when closed
                 >
-                    <div className="bg-[#0f172a]/90 backdrop-blur-xl border-t-4 border-[#8b5cf6]/50 rounded-t-[2.5rem] p-4 pb-6 shadow-[0_-10px_60px_rgba(0,0,0,0.7)] space-y-3 pointer-events-auto">
+                    <div className="bg-[#0f172a]/95 backdrop-blur-xl border-t-4 border-[#8b5cf6]/50 rounded-t-[2.5rem] p-4 pb-6 shadow-[0_-10px_60px_rgba(0,0,0,0.7)] space-y-3 pointer-events-auto">
 
                         {/* 1. Goal & Stats Stats Row (Ultra Compact) */}
                         <div className="bg-[#1e1b4b]/60 rounded-2xl p-2.5 border border-purple-500/20 flex items-center gap-3 shadow-inner">
@@ -117,26 +143,91 @@ export default function JarThemeLayout({
                             </div>
                         </div>
 
-                        {/* 2. Progress Bar (Slim) */}
-                        <div className="relative w-full h-6 bg-[#1e1b4b] border border-purple-500/20 rounded-full flex items-center justify-center overflow-hidden shadow-inner">
-                            <div className={`absolute top-0 left-0 h-full transition-all duration-1000 ${isDanger ? 'bg-[#ff8a80]' : isWarning ? 'bg-[#ffd180]' : 'bg-[#a78bfa]'}`} style={{ width: `${timePercent}%` }}></div>
-                            <div className="relative z-10 flex items-center gap-1 font-black text-white text-xs drop-shadow-md">
-                                <span className="opacity-90"><Monitor className="w-3 h-3 inline mr-1" />{visualMinutes} / {timeLimit}</span>
-                            </div>
+                        {/* 2. Progress Bar (Slim) & Mode Toggle */}
+                        <div className="space-y-2 mb-1">
+                            {familySettings?.bonus_enabled && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setTimeType(prev => prev === 'bonus' ? null : 'bonus');
+                                    }}
+                                    className={`relative w-full h-9 bg-[#1e1b4b] border rounded-full flex items-center justify-center overflow-hidden shadow-inner transition-all duration-300 ${(timeType === 'bonus' || timeType === null) ? 'border-amber-500/50 ring-1 ring-amber-400/30 scale-100 opacity-100' : 'border-amber-500/30 scale-[0.98] opacity-70 hover:opacity-90'}`}
+                                >
+                                    <div className="absolute top-0 left-0 h-full bg-[#fbbf24] transition-all duration-1000" style={{ width: `${bonusTimePercent}%` }}></div>
+
+                                    <div className="relative z-10 w-full flex items-center justify-between px-3">
+                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${(timeType === 'bonus' || timeType === null) ? 'text-white' : 'text-amber-200/70'}`}>{t.focus_label || '精選'}</span>
+                                        <div className="flex items-center gap-1 font-black text-white text-xs drop-shadow-md">
+                                            <span className="opacity-90"><Star className="w-3 h-3 inline mr-1" />{visualBonusMinutes} {t.minutes_unit} <span className="opacity-50 text-[10px]">/ {bonusTimeLimit}</span></span>
+                                        </div>
+                                    </div>
+                                </button>
+                            )}
+
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (familySettings?.bonus_enabled) {
+                                        setTimeType(prev => prev === 'general' ? null : 'general');
+                                    }
+                                }}
+                                className={`relative w-full h-9 bg-[#1e1b4b] border rounded-full flex items-center justify-center overflow-hidden shadow-inner transition-all duration-300 ${(timeType === 'general' || timeType === null) ? 'border-purple-500/50 ring-1 ring-purple-400/30 scale-100 opacity-100' : (familySettings?.bonus_enabled ? 'border-purple-500/30 scale-[0.98] opacity-70 hover:opacity-90' : 'border-purple-500/20')}`}
+                            >
+                                <div className={`absolute top-0 left-0 h-full transition-all duration-1000 ${isDanger ? 'bg-[#ff8a80]' : isWarning ? 'bg-[#ffd180]' : 'bg-[#a78bfa]'}`} style={{ width: `${timePercent}%` }}></div>
+
+                                <div className={`relative z-10 w-full flex items-center ${familySettings?.bonus_enabled ? 'justify-between px-3' : 'justify-center'}`}>
+                                    {familySettings?.bonus_enabled && (
+                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${(timeType === 'general' || timeType === null) ? 'text-white' : 'text-purple-200/70'}`}>{t.play_label || '一般'}</span>
+                                    )}
+                                    <div className="flex items-center gap-1 font-black text-white text-xs drop-shadow-md">
+                                        <span className="opacity-90"><Monitor className="w-3 h-3 inline mr-1" />{visualMinutes} {t.minutes_unit} <span className="opacity-50 text-[10px]">/ {timeLimit}</span></span>
+                                    </div>
+                                </div>
+                            </button>
                         </div>
 
                         {/* 3. Actions Grid */}
                         <div className="flex flex-col gap-2">
+                            {/* Toggle Buttons Removed - Integrated into Progress Bars */}
+
                             {/* Row A: Quick Deduct (4 items) */}
                             <div className="grid grid-cols-4 gap-2">
-                                {[10, 20, 30].map(val => (
-                                    <button key={val} onClick={() => {
-                                        showModal({ type: 'confirm', title: t.quick_deduct, message: `${t.confirm_deduct} ${val} ${t.minutes_unit}?`, onConfirm: () => onUpdate(kid, 0, -val, t.quick_deduct, actorName) });
-                                    }} className="bg-[#450a0a]/60 hover:bg-[#7f1d1d]/80 text-red-200 border border-red-500/20 active:scale-95 py-2.5 rounded-xl text-sm font-black transition-all shadow-sm backdrop-blur-sm">
-                                        -{val}
-                                    </button>
-                                ))}
-                                <button onClick={() => showModal({ type: 'prompt', title: t.prompt_custom_deduct, onConfirm: (v) => v && onUpdate(kid, 0, -parseInt(v), t.manual_deduct, actorName) })}
+                                {[10, 20, 30].map(mins => (
+                                    <button
+                                        key={mins}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const effectiveType = timeType || 'general';
+                                            const typeLabel = (effectiveType === 'bonus') ? ` (${t.focus_label || '精選'})` : (timeType === 'general' ? ` (${t.play_label || '一般'})` : '');
+
+                                            showModal({
+                                                type: 'confirm',
+                                                title: (t.quick_deduct || '快速扣除') + typeLabel,
+                                                message: `${t.confirm_deduct || '確定要扣除'} ${mins} ${t.minutes_unit}?`,
+                                                onConfirm: () => {
+                                                    if (effectiveType === 'general') {
+                                                        onUpdate(kid, 0, -mins, 0, t.quick_deduct || '快速扣除', actorName);
+                                                    } else {
+                                                        onUpdate(kid, 0, 0, -mins, t.quick_deduct + ' (精選)', actorName);
+                                                    }
+                                                }
+                                            });
+                                        }}
+                                        className={`h-9 border border-white/20 rounded-xl font-bold flex items-center justify-center gap-0.5 transition-all text-sm ${(timeType === 'general' || timeType === null) ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-amber-500/30'}`}
+                                    >
+                                        -{mins}
+                                    </button>))}
+                                <button onClick={() => showModal({
+                                    type: 'prompt', title: t.prompt_custom_deduct, onConfirm: (v) => {
+                                        const m = parseInt(v);
+                                        if (m) {
+                                            const effectiveType = timeType || 'general';
+                                            const typeLabel = (effectiveType === 'bonus') ? ` (${t.focus_label})` : '';
+                                            if (effectiveType === 'general') onUpdate(kid, 0, -m, 0, t.manual_deduct, actorName);
+                                            else onUpdate(kid, 0, 0, -m, t.manual_deduct + typeLabel, actorName);
+                                        }
+                                    }
+                                })}
                                     className="bg-white/5 hover:bg-white/10 text-purple-100 border border-purple-500/30 active:scale-95 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center justify-center backdrop-blur-sm">
                                     <span className="text-xs">自訂</span>
                                 </button>
@@ -144,25 +235,113 @@ export default function JarThemeLayout({
 
                             {/* Row B: Redeem & Close */}
                             <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                                {/* Redeem Points (Time -> Star) - Cosmic Blue */}
+                                {/* Redeem Points (Time -> Star) - Cosmic Blue (General Only for now or simplistic) */}
                                 <button onClick={() => {
                                     const kidMins = kid.total_minutes; const rate = familySettings?.point_to_minutes || 2;
                                     if (Math.floor(kidMins / rate) < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
-                                    showModal({ type: 'prompt', title: t.prompt_redeem_points, message: t.prompt_rate_mins_to_pts?.replace('{rate}', rate).replace('{value}', kidMins), defaultValue: kidMins.toString(), unit: t.minutes_unit, rate: rate, mode: 'minsToPts', onConfirm: (val) => { const mins = parseInt(val); const pts = Math.floor(mins / rate); if (pts > 0 && mins <= kidMins) onUpdate(kid, pts, -(pts * rate), t.time_to_points, actorName); } });
+                                    showModal({
+                                        type: 'prompt',
+                                        title: t.prompt_redeem_points,
+                                        message: t.prompt_rate_mins_to_pts?.replace('{rate}', rate).replace('{value}', kidMins),
+                                        defaultValue: kidMins.toString(),
+                                        unit: t.minutes_unit,
+                                        rate: rate,
+                                        mode: 'minsToPts',
+                                        onConfirm: (val) => {
+                                            const mins = parseInt(val);
+                                            const pts = Math.floor(mins / rate);
+                                            if (pts > 0 && mins <= kidMins) {
+                                                setIsMenuOpen(false);
+                                                setTimeout(() => {
+                                                    onUpdate(kid, pts, -(pts * rate), 0, t.time_to_points, actorName);
+                                                }, 600);
+                                            }
+                                        }
+                                    });
                                 }} className="bg-gradient-to-r from-blue-900/60 to-indigo-900/60 hover:from-blue-800 hover:to-indigo-800 text-blue-100 border border-blue-400/30 active:scale-95 py-3 rounded-2xl text-xs font-bold transition-all shadow-[0_0_10px_rgba(59,130,246,0.2)] flex items-center justify-center gap-1 backdrop-blur-sm">
                                     <Monitor className="w-3.5 h-3.5" />➔<Star className="w-3.5 h-3.5 text-[#fbbf24] fill-current" />
-                                    <span>{t.prompt_redeem_points}</span>
+                                    <span>{t.points_label}</span>
                                 </button>
 
                                 {/* Redeem Time (Star -> Time) - Cosmic Green/Teal */}
-                                <button onClick={() => {
-                                    const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
-                                    if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
-                                    showModal({ type: 'prompt', title: t.prompt_redeem_time, message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts), defaultValue: '1', unit: t.points_label, rate: rate, mode: 'ptsToMins', onConfirm: (val) => { const want = parseInt(val); if (want && want <= kidPts) onUpdate(kid, -want, want * rate, t.points_to_time, actorName); } });
-                                }} className="bg-gradient-to-r from-emerald-900/60 to-teal-900/60 hover:from-emerald-800 hover:to-teal-800 text-emerald-100 border border-emerald-400/30 active:scale-95 py-3 rounded-2xl text-xs font-bold transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)] flex items-center justify-center gap-1 backdrop-blur-sm">
-                                    <Star className="w-3.5 h-3.5 text-[#fbbf24] fill-current" />➔<Monitor className="w-3.5 h-3.5" />
-                                    <span>{t.prompt_redeem_time}</span>
-                                </button>
+                                {familySettings?.bonus_enabled ? (
+                                    <div className="flex gap-1">
+                                        <button onClick={() => {
+                                            const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
+                                            if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                            showModal({
+                                                type: 'prompt',
+                                                title: t.prompt_redeem_time + ` (${t.play_label})`,
+                                                message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
+                                                defaultValue: '1',
+                                                unit: t.points_label,
+                                                rate: rate,
+                                                mode: 'ptsToMins',
+                                                onConfirm: (val) => {
+                                                    const want = parseInt(val);
+                                                    if (want && want <= kidPts) {
+                                                        setIsMenuOpen(false);
+                                                        setTimeout(() => {
+                                                            onUpdate(kid, -want, want * rate, 0, t.points_to_time, actorName);
+                                                        }, 600);
+                                                    }
+                                                }
+                                            });
+                                        }} className="flex-1 bg-gradient-to-r from-emerald-900/60 to-teal-900/60 hover:from-emerald-800 hover:to-teal-800 text-emerald-100 border border-emerald-400/30 active:scale-95 py-3 rounded-l-2xl text-xs font-bold transition-all flex items-center justify-center backdrop-blur-sm">
+                                            <Monitor className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button onClick={() => {
+                                            const kidPts = kid.total_points; const rate = familySettings?.bonus_point_to_minutes || 2;
+                                            if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                            showModal({
+                                                type: 'prompt',
+                                                title: `兌換 (${t.focus_label})`,
+                                                message: `匯率 1:${rate}，目前有 ${kidPts} 點：`,
+                                                defaultValue: '1',
+                                                unit: t.points_label,
+                                                rate: rate,
+                                                mode: 'ptsToMins',
+                                                onConfirm: (val) => {
+                                                    const want = parseInt(val);
+                                                    if (want && want <= kidPts) {
+                                                        setIsMenuOpen(false);
+                                                        setTimeout(() => {
+                                                            onUpdate(kid, -want, 0, want * rate, '點數兌換精選', actorName);
+                                                        }, 600);
+                                                    }
+                                                }
+                                            });
+                                        }} className="flex-1 bg-gradient-to-r from-amber-900/60 to-orange-900/60 hover:from-amber-800 hover:to-orange-800 text-amber-100 border border-amber-400/30 active:scale-95 py-3 rounded-r-2xl text-xs font-bold transition-all flex items-center justify-center backdrop-blur-sm">
+                                            <Star className="w-3.5 h-3.5 fill-current" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => {
+                                        const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
+                                        if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                        showModal({
+                                            type: 'prompt',
+                                            title: t.prompt_redeem_time,
+                                            message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
+                                            defaultValue: '1',
+                                            unit: t.points_label,
+                                            rate: rate,
+                                            mode: 'ptsToMins',
+                                            onConfirm: (val) => {
+                                                const want = parseInt(val);
+                                                if (want && want <= kidPts) {
+                                                    setIsMenuOpen(false);
+                                                    setTimeout(() => {
+                                                        onUpdate(kid, -want, want * rate, 0, t.points_to_time, actorName);
+                                                    }, 600);
+                                                }
+                                            }
+                                        });
+                                    }} className="bg-gradient-to-r from-emerald-900/60 to-teal-900/60 hover:from-emerald-800 hover:to-teal-800 text-emerald-100 border border-emerald-400/30 active:scale-95 py-3 rounded-2xl text-xs font-bold transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)] flex items-center justify-center gap-1 backdrop-blur-sm">
+                                        <Star className="w-3.5 h-3.5 text-[#fbbf24] fill-current" />➔<Monitor className="w-3.5 h-3.5" />
+                                        <span>{t.prompt_redeem_time}</span>
+                                    </button>
+                                )}
 
                                 {/* Close Button */}
                                 <button
@@ -182,7 +361,10 @@ export default function JarThemeLayout({
                     className={`absolute bottom-6 right-6 z-[60] transition-all duration-300 ${isMenuOpen ? 'opacity-0 pointer-events-none scale-50' : 'opacity-100 scale-100'}`}
                 >
                     <button
-                        onClick={() => setIsMenuOpen(true)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsMenuOpen(true);
+                        }}
                         className="w-16 h-16 rounded-full shadow-[0_0_20px_rgba(139,92,246,0.4)] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center pointer-events-auto border-4 border-purple-300/20 ring-4 ring-[#8b5cf6]/30 bg-[#8b5cf6] text-white hover:scale-110 hover:bg-[#7c3aed]"
                     >
                         <PlusCircle className="w-8 h-8" />
