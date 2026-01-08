@@ -215,7 +215,7 @@ export default function Dashboard() {
         bonus_enabled: false,
         bonus_weekday_limit: 30,
         bonus_holiday_limit: 60,
-        bonus_point_to_minutes: 10
+        bonus_point_to_minutes: 3
     });
 
     const [modal, setModal] = useState({
@@ -1304,7 +1304,7 @@ export default function Dashboard() {
                                         tempSettings.bonus_enabled !== (family.bonus_enabled || false) ||
                                         tempSettings.bonus_weekday_limit !== (family.bonus_weekday_limit || 30) ||
                                         tempSettings.bonus_holiday_limit !== (family.bonus_holiday_limit || 60) ||
-                                        tempSettings.bonus_point_to_minutes !== (family.bonus_point_to_minutes || 10);
+                                        tempSettings.bonus_point_to_minutes !== (family.bonus_point_to_minutes || 3);
 
                                     if (isChanged) {
                                         showModal({
