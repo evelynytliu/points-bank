@@ -63,7 +63,7 @@ export default function DoodleThemeLayout({
                 <div className="flex-1 flex flex-col justify-center items-center gap-0">
                     <div className="flex items-center gap-2 text-[#ff8a80] font-bold text-lg mb-1">
                         <Star className="w-5 h-5 fill-current" />
-                        <span>{t.points_label || '點數'}</span>
+                        <span>{t.points_label}</span>
                     </div>
                     {/* Updated: Smaller font text-6xl (was text-[5rem]) */}
                     <div className="text-6xl leading-none font-black text-[#4a4a4a] italic tracking-tighter" style={{ textShadow: '3px 3px 0px #eee' }}>
@@ -105,7 +105,7 @@ export default function DoodleThemeLayout({
                         ) : (
                             <div className="border-2 border-dashed border-[#ccc] rounded-xl p-2 flex items-center justify-center gap-2 text-[#aaa] hover:text-[#ff8a80] hover:border-[#ff8a80] transition-all">
                                 <PlusCircle className="w-4 h-4" />
-                                <span className="text-xs font-bold">{t.set_goal || '設定願望'}</span>
+                                <span className="text-xs font-bold">{t.wish_setup_new}</span>
                             </div>
                         )}
                     </div>
@@ -151,7 +151,7 @@ export default function DoodleThemeLayout({
 
                             {/* Label Badge */}
                             <div className={`relative z-10 flex-shrink-0 ml-2 px-3 py-1 rounded-lg font-black text-sm transition-colors border-2 ${(timeType === 'bonus' || timeType === null) ? 'bg-white text-[#78350f] border-[#d97706]' : 'bg-[#fff] text-[#9ca3af] border-[#e6e6e6]'}`}>
-                                {t.focus_mode || '精選'}
+                                {t.focus_mode}
                             </div>
 
                             <div className="relative z-10 flex-1 flex items-center justify-center gap-2 font-black text-[#78350f] text-lg tracking-widest pl-2 pr-4">
@@ -179,7 +179,7 @@ export default function DoodleThemeLayout({
                                             key={mins}
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                onUpdate(kid, 0, 0, -mins, (t.quick_deduct || '快速扣除') + ' (精選)', actorName);
+                                                onUpdate(kid, 0, 0, -mins, t.quick_deduct + ' (' + t.focus_label + ')', actorName);
                                             }}
                                             className="border-2 border-[#d97706] bg-white text-[#78350f] font-black rounded-xl py-2 shadow-[2px_2px_0px_#d97706] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all text-sm hover:bg-[#ffecb3]"
                                         >
@@ -191,18 +191,18 @@ export default function DoodleThemeLayout({
                                             e.stopPropagation();
                                             showModal({
                                                 type: 'prompt',
-                                                title: t.prompt_custom_deduct + ' (精選)',
+                                                title: t.prompt_custom_deduct + ' (' + t.focus_label + ')',
                                                 message: t.prompt_enter_mins_deduct,
                                                 unit: t.minutes_unit,
                                                 onConfirm: (val) => {
                                                     const m = parseInt(val);
-                                                    if (m) onUpdate(kid, 0, 0, -m, t.manual_deduct + ' (精選)', actorName);
+                                                    if (m) onUpdate(kid, 0, 0, -m, t.manual_deduct + ' (' + t.focus_label + ')', actorName);
                                                 }
                                             });
                                         }}
                                         className="border-2 border-[#d97706] bg-white text-[#78350f] font-black rounded-xl py-2 shadow-[2px_2px_0px_#d97706] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all text-sm hover:bg-[#ffecb3]"
                                     >
-                                        {t.custom || '自訂'}
+                                        {t.custom}
                                     </button>
                                 </div>
                             </div>
@@ -229,7 +229,7 @@ export default function DoodleThemeLayout({
                         {/* Label Badge */}
                         {familySettings?.bonus_enabled && (
                             <div className={`relative z-10 flex-shrink-0 ml-2 px-3 py-1 rounded-lg font-black text-sm transition-colors border-2 ${(timeType === 'general' || timeType === null) ? 'bg-white text-[#4a4a4a] border-[#4a4a4a]' : 'bg-[#f5f5f5] text-[#888] border-[#ccc]'}`}>
-                                {t.play_mode || '一般'}
+                                {t.play_mode}
                             </div>
                         )}
 
@@ -260,7 +260,7 @@ export default function DoodleThemeLayout({
                                         key={mins}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onUpdate(kid, 0, -mins, 0, t.quick_deduct || '快速扣除', actorName);
+                                            onUpdate(kid, 0, -mins, 0, t.quick_deduct, actorName);
                                         }}
                                         className="border-2 border-[#4a4a4a] bg-white text-[#4a4a4a] font-black rounded-xl py-2 shadow-[2px_2px_0px_#4a4a4a] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all text-sm hover:bg-[#e0e0e0]"
                                     >
@@ -283,7 +283,7 @@ export default function DoodleThemeLayout({
                                     }}
                                     className="border-2 border-[#4a4a4a] bg-white text-[#4a4a4a] font-black rounded-xl py-2 shadow-[2px_2px_0px_#4a4a4a] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all text-sm hover:bg-[#e0e0e0]"
                                 >
-                                    {t.custom || '自訂'}
+                                    {t.custom}
                                 </button>
                             </div>
                         </div>
@@ -299,7 +299,7 @@ export default function DoodleThemeLayout({
                         onClick={() => {
                             const kidMins = kid.total_minutes;
                             const rate = familySettings?.point_to_minutes || 2;
-                            if (Math.floor(kidMins / rate) < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
+                            if (Math.floor(kidMins / rate) < 1) return showModal({ title: t.alert_title, message: t.alert_mins_not_enough });
                             showModal({
                                 type: 'prompt',
                                 title: t.prompt_redeem_points,
@@ -328,10 +328,10 @@ export default function DoodleThemeLayout({
                                     onClick={() => {
                                         const kidPts = kid.total_points;
                                         const rate = familySettings?.point_to_minutes || 2;
-                                        if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                        if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                         showModal({
                                             type: 'prompt',
-                                            title: t.prompt_redeem_time + ' (一般)',
+                                            title: t.prompt_redeem_time + ' (' + t.play_label + ')',
                                             message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
                                             defaultValue: '1',
                                             unit: t.points_label,
@@ -346,7 +346,7 @@ export default function DoodleThemeLayout({
                                     }}
                                     className="flex-1 bg-[#e8f5e9] border-2 border-[#4a4a4a] text-[#2e7d32] shadow-[4px_4px_0px_#4a4a4a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] rounded-xl p-1 text-sm font-black hover:bg-[#c8e6c9] flex flex-col items-center justify-center"
                                 >
-                                    <span className="text-[10px] uppercase opacity-70">一般</span>
+                                    <span className="text-[10px] uppercase opacity-70">{t.play_label}</span>
                                     <Monitor className="w-5 h-5" />
                                 </button>
                                 <button
@@ -354,11 +354,11 @@ export default function DoodleThemeLayout({
                                         const kidPts = kid.total_points;
                                         // Use bonus rate
                                         const rate = familySettings?.bonus_point_to_minutes || 2;
-                                        if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                        if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                         showModal({
                                             type: 'prompt',
-                                            title: '兌換精選時間',
-                                            message: `匯率 1:${rate} (精選)，目前有 ${kidPts} 點：`,
+                                            title: `${t.exchange_to_time} (${t.focus_label})`,
+                                            message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
                                             defaultValue: '1',
                                             unit: t.points_label,
                                             rate: rate,
@@ -366,13 +366,13 @@ export default function DoodleThemeLayout({
                                             onConfirm: (val) => {
                                                 const want = parseInt(val);
                                                 // onUpdate(kid, pChange, mChange, bChange, reason, actor)
-                                                if (want && want <= kidPts) onUpdate(kid, -want, 0, want * rate, '點數兌換精選', actorName);
+                                                if (want && want <= kidPts) onUpdate(kid, -want, 0, want * rate, t.points_to_time + ' (' + t.focus_label + ')', actorName);
                                             }
                                         });
                                     }}
                                     className="flex-1 bg-[#fff8e1] border-2 border-[#d97706] text-[#78350f] shadow-[4px_4px_0px_#d97706] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] rounded-xl p-1 text-sm font-black hover:bg-[#ffecb3] flex flex-col items-center justify-center"
                                 >
-                                    <span className="text-[10px] uppercase opacity-70">精選</span>
+                                    <span className="text-[10px] uppercase opacity-70">{t.focus_label}</span>
                                     <Star className="w-5 h-5" />
                                 </button>
                             </div>
@@ -381,7 +381,7 @@ export default function DoodleThemeLayout({
                                 onClick={() => {
                                     const kidPts = kid.total_points;
                                     const rate = familySettings?.point_to_minutes || 2;
-                                    if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                    if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                     showModal({
                                         type: 'prompt',
                                         title: t.prompt_redeem_time,

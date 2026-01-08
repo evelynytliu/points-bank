@@ -63,7 +63,7 @@ export default function NeonThemeLayout({
                     {/* Left Column: Big Points Number (Neon Style) */}
                     <div className="flex-1 flex flex-col justify-center items-center py-2 relative">
                         <div className="text-cyan-400 font-bold text-sm tracking-[0.2em] mb-2 uppercase drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">
-                            {t.current_points || '目前點數'}
+                            {t.current_points}
                         </div>
                         <div className="text-7xl font-black text-white italic tracking-tighter drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]" style={{ WebkitTextStroke: '2px rgba(34,211,238,0.3)' }}>
                             <AnimatedCounter value={visualPoints} />
@@ -121,7 +121,7 @@ export default function NeonThemeLayout({
                                 <Clock className="w-4 h-4 text-slate-400" />
                             </div>
                             <div className="flex-1">
-                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider leading-none mb-0.5">{t.can_exchange || '可兌換'}</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider leading-none mb-0.5">{t.redeemable_rewards}</div>
                                 <div className="text-xl font-black text-white leading-none flex gap-3 items-baseline">
                                     <span>
                                         <AnimatedCounter value={Math.floor(visualPoints * (familySettings?.point_to_minutes || 2))} />
@@ -130,7 +130,7 @@ export default function NeonThemeLayout({
                                     {familySettings?.bonus_enabled && (
                                         <span className="text-amber-400 border-l border-white/10 pl-3">
                                             <AnimatedCounter value={Math.floor(visualPoints * (familySettings?.bonus_point_to_minutes || 10))} />
-                                            <span className="text-[10px] text-amber-400/60 font-medium ml-1">精選</span>
+                                            <span className="text-[10px] text-amber-400/60 font-medium ml-1">{t.focus_label}</span>
                                         </span>
                                     )}
                                 </div>
@@ -143,7 +143,7 @@ export default function NeonThemeLayout({
                                 <Coins className="w-4 h-4 text-slate-400" />
                             </div>
                             <div>
-                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider leading-none mb-0.5">{t.cash_unit || '元'}</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider leading-none mb-0.5">{t.cash_unit}</div>
                                 <div className="text-xl font-black text-emerald-400 leading-none">
                                     $<AnimatedCounter value={(visualPoints * (familySettings?.point_to_cash || 5))} />
                                 </div>
@@ -171,7 +171,7 @@ export default function NeonThemeLayout({
 
                         {/* Label */}
                         <div className={`relative z-10 pl-4 pr-2 font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${(timeType === 'bonus' || timeType === null) ? 'text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,1)]' : 'text-amber-500/60'}`}>
-                            {t.focus_mode || '精選'}
+                            {t.focus_mode}
                         </div>
 
                         <div className={`relative z-10 flex-1 flex items-center justify-end md:justify-center pr-4 gap-2 font-black text-xs uppercase tracking-widest transition-colors ${(timeType === 'bonus' || timeType === null) ? 'text-amber-300 drop-shadow-[0_0_5px_rgba(245,158,11,0.8)]' : 'text-amber-600'}`}>
@@ -199,7 +199,7 @@ export default function NeonThemeLayout({
                     {/* Label */}
                     {familySettings?.bonus_enabled && (
                         <div className={`relative z-10 pl-4 pr-2 font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${(timeType === 'general' || timeType === null) ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,1)]' : 'text-cyan-500/60'}`}>
-                            {t.play_mode || '一般'}
+                            {t.play_mode}
                         </div>
                     )}
 
@@ -220,17 +220,17 @@ export default function NeonThemeLayout({
                         onClick={(e) => {
                             e.stopPropagation();
                             const effectiveType = timeType || 'general';
-                            const typeLabel = (effectiveType === 'bonus') ? ` (${t.focus_label || '精選'})` : (timeType === 'general' ? ` (${t.play_label || '一般'})` : '');
+                            const typeLabel = (effectiveType === 'bonus') ? ` (${t.focus_label})` : (timeType === 'general' ? ` (${t.play_label})` : '');
 
                             showModal({
                                 type: 'confirm',
-                                title: (t.quick_deduct || '快速扣除') + typeLabel,
-                                message: `${t.confirm_deduct || '確定要扣除'} ${mins} ${t.minutes_unit}?`,
+                                title: (t.quick_deduct) + typeLabel,
+                                message: `${t.confirm_deduct} ${mins} ${t.minutes_unit}?`,
                                 onConfirm: () => {
                                     if (effectiveType === 'general') {
                                         onUpdate(kid, 0, -mins, 0, t.quick_deduct || '快速扣除', actorName);
                                     } else {
-                                        onUpdate(kid, 0, 0, -mins, t.quick_deduct + ' (精選)', actorName);
+                                        onUpdate(kid, 0, 0, -mins, t.quick_deduct + ' (' + t.focus_label + ')', actorName);
                                     }
                                 }
                             });
@@ -249,7 +249,7 @@ export default function NeonThemeLayout({
                         const kidMins = kid.total_minutes;
                         const rate = familySettings?.point_to_minutes || 2;
                         const maxPts = Math.floor(kidMins / rate);
-                        if (maxPts < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
+                        if (maxPts < 1) return showModal({ title: t.alert_title, message: t.alert_mins_not_enough });
                         showModal({
                             type: 'prompt',
                             title: t.prompt_redeem_points,
@@ -278,10 +278,10 @@ export default function NeonThemeLayout({
                                 onClick={() => {
                                     const kidPts = kid.total_points;
                                     const rate = familySettings?.point_to_minutes || 2;
-                                    if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                    if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                     showModal({
                                         type: 'prompt',
-                                        title: '兌換一般時間',
+                                        title: t.prompt_redeem_time + ' (' + t.play_label + ')',
                                         message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
                                         defaultValue: '1',
                                         unit: t.points_label,
@@ -301,18 +301,18 @@ export default function NeonThemeLayout({
                                 onClick={() => {
                                     const kidPts = kid.total_points;
                                     const rate = familySettings?.bonus_point_to_minutes || 2;
-                                    if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                    if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                     showModal({
                                         type: 'prompt',
-                                        title: '兌換精選時間',
-                                        message: `匯率 1:${rate} (精選)，目前有 ${kidPts} 點：`,
+                                        title: `${t.exchange_to_time} (${t.focus_label})`,
+                                        message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
                                         defaultValue: '1',
                                         unit: t.points_label,
                                         rate: rate,
                                         mode: 'ptsToMins',
                                         onConfirm: (val) => {
                                             const want = parseInt(val);
-                                            if (want && want <= kidPts) onUpdate(kid, -want, 0, want * rate, '點數兌換精選', actorName);
+                                            if (want && want <= kidPts) onUpdate(kid, -want, 0, want * rate, t.points_to_time + ' (' + t.focus_label + ')', actorName);
                                         }
                                     });
                                 }}
@@ -326,7 +326,7 @@ export default function NeonThemeLayout({
                             onClick={() => {
                                 const kidPts = kid.total_points;
                                 const rate = familySettings?.point_to_minutes || 2;
-                                if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                 showModal({
                                     type: 'prompt',
                                     title: t.prompt_redeem_time,

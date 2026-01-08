@@ -105,13 +105,13 @@ function SortableKidItem({
 
                     {editingKidId === kid.id ? (
                         <div className="flex gap-1">
-                            <button onClick={() => saveEditKid(kid.id)} className="p-2 text-green-500 hover:scale-110 transition-all rounded-full hover:bg-green-500/10" title="儲存"><CheckCircle2 className="w-5 h-5" /></button>
-                            <button onClick={cancelEditKid} className="p-2 text-red-500 hover:scale-110 transition-all rounded-full hover:bg-red-500/10" title="取消"><X className="w-5 h-5" /></button>
+                            <button onClick={() => saveEditKid(kid.id)} className="p-2 text-green-500 hover:scale-110 transition-all rounded-full hover:bg-green-500/10" title={t.save}><CheckCircle2 className="w-5 h-5" /></button>
+                            <button onClick={cancelEditKid} className="p-2 text-red-500 hover:scale-110 transition-all rounded-full hover:bg-red-500/10" title={t.cancel}><X className="w-5 h-5" /></button>
                         </div>
                     ) : (
                         <div className="flex gap-1">
-                            <button onClick={() => startEditKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-slate-400 hover:text-blue-500 hover:bg-blue-50' : 'text-slate-500 hover:text-blue-400 hover:bg-blue-500/20'}`} title="修改資料"><Edit2 className="w-4 h-4" /></button>
-                            <button onClick={() => deleteKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-slate-400 hover:text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/20'}`} title="刪除小孩"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => startEditKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-slate-400 hover:text-blue-500 hover:bg-blue-50' : 'text-slate-500 hover:text-blue-400 hover:bg-blue-500/20'}`} title={t.edit_profile}><Edit2 className="w-4 h-4" /></button>
+                            <button onClick={() => deleteKid(kid)} className={`p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-slate-400 hover:text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-red-500/20'}`} title={t.delete_kid_tooltip}><Trash2 className="w-4 h-4" /></button>
                         </div>
                     )}
                 </div>
@@ -311,7 +311,7 @@ export default function Dashboard() {
         setModal({
             isOpen: true,
             type: config.type || 'alert',
-            title: config.title || '系統訊息',
+            title: config.title || t.system_message,
             message: config.message || '',
             value: config.defaultValue || '',
             unit: config.unit || '',
@@ -340,13 +340,13 @@ export default function Dashboard() {
 
             showModal({
                 type: 'prompt',
-                title: '安全驗證',
-                message: '此操作需要家長管理密碼：',
+                title: t.security_check,
+                message: t.enter_parent_pin,
                 onConfirm: (val) => {
                     if (val === family.parent_pin) {
                         resolve(true);
                     } else {
-                        showModal({ title: '驗證失敗', message: '密碼錯誤！' });
+                        showModal({ title: t.verify_fail, message: t.wrong_pin });
                         resolve(false);
                     }
                 },
@@ -554,24 +554,24 @@ export default function Dashboard() {
 
     const getActorName = () => {
         if (userRole === 'parent') {
-            return user?.email?.split('@')[0] || '管理員';
+            return user?.email?.split('@')[0] || t.admin_default_name;
         }
-        return profile?.full_name || '小孩';
+        return profile?.full_name || t.kid_default_name;
     };
 
     const handleBatchUpdate = async () => {
         if (!await checkParentPin()) return;
-        if (selectedKids.length === 0) return alert('請選擇對象');
+        if (selectedKids.length === 0) return alert(t.select_kids_alert);
         const p = parseInt(ptsChange) || 0;
         const m = parseInt(minChange) || 0;
         const b = parseInt(bonusChange) || 0;
-        if (p === 0 && m === 0 && b === 0) return alert('請輸入調整數值');
+        if (p === 0 && m === 0 && b === 0) return alert(t.enter_values_alert);
 
         const actor = getActorName();
         for (const kidId of selectedKids) {
             const kid = kids.find(k => k.id === kidId);
             if (kid) {
-                await updateKidAction(kid, p, m, b, customReason || '後台批次調整', actor, false);
+                await updateKidAction(kid, p, m, b, customReason || t.batch_update_reason, actor, false);
             }
         }
 

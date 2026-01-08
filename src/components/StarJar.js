@@ -24,7 +24,7 @@ const RisingStar = ({ x, y, color, scale, onComplete }) => (
     </motion.div>
 );
 
-export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
+export default function StarJar({ points, theme, seed = 0, starSize = 5, t }) {
     const isDoodle = theme === 'doodle';
     const isContainer = theme === 'container';
 
@@ -462,7 +462,7 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5 }) {
                         onClick={requestPermission}
                         className="bg-white/90 text-amber-600 px-4 py-2 rounded-full font-bold shadow-lg active:scale-95 transition-transform text-sm border-2 border-amber-200"
                     >
-                        開啟搖晃感應 (Enable Shake)
+                        {t?.enable_shake || '開啟搖晃感應 (Enable Shake)'}
                     </button>
                     {debugMsg && <div className="mt-2 text-[10px] text-white bg-red-500/80 px-2 py-1 rounded">{debugMsg}</div>}
                 </div>

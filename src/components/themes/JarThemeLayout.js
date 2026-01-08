@@ -56,7 +56,7 @@ export default function JarThemeLayout({
 
                 {/* Physics Background Layer */}
                 <div className="absolute inset-x-0 bottom-0 top-[20px] z-0">
-                    <StarJar points={visualPoints} theme="container" seed={kid.id} starSize={familySettings?.star_size || 5} />
+                    <StarJar points={visualPoints} theme="container" seed={kid.id} starSize={familySettings?.star_size || 5} t={t} />
                 </div>
 
                 {/* Interactive Content Layer */}
@@ -125,7 +125,7 @@ export default function JarThemeLayout({
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-1 text-xs font-bold text-purple-300/60 opacity-80">
-                                        <PlusCircle className="w-4 h-4" /> <span>願望</span>
+                                        <PlusCircle className="w-4 h-4" /> <span>{t.wish_label}</span>
                                     </div>
                                 )}
                             </div>
@@ -229,7 +229,7 @@ export default function JarThemeLayout({
                                     }
                                 })}
                                     className="bg-white/5 hover:bg-white/10 text-purple-100 border border-purple-500/30 active:scale-95 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center justify-center backdrop-blur-sm">
-                                    <span className="text-xs">自訂</span>
+                                    <span className="text-xs">{t.custom}</span>
                                 </button>
                             </div>
 
@@ -238,7 +238,7 @@ export default function JarThemeLayout({
                                 {/* Redeem Points (Time -> Star) - Cosmic Blue (General Only for now or simplistic) */}
                                 <button onClick={() => {
                                     const kidMins = kid.total_minutes; const rate = familySettings?.point_to_minutes || 2;
-                                    if (Math.floor(kidMins / rate) < 1) return showModal({ title: '提醒', message: t.alert_mins_not_enough });
+                                    if (Math.floor(kidMins / rate) < 1) return showModal({ title: t.alert_title, message: t.alert_mins_not_enough });
                                     showModal({
                                         type: 'prompt',
                                         title: t.prompt_redeem_points,
@@ -268,7 +268,7 @@ export default function JarThemeLayout({
                                     <div className="flex gap-1">
                                         <button onClick={() => {
                                             const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
-                                            if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                            if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                             showModal({
                                                 type: 'prompt',
                                                 title: t.prompt_redeem_time + ` (${t.play_label})`,
@@ -292,11 +292,11 @@ export default function JarThemeLayout({
                                         </button>
                                         <button onClick={() => {
                                             const kidPts = kid.total_points; const rate = familySettings?.bonus_point_to_minutes || 2;
-                                            if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                            if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                             showModal({
                                                 type: 'prompt',
-                                                title: `兌換 (${t.focus_label})`,
-                                                message: `匯率 1:${rate}，目前有 ${kidPts} 點：`,
+                                                title: `${t.exchange_to_time} (${t.focus_label})`,
+                                                message: t.prompt_rate_pts_to_mins?.replace('{rate}', rate).replace('{value}', kidPts),
                                                 defaultValue: '1',
                                                 unit: t.points_label,
                                                 rate: rate,
@@ -306,7 +306,7 @@ export default function JarThemeLayout({
                                                     if (want && want <= kidPts) {
                                                         setIsMenuOpen(false);
                                                         setTimeout(() => {
-                                                            onUpdate(kid, -want, 0, want * rate, '點數兌換精選', actorName);
+                                                            onUpdate(kid, -want, 0, want * rate, t.points_to_time + ' (' + t.focus_label + ')', actorName);
                                                         }, 600);
                                                     }
                                                 }
@@ -318,7 +318,7 @@ export default function JarThemeLayout({
                                 ) : (
                                     <button onClick={() => {
                                         const kidPts = kid.total_points; const rate = familySettings?.point_to_minutes || 2;
-                                        if (kidPts < 1) return showModal({ title: '提醒', message: t.alert_pts_not_enough });
+                                        if (kidPts < 1) return showModal({ title: t.alert_title, message: t.alert_pts_not_enough });
                                         showModal({
                                             type: 'prompt',
                                             title: t.prompt_redeem_time,
