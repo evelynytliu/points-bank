@@ -34,6 +34,9 @@ export default function Home() {
   }, [router]);
 
   useEffect(() => {
+    // Force Doodle Theme for Entry Page
+    document.body.className = 'theme-doodle';
+
     // Wrap in setTimeout to avoid 'setState synchronously within effect' lint error
     const timer = setTimeout(() => {
       const savedLang = localStorage.getItem('app_language') || 'zh';
