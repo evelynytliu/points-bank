@@ -213,12 +213,13 @@ export default function StarJar({ points, theme, seed = 0, starSize = 5, t }) {
             walls.push(Bodies.rectangle(width / 2, 0, width, 60, wallOpts)); // Ceiling
 
             // Central Obstacle
-            walls.push(Bodies.rectangle(width / 2, 110, 180, 80, {
-                isStatic: true,
-                render: { visible: false },
-                chamfer: { radius: 10 },
-                label: 'wall'
-            }));
+            // Central Obstacle REMOVED to prevent stars from getting stuck
+            // walls.push(Bodies.rectangle(width / 2, 110, 180, 80, {
+            //     isStatic: true,
+            //     render: { visible: false },
+            //     chamfer: { radius: 10 },
+            //     label: 'wall'
+            // }));
         } else {
             walls.push(Bodies.rectangle(50, 127, 65, 2, wallOpts));
             walls.push(Bodies.rectangle(15, 85, 2, 90, { ...wallOpts, friction: 0.5 }));
