@@ -1249,7 +1249,7 @@ export default function Dashboard() {
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <span className={`font-bold ${family?.theme === 'jar' ? 'text-purple-300' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-cyan-400')} uppercase text-base tracking-widest`}>{log.kids?.name}</span>
-                                            <span className={`text-sm ${family?.theme === 'jar' ? 'text-purple-200/60' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600')} font-mono italic`}>{new Date(log.created_at).toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-TW')}</span>
+                                            <span className={`text-sm ${family?.theme === 'jar' ? 'text-purple-200/60' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600')} font-mono italic`}>{new Date(log.created_at).toLocaleString(language === 'en' ? 'en-US' : 'zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         {userRole === 'parent' && (
                                             <button
