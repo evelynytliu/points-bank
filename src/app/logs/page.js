@@ -89,7 +89,10 @@ export default function LogsPage() {
     });
 
     if (loading) return (
-        <div className={`min-h-screen flex items-center justify-center font-bold animate-pulse ${family?.theme === 'jar' ? 'text-purple-400' : (family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400')}`}>{t.loading}</div>
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+            <History className={`w-12 h-12 animate-bounce ${family?.theme === 'jar' ? 'text-purple-400' : (family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400')}`} />
+            <div className={`font-black tracking-[0.3em] uppercase text-sm animate-pulse ${family?.theme === 'jar' ? 'text-purple-400' : (family?.theme === 'doodle' ? 'text-[#ff8a80]' : 'text-cyan-400')}`}>{t.loading}</div>
+        </div>
     );
 
     const theme = family?.theme || 'cyber';

@@ -102,6 +102,61 @@ h4 {
   font-family: var(--font-display);
 }
 
+/* ---------- Global UX polish ---------- */
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+/* Visible keyboard focus, theme-aware */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Themed scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 8px;
+  opacity: 0.6;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer components {
   .glass-panel {
     background: var(--panel-bg);

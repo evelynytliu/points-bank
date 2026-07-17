@@ -14,6 +14,7 @@ import JarThemeLayout from '@/components/themes/JarThemeLayout';
 import NeonThemeLayout from '@/components/themes/NeonThemeLayout';
 import DoodleThemeLayout from '@/components/themes/DoodleThemeLayout';
 import AnimatedCounter from '@/components/AnimatedCounter';
+import WeeklyRecap from '@/components/WeeklyRecap';
 
 const AVATARS = [
     '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', '🐷', '🐯',
@@ -147,8 +148,17 @@ export default function Dashboard() {
     const [goals, setGoals] = useState({}); // Map of kid_id -> goal object
     const [updatingKidGoalId, setUpdatingKidGoalId] = useState(null);
     const [logs, setLogs] = useState([]);
+    const [statsLogs, setStatsLogs] = useState([]); // last 14 days, for weekly recap & streaks
     const [familyMembers, setFamilyMembers] = useState([]);
     const [userRole, setUserRole] = useState('parent'); // 'parent' or 'kid'
+    const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' }
+    const toastTimerRef = useRef(null);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = setTimeout(() => setToast(null), 2600);
+    };
 
     // Language
     const [language, setLanguage] = useState('zh');
@@ -526,6 +536,17 @@ export default function Dashboard() {
             if (lError) console.error('獲取日誌失敗:', lError);
             setLogs(logsData || []);
 
+            // 近 14 天日誌：計算每週小結與連續天數
+            const statsSince = new Date();
+            statsSince.setDate(statsSince.getDate() - 13);
+            statsSince.setHours(0, 0, 0, 0);
+            const { data: statsData } = await supabase
+                .from('logs')
+                .select(`kid_id, points_change, created_at, kids!inner(family_id)`)
+                .eq('kids.family_id', currentFamilyId)
+                .gte('created_at', statsSince.toISOString());
+            setStatsLogs(statsData || []);
+
             // 如果是家長，獲取所有成員清單用於管理
             if (authUser) {
                 const { data: members } = await supabase
@@ -561,11 +582,11 @@ export default function Dashboard() {
 
     const handleBatchUpdate = async () => {
         if (!await checkParentPin()) return;
-        if (selectedKids.length === 0) return alert(t.select_kids_alert);
+        if (selectedKids.length === 0) return showToast(t.select_kids_alert, 'error');
         const p = parseInt(ptsChange) || 0;
         const m = parseInt(minChange) || 0;
         const b = parseInt(bonusChange) || 0;
-        if (p === 0 && m === 0 && b === 0) return alert(t.enter_values_alert);
+        if (p === 0 && m === 0 && b === 0) return showToast(t.enter_values_alert, 'error');
 
         const actor = getActorName();
         for (const kidId of selectedKids) {
@@ -617,12 +638,34 @@ export default function Dashboard() {
                 .neq('id', family.id);
 
             if (duplicates && duplicates.length > 0) {
-                return alert('⚠️ 這個家庭訪問碼已經被其他人使用了，請換一個！(試試點擊隨機產生)');
+                return showModal({ title: t.system_message, message: t.code_taken });
             }
         }
 
         // Separate db settings and local settings
         const { star_size, ...dbSettings } = tempSettings;
+
+        // Guard against empty/invalid numeric inputs (inputs allow '' while typing)
+        const numericDefaults = {
+            weekday_limit: 50,
+            holiday_limit: 90,
+            point_to_minutes: 2,
+            point_to_cash: 5,
+            bonus_weekday_limit: 30,
+            bonus_holiday_limit: 60,
+            bonus_point_to_minutes: 3
+        };
+        Object.entries(numericDefaults).forEach(([key, fallback]) => {
+            const v = dbSettings[key];
+            if (v === '' || v === null || v === undefined || Number.isNaN(v)) {
+                dbSettings[key] = fallback;
+            }
+        });
+
+        // Parent PIN must be 4 digits when verification is enabled
+        if (dbSettings.use_parent_pin && !/^\d{4}$/.test(dbSettings.parent_pin || '')) {
+            return showToast(t.pin_must_be_4, 'error');
+        }
 
         // Save local settings
         if (star_size) {
@@ -630,9 +673,9 @@ export default function Dashboard() {
         }
 
         const { error } = await supabase.from('families').update(dbSettings).eq('id', family.id);
-        if (error) alert('儲存失敗: ' + error.message);
+        if (error) showModal({ title: t.system_message, message: t.save_failed + error.message });
         else {
-            alert('設定已更新！');
+            showToast(t.settings_saved);
             setShowSettingsModal(false);
             setIsAdminExpanded(false); // Collapse Admin Console on save
             fetchData();
@@ -640,15 +683,20 @@ export default function Dashboard() {
     };
 
     const kickMember = async (memberId) => {
-        if (memberId === family.admin_id) return alert('不能移除管理員');
-        if (!confirm('確定要將此成員移出家庭嗎？')) return;
-
-        const { error } = await supabase.rpc('remove_family_member', { target_user_id: memberId });
-        if (error) alert('移除失敗: ' + error.message);
-        else {
-            alert('已成功移除');
-            fetchData();
-        }
+        if (memberId === family.admin_id) return showToast(t.cannot_remove_admin, 'error');
+        showModal({
+            type: 'confirm',
+            title: t.members_section,
+            message: t.confirm_remove_member,
+            onConfirm: async () => {
+                const { error } = await supabase.rpc('remove_family_member', { target_user_id: memberId });
+                if (error) showToast(t.remove_failed + error.message, 'error');
+                else {
+                    showToast(t.member_removed);
+                    fetchData();
+                }
+            }
+        });
     };
 
     const addKid = async () => {
@@ -660,7 +708,7 @@ export default function Dashboard() {
             family_id: profile.family_id,
             login_pin: '1234'
         });
-        if (error) alert(error.message);
+        if (error) showToast(error.message, 'error');
         else {
             setNewKidName('');
             setNewKidAvatar(AVATARS[Math.floor(Math.random() * AVATARS.length)]);
@@ -671,7 +719,7 @@ export default function Dashboard() {
 
     const updateKidAvatar = async (kidId, avatar) => {
         const { error } = await supabase.from('kids').update({ avatar }).eq('id', kidId);
-        if (error) alert(error.message);
+        if (error) showToast(error.message, 'error');
         else {
             setShowAvatarPicker(null);
             fetchData();
@@ -681,7 +729,7 @@ export default function Dashboard() {
     const updateKidPin = async (kidId, newPin) => {
         if (!/^\d{4}$/.test(newPin)) return;
         const { error } = await supabase.from('kids').update({ login_pin: newPin }).eq('id', kidId);
-        if (error) alert(error.message);
+        if (error) showToast(error.message, 'error');
         else fetchData();
     };
 
@@ -697,7 +745,7 @@ export default function Dashboard() {
 
     const saveEditKid = async (kidId) => {
         if (!editName.trim()) return;
-        if (!/^\d{4}$/.test(editPin)) return alert('PIN 碼必須為 4 位數字');
+        if (!/^\d{4}$/.test(editPin)) return showToast(t.pin_must_be_4, 'error');
 
         const { error } = await supabase.from('kids').update({
             name: editName.trim(),
@@ -705,7 +753,7 @@ export default function Dashboard() {
         }).eq('id', kidId);
 
         if (error) {
-            alert(error.message);
+            showToast(error.message, 'error');
         } else {
             setEditingKidId(null);
             fetchData();
@@ -737,14 +785,14 @@ export default function Dashboard() {
         if (!await checkParentPin()) return;
         showModal({
             type: 'confirm',
-            title: '刪除成員',
-            message: `確定要刪除「${kid.name}」嗎？此操作無法復原。`,
+            title: t.delete_member_title,
+            message: t.delete_member_confirm.replace('{name}', kid.name),
             onConfirm: async () => {
                 const { error } = await supabase.from('kids').delete().eq('id', kid.id);
                 if (error) {
-                    showModal({ title: '刪除失敗', message: error.message });
+                    showToast(t.delete_failed + error.message, 'error');
                 } else {
-                    showModal({ title: '操作成功', message: '成員已移除' });
+                    showToast(t.member_deleted);
                     fetchData();
                 }
             }
@@ -769,7 +817,7 @@ export default function Dashboard() {
         });
 
         if (error) {
-            alert('更新失敗: ' + error.message);
+            showToast(t.update_failed + error.message, 'error');
             console.error('RPC Error:', error);
             return;
         }
@@ -780,18 +828,18 @@ export default function Dashboard() {
     const batchAllocate = async () => {
         if (!await checkParentPin()) return;
         const minutes = allocPlan === 'weekday' ? family.weekday_limit : family.holiday_limit;
-        const reason = `${allocPlan === 'weekday' ? '平日' : '假日'}分配`;
+        const reason = allocPlan === 'weekday' ? t.weekday_alloc_reason : t.holiday_alloc_reason;
 
         showModal({
             type: 'confirm',
-            title: '批次分配',
-            message: `確定要為所有小孩分配 ${minutes} 分鐘嗎？`,
+            title: t.batch_alloc_title,
+            message: t.batch_alloc_confirm.replace('{mins}', minutes),
             onConfirm: async () => {
                 const actor = getActorName();
                 for (const kid of kids) {
                     await updateKidAction(kid, 0, minutes, 0, reason, actor, false);
                 }
-                showModal({ title: '完成', message: '分配完成！' });
+                showToast(t.alloc_done);
                 fetchData();
             }
         });
@@ -801,14 +849,14 @@ export default function Dashboard() {
         if (!await checkParentPin()) return;
         showModal({
             type: 'confirm',
-            title: '清空異動紀錄',
-            message: '確定要清空所有異動紀錄嗎？這將會刪除日誌，但「保留」目前的點數與剩餘時間。此操作無法復原。',
+            title: t.clear_logs_title,
+            message: t.clear_logs_confirm,
             onConfirm: async () => {
                 const kidIds = kids.map(k => k.id);
                 const { error } = await supabase.from('logs').delete().in('kid_id', kidIds);
-                if (error) showModal({ title: '失敗', message: error.message });
+                if (error) showToast(t.delete_failed + error.message, 'error');
                 else {
-                    showModal({ title: '成功', message: '異動紀錄已清空' });
+                    showToast(t.logs_cleared);
                     fetchData();
                 }
             }
@@ -819,8 +867,8 @@ export default function Dashboard() {
         if (!await checkParentPin()) return;
         showModal({
             type: 'confirm',
-            title: '危險：徹底清空',
-            message: '確定要清空所有紀錄「並歸零點數」嗎？所有小孩的點數與時間將會變為 0。此操作無法復原。',
+            title: t.reset_title,
+            message: t.reset_confirm,
             onConfirm: async () => {
                 const kidIds = kids.map(k => k.id);
                 // 1. Delete logs
@@ -828,9 +876,9 @@ export default function Dashboard() {
                 // 2. Reset kids stats
                 const { error } = await supabase.from('kids').update({ total_points: 0, total_minutes: 0 }).in('id', kidIds);
 
-                if (error) showModal({ title: '失敗', message: error.message });
+                if (error) showToast(t.delete_failed + error.message, 'error');
                 else {
-                    showModal({ title: '成功', message: '所有資料已重設並歸零' });
+                    showToast(t.reset_done);
                     fetchData();
                 }
             }
@@ -843,15 +891,15 @@ export default function Dashboard() {
 
         showModal({
             type: 'confirm',
-            title: '撤銷並刪除紀錄',
-            message: '確定要刪除並撤銷此紀錄嗎？這會自動還原該次異動的點數與時間。',
+            title: t.revert_log_title,
+            message: t.revert_log_confirm,
             onConfirm: async () => {
                 // Optimistic UI update for logs list
                 setLogs(prev => prev.filter(l => l.id !== logId));
 
                 const { error } = await supabase.rpc('delete_and_revert_log', { target_log_id: logId });
                 if (error) {
-                    showModal({ title: '撤銷失敗', message: error.message });
+                    showToast(t.revert_failed + error.message, 'error');
                     // Revert optimistic update if failed (optional, but good practice)
                     fetchData();
                 } else {
@@ -862,7 +910,7 @@ export default function Dashboard() {
     };
 
     const handleCreateFamily = async () => {
-        if (!newFamilyName.trim()) return alert('請輸入家庭名稱');
+        if (!newFamilyName.trim()) return showToast(t.enter_family_name, 'error');
 
         const { data: familyData, error } = await supabase.from('families').insert({
             family_name: newFamilyName,
@@ -871,7 +919,7 @@ export default function Dashboard() {
         }).select().single();
 
         if (error) {
-            alert('建立失敗: ' + error.message);
+            showToast(t.save_failed + error.message, 'error');
         } else if (familyData) {
             await supabase.from('profiles').update({ family_id: familyData.id }).eq('id', user.id);
             setShowOnboarding(false);
@@ -883,8 +931,8 @@ export default function Dashboard() {
         const codeToUse = typeof codeIn === 'string' ? codeIn.trim() : joinCode.trim();
         const pinToUse = typeof pinIn === 'string' ? pinIn.trim() : joinPin.trim();
 
-        if (!codeToUse) return alert('請輸入家庭代碼');
-        if (!pinToUse) return alert('請輸入家庭驗證 PIN 碼');
+        if (!codeToUse) return showToast(t.enter_family_code, 'error');
+        if (!pinToUse) return showToast(t.enter_family_pin, 'error');
 
         let targetId = codeToUse;
         let targetFamily = null;
@@ -912,16 +960,16 @@ export default function Dashboard() {
                     targetFamily = familyById;
                 }
             } else {
-                return alert(t.alert_no_family);
+                return showToast(t.alert_no_family, 'error');
             }
         }
 
-        if (!targetFamily) return alert(t.alert_no_family);
+        if (!targetFamily) return showToast(t.alert_no_family, 'error');
 
         // 3. Check PIN
         if (targetFamily.use_parent_pin && targetFamily.parent_pin) {
             if (pinToUse !== targetFamily.parent_pin) {
-                return alert('PIN 碼錯誤！加入家庭失敗。');
+                return showToast(t.join_pin_error, 'error');
             }
         }
 
@@ -929,9 +977,9 @@ export default function Dashboard() {
         const { error } = await supabase.rpc('join_family', { target_family_id: targetId });
 
         if (error) {
-            alert(t.alert_join_fail + error.message);
+            showToast(t.alert_join_fail + error.message, 'error');
         } else {
-            alert(t.alert_join_success);
+            showToast(t.alert_join_success);
             setShowOnboarding(false);
             setShowSettingsModal(false);
             // Clear inputs
@@ -966,15 +1014,23 @@ export default function Dashboard() {
         }
 
         if (error) {
-            alert('更新願望失敗: ' + error.message);
+            showToast(t.update_failed + error.message, 'error');
         } else {
             await fetchData();
         }
         setUpdatingKidGoalId(null);
     };
 
-    const handleDeleteGoal = async (kidId) => {
-        if (!confirm('確定要刪除這個願望目標嗎？')) return;
+    const handleDeleteGoal = (kidId) => {
+        showModal({
+            type: 'confirm',
+            title: t.delete_goal_confirm_title,
+            message: t.delete_goal_confirm_msg,
+            onConfirm: () => doDeleteGoal(kidId)
+        });
+    };
+
+    const doDeleteGoal = async (kidId) => {
         setUpdatingKidGoalId(kidId);
 
         try {
@@ -1008,7 +1064,7 @@ export default function Dashboard() {
             await fetchData();
         } catch (error) {
             console.error('Error deleting goal:', error);
-            alert('刪除失敗: ' + error.message);
+            showToast(t.remove_failed + error.message, 'error');
         } finally {
             setUpdatingKidGoalId(null);
         }
@@ -1024,22 +1080,22 @@ export default function Dashboard() {
 
             if (error) throw error;
             if (!allLogs || allLogs.length === 0) {
-                showModal({ title: '提醒', message: '目前沒有任何紀錄可以匯出。' });
+                showModal({ title: t.alert_title, message: t.no_export_data });
                 return;
             }
 
-            // CSV Header
-            const headers = ['時間', '對象', '原因', '點數變動', '分鐘變動', '操作者'];
+            // CSV Header (localized)
+            const headers = [t.col_time, t.col_target, t.col_reason, t.points_adjust, t.minutes_adjust, t.col_operator];
             const csvRows = [headers.join(',')];
 
             for (const log of allLogs) {
                 const row = [
                     `"${new Date(log.created_at).toLocaleString().replace(/"/g, '""')}"`,
-                    `"${(log.kids?.name || '未知').replace(/"/g, '""')}"`,
-                    `"${(log.reason || '調整').replace(/"/g, '""')}"`,
+                    `"${(log.kids?.name || '-').replace(/"/g, '""')}"`,
+                    `"${(log.reason || t.default_reason).replace(/"/g, '""')}"`,
                     log.points_change,
                     log.minutes_change,
-                    `"${(log.actor_name || '系統').replace(/"/g, '""')}"`
+                    `"${(log.actor_name || t.default_actor).replace(/"/g, '""')}"`
                 ];
                 csvRows.push(row.join(','));
             }
@@ -1049,21 +1105,26 @@ export default function Dashboard() {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `點數紀錄_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute('download', `points-bank-logs_${new Date().toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         } catch (e) {
             console.error('Export error:', e);
-            showModal({ title: '匯出失敗', message: e.message });
+            showToast(t.export_failed + e.message, 'error');
         }
     };
 
     if (loading) {
         const cached = typeof window !== 'undefined' ? localStorage.getItem('cached_theme') : 'doodle';
-        const isDark = cached === 'neon' || cached === 'cyber';
+        const isDark = cached === 'neon' || cached === 'cyber' || cached === 'jar';
         return (
-            <div className={`min-h-screen flex items-center justify-center font-bold animate-pulse ${isDark ? 'bg-[#080812] text-cyan-400' : 'bg-[#fffbf0] text-[#ff8a80]'}`}>載入中...</div>
+            <div className={`min-h-screen flex flex-col items-center justify-center gap-5 ${isDark ? 'bg-[#080812]' : 'bg-[#fffbf0]'}`}>
+                <div className="animate-bounce">
+                    <Logo className={`w-16 h-16 ${isDark ? 'text-cyan-400' : 'text-[#ff8a80]'}`} />
+                </div>
+                <div className={`font-black tracking-[0.3em] uppercase text-sm animate-pulse ${isDark ? 'text-cyan-400' : 'text-[#ff8a80]'}`}>{t.loading}</div>
+            </div>
         );
     }
 
@@ -1213,6 +1274,16 @@ export default function Dashboard() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-8 mt-8">
+                        {kids.length === 0 && userRole === 'parent' && (
+                            <div className={`glass-panel p-10 md:p-14 text-center flex flex-col items-center gap-4 ${family?.theme === 'jar' ? '' : (family?.theme !== 'neon' ? 'border-[#4a4a4a]' : 'border-cyan-500/20')}`}>
+                                <div className="text-6xl animate-bounce">🌱</div>
+                                <h3 className={`text-2xl font-black ${(family?.theme !== 'neon' && family?.theme !== 'jar') ? 'text-[#4a4a4a]' : 'text-white'}`}>{t.empty_kids_title}</h3>
+                                <p className={`font-medium max-w-sm ${family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-400'}`}>{t.empty_kids_desc}</p>
+                                <button onClick={() => setShowAddModal(true)} className="btn btn-primary px-8 py-4 mt-2 font-black uppercase tracking-widest shadow-xl">
+                                    <PlusCircle className="w-5 h-5" /> {t.add_first_kid}
+                                </button>
+                            </div>
+                        )}
                         {kids.map(kid => (
                             <KidCard
                                 key={kid.id}
@@ -1236,6 +1307,9 @@ export default function Dashboard() {
                 </div>
 
                 <div className="lg:col-span-4 space-y-8">
+                    {kids.length > 0 && (
+                        <WeeklyRecap kids={kids} logs={statsLogs} t={t} theme={family?.theme} />
+                    )}
                     <h2 className={`text-2xl font-black italic ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#4a4a4a]' : 'text-white')} flex items-center gap-3 uppercase tracking-tight`}><History className="text-pink-500" /> {t.history_log}</h2>
                     <div className="min-h-[500px]">
                         {logs.length === 0 ? (
@@ -1255,19 +1329,19 @@ export default function Dashboard() {
                                             <button
                                                 onClick={() => deleteLog(log.id)}
                                                 className={`p-1.5 rounded-lg ${family?.theme !== 'neon' ? 'text-[#ff8a80] hover:bg-red-50' : 'text-slate-500 hover:text-red-400 hover:bg-white/5'} transition-all`}
-                                                title="刪除此筆紀錄"
+                                                title={t.delete_log_tooltip}
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         )}
                                     </div>
-                                    <div className={`text-base ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-300')} font-medium`}>{log.reason || '調整'}</div>
+                                    <div className={`text-base ${family?.theme === 'jar' ? 'text-white' : (family?.theme !== 'neon' ? 'text-[#555]' : 'text-slate-300')} font-medium`}>{log.reason || t.default_reason}</div>
                                     <div className="flex justify-between items-center mt-1">
                                         <div className="flex gap-2">
-                                            {log.points_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} 點</span>}
-                                            {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} 分鐘</span>}
+                                            {log.points_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.points_change > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{log.points_change > 0 ? '+' : ''}{log.points_change} {t.pt_unit}</span>}
+                                            {log.minutes_change !== 0 && <span className={`text-sm px-2 py-0.5 rounded ${log.minutes_change > 0 ? (family?.theme !== 'neon' ? 'bg-[#ff8a80]/10 text-[#ff8a80]' : 'bg-cyan-500/10 text-cyan-400') : 'bg-orange-500/10 text-orange-400'}`}>{log.minutes_change > 0 ? '+' : ''}{log.minutes_change} {t.min_unit_short}</span>}
                                         </div>
-                                        <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-200/60' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600')} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || '系統'}</div>
+                                        <div className={`text-sm ${family?.theme === 'jar' ? 'text-purple-200/60' : (family?.theme !== 'neon' ? 'text-[#888]' : 'text-slate-600')} flex items-center gap-1`}><User className="w-4 h-4" /> {log.actor_name || t.default_actor}</div>
                                     </div>
                                 </li>
                             ))
@@ -1277,7 +1351,7 @@ export default function Dashboard() {
                         onClick={() => router.push('/logs')}
                         className={`w-full mt-4 py-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 ${family?.theme === 'jar' ? 'bg-purple-500/10 border-purple-500/20 text-purple-200 hover:bg-purple-500/30' : (family?.theme !== 'neon' ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] hover:bg-[#f5f5f5] hover:text-[#4a4a4a]' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10')}`}
                     >
-                        <History className="w-4 h-4" /> 查看全部異動紀錄
+                        <History className="w-4 h-4" /> {t.view_all_logs}
                     </button>
                 </div>
             </div>
@@ -1350,8 +1424,8 @@ export default function Dashboard() {
                                                         <button onClick={() => {
                                                             showModal({
                                                                 type: 'prompt',
-                                                                title: '輸入 PIN 碼',
-                                                                message: `請輸入「${hist.name}」的家庭 PIN 碼：`,
+                                                                title: t.security_check,
+                                                                message: `${hist.name} — ${t.enter_family_pin}`,
                                                                 onConfirm: (val) => handleJoinFamily(hist.short_id, val)
                                                             });
                                                         }} className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'bg-[#f5f5f5] text-[#4a4a4a] hover:bg-[#e0e0e0]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
@@ -1551,7 +1625,7 @@ export default function Dashboard() {
                                                                 cancelText: t.cancel,
                                                                 onConfirm: () => {
                                                                     navigator.clipboard.writeText(msg);
-                                                                    alert(t.copied);
+                                                                    showToast(t.copied);
                                                                 }
                                                             });
                                                         }}
@@ -1565,7 +1639,7 @@ export default function Dashboard() {
                                                     <button
                                                         onClick={() => {
                                                             if (kids.length === 0) {
-                                                                alert(t.no_kids_alert);
+                                                                showToast(t.no_kids_alert, 'error');
                                                                 return;
                                                             }
 
@@ -1595,7 +1669,7 @@ export default function Dashboard() {
                                                                                         cancelText: t.cancel,
                                                                                         onConfirm: () => {
                                                                                             navigator.clipboard.writeText(msg);
-                                                                                            alert(t.copied);
+                                                                                            showToast(t.copied);
                                                                                         }
                                                                                     });
                                                                                 }}
@@ -1626,7 +1700,7 @@ export default function Dashboard() {
                                                     placeholder="例如: FAMILY123"
                                                 />
                                                 <button
-                                                    onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); alert(t.copied); }}
+                                                    onClick={() => { navigator.clipboard.writeText(tempSettings.short_id); showToast(t.copied); }}
                                                     className={`absolute right-2 p-2 rounded-xl transition-all ${family?.theme !== 'neon' ? 'text-[#ccc] hover:text-[#4a4a4a] hover:bg-black/5' : 'text-slate-500 hover:text-white hover:bg-white/10'}`}
                                                     title={t.copy_code || 'Copy'}
                                                 >
@@ -1708,7 +1782,7 @@ export default function Dashboard() {
                                                                         if (parseInt(val) === ans) {
                                                                             setIsPinVisible(true);
                                                                         } else {
-                                                                            alert(t.math_error);
+                                                                            showToast(t.math_error, 'error');
                                                                         }
                                                                     }
                                                                 });
@@ -1864,6 +1938,20 @@ export default function Dashboard() {
             }
 
             <CustomModal config={modal} onClose={() => setModal(prev => ({ ...prev, isOpen: false }))} familyTheme={family?.theme} t={t} />
+
+            {/* Toast Feedback */}
+            {toast && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[300] animate-in fade-in slide-in-from-bottom-4 duration-300 px-4 w-full max-w-md pointer-events-none">
+                    <div className={`px-6 py-4 rounded-2xl font-bold text-center shadow-2xl border-2 flex items-center justify-center gap-2 ${family?.theme === 'jar'
+                        ? 'bg-[#0f172a] border-purple-500/50 text-white'
+                        : (family?.theme !== 'neon'
+                            ? 'bg-white border-[#4a4a4a] text-[#4a4a4a] shadow-[4px_4px_0px_#d8c4b6]'
+                            : 'bg-black border-cyan-500/40 text-white')}`}>
+                        <span>{toast.type === 'error' ? '⚠️' : '✅'}</span>
+                        <span className="text-sm">{toast.message}</span>
+                    </div>
+                </div>
+            )}
 
             <TourOverlay
                 step={tourStep}

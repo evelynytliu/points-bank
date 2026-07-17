@@ -12,6 +12,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
     const [imageUrl, setImageUrl] = useState(goal?.image_url || '');
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [formError, setFormError] = useState('');
     const fileInputRef = useRef(null);
 
     // Image compression utility
@@ -78,7 +79,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
             setImageUrl(publicUrlData.publicUrl);
         } catch (error) {
             console.error('Upload failed:', error);
-            alert(t.alert_upload_failed + error.message);
+            setFormError(t.alert_upload_failed + error.message);
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -93,6 +94,7 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
             setImageUrl(goal?.image_url || '');
             setIsEditing(!goal);
             setIsSaving(false);
+            setFormError('');
         }
     }, [isOpen, goal]);
 
@@ -103,9 +105,10 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
     const remaining = Math.max(0, (goal?.target_points || 0) - kid.total_points);
 
     const handleSave = async () => {
-        if (!title.trim()) return alert(t.alert_enter_wish_name);
-        if (targetPoints <= 0) return alert(t.alert_target_points_greater_zero);
+        if (!title.trim()) return setFormError(t.alert_enter_wish_name);
+        if (targetPoints <= 0) return setFormError(t.alert_target_points_greater_zero);
 
+        setFormError('');
         setIsSaving(true);
         try {
             await onSave({
@@ -366,6 +369,12 @@ export default function WishGoalModal({ isOpen, onClose, kid, goal, onSave, onDe
                                 </div>
                             )}
 
+
+                            {formError && (
+                                <div className={`p-3 rounded-xl text-sm font-bold text-center animate-in fade-in slide-in-from-top-1 duration-300 ${theme === 'doodle' ? 'bg-[#fff0ef] border-2 border-[#ff8a80] text-[#d84315]' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`} role="alert">
+                                    {formError}
+                                </div>
+                            )}
 
                             <div className="pt-2 flex gap-2">
                                 {goal && (

@@ -253,6 +253,72 @@ const rawTranslations = {
     delete_kid_tooltip: ['刪除小孩', 'Delete Kid'],
     enable_shake: ['開啟搖晃感應', 'Enable Shake'],
     encrypted_storage: ['加密儲存', 'Encrypted Storage'],
+
+    // Landing Page
+    hero_badge: ['親子共用的點數銀行', 'A points bank for families'],
+    hero_title_1: ['讓螢幕時間', 'Turn screen time'],
+    hero_title_2: ['變成孩子的成就感', "into kids' achievements"],
+    hero_subtitle: ['孩子用好表現賺點數、兌換螢幕時間、為願望儲蓄；家長輕鬆建立溫和且一致的家庭規則。', 'Kids earn points for good behavior, redeem screen time, and save for wishes — while parents set gentle, consistent family rules.'],
+    how_it_works: ['三步驟開始', 'How it works'],
+    feature1_title: ['賺點數', 'Earn Points'],
+    feature1_desc: ['完成任務與好表現，累積屬於自己的星星點數。', 'Complete tasks and earn stars for good behavior.'],
+    feature2_title: ['換時間', 'Redeem Time'],
+    feature2_desc: ['用點數兌換螢幕時間，額度與匯率由家長設定。', 'Trade points for screen time with limits set by parents.'],
+    feature3_title: ['存願望', 'Save for Wishes'],
+    feature3_desc: ['為心願目標儲蓄點數，練習耐心與延遲滿足。', 'Save points toward wish goals and practice patience.'],
+    landing_footer: ['為每個家庭打造的正向教養小工具', 'A positive parenting tool for every family'],
+    free_start: ['免費使用・1 分鐘完成設定', 'Free to use · 1-minute setup'],
+    searching: ['搜尋中...', 'Searching...'],
+
+    // Weekly Recap
+    weekly_recap: ['近 7 天小結', 'Last 7 Days'],
+    weekly_earned_pts: ['獲得點數', 'Points earned'],
+    weekly_family_total: ['全家共賺了', 'Family earned'],
+    streak_suffix: ['天連續', 'day streak'],
+    no_weekly_data: ['本週還沒有紀錄，發出第一筆點數吧！', 'No activity yet this week — award the first points!'],
+
+    // Empty State
+    empty_kids_title: ['歡迎加入 Points Bank！', 'Welcome to Points Bank!'],
+    empty_kids_desc: ['新增第一位小孩成員，開始你們家的點數之旅。', 'Add your first kid to start your family points journey.'],
+    add_first_kid: ['新增第一位小孩', 'Add Your First Kid'],
+
+    // Feedback / Toasts
+    settings_saved: ['設定已更新！', 'Settings saved!'],
+    save_failed: ['儲存失敗: ', 'Save failed: '],
+    code_taken: ['這個家庭訪問碼已經被使用了，請換一個（可點擊隨機產生）。', 'This access code is already taken. Try another one (or randomize).'],
+    member_removed: ['已成功移除', 'Member removed'],
+    remove_failed: ['移除失敗: ', 'Remove failed: '],
+    cannot_remove_admin: ['不能移除管理員', 'Cannot remove the admin'],
+    confirm_remove_member: ['確定要將此成員移出家庭嗎？', 'Remove this member from the family?'],
+    pin_must_be_4: ['PIN 碼必須為 4 位數字', 'PIN must be 4 digits'],
+    delete_goal_confirm_title: ['刪除願望', 'Delete Wish'],
+    delete_goal_confirm_msg: ['確定要刪除這個願望目標嗎？', 'Delete this wish goal?'],
+    update_failed: ['更新失敗: ', 'Update failed: '],
+    join_pin_error: ['PIN 碼錯誤！加入家庭失敗。', 'Wrong PIN! Failed to join family.'],
+    enter_family_name: ['請輸入家庭名稱', 'Please enter a family name'],
+    enter_family_code: ['請輸入家庭代碼', 'Please enter a family code'],
+    enter_family_pin: ['請輸入家庭驗證 PIN 碼', 'Please enter the family PIN'],
+
+    // Confirm dialogs (previously hardcoded Chinese)
+    delete_member_title: ['刪除成員', 'Delete Member'],
+    delete_member_confirm: ['確定要刪除「{name}」嗎？此操作無法復原。', 'Delete "{name}"? This cannot be undone.'],
+    member_deleted: ['成員已移除', 'Member removed'],
+    delete_failed: ['刪除失敗: ', 'Delete failed: '],
+    batch_alloc_title: ['批次分配', 'Batch Allocate'],
+    batch_alloc_confirm: ['確定要為所有小孩分配 {mins} 分鐘嗎？', 'Allocate {mins} minutes to all kids?'],
+    alloc_done: ['分配完成！', 'Allocation complete!'],
+    clear_logs_title: ['清空異動紀錄', 'Clear History Logs'],
+    clear_logs_confirm: ['確定要清空所有異動紀錄嗎？這將會刪除日誌，但「保留」目前的點數與剩餘時間。此操作無法復原。', 'Clear all history logs? Current points and time will be kept. This cannot be undone.'],
+    logs_cleared: ['異動紀錄已清空', 'History logs cleared'],
+    reset_title: ['危險：徹底清空', 'Danger: Full Reset'],
+    reset_confirm: ['確定要清空所有紀錄「並歸零點數」嗎？所有小孩的點數與時間將會變為 0。此操作無法復原。', 'Clear all logs AND reset all points to zero? This cannot be undone.'],
+    reset_done: ['所有資料已重設並歸零', 'All data has been reset to zero'],
+    revert_log_title: ['撤銷並刪除紀錄', 'Revert & Delete Log'],
+    revert_log_confirm: ['確定要刪除並撤銷此紀錄嗎？這會自動還原該次異動的點數與時間。', 'Delete and revert this log? Its points and time changes will be restored automatically.'],
+    revert_failed: ['撤銷失敗: ', 'Revert failed: '],
+    delete_log_tooltip: ['刪除此筆紀錄', 'Delete this log'],
+    no_export_data: ['目前沒有任何紀錄可以匯出。', 'No records to export yet.'],
+    export_failed: ['匯出失敗: ', 'Export failed: '],
 };
 
 // Helper to generate dictionaries

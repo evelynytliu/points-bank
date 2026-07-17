@@ -1,14 +1,46 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Points Bank | Smart Family Token System',
-  description: 'Manage screen time with a visual points system.',
+  metadataBase: new URL('https://points-bank.vercel.app'),
+  title: {
+    default: 'Points Bank 親子點數銀行｜讓螢幕時間變成孩子的成就感',
+    template: '%s | Points Bank',
+  },
+  description: '孩子用好表現賺點數、兌換螢幕時間、為願望儲蓄；家長輕鬆建立溫和且一致的家庭規則。免費使用，1 分鐘完成設定。',
+  keywords: ['親子', '點數銀行', '螢幕時間管理', '兒童獎勵', '正向教養', 'screen time', 'family points', 'kids rewards'],
+  applicationName: 'Points Bank',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Points Bank',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'zh_TW',
+    url: 'https://points-bank.vercel.app',
+    siteName: 'Points Bank',
+    title: 'Points Bank 親子點數銀行｜讓螢幕時間變成孩子的成就感',
+    description: '孩子用好表現賺點數、兌換螢幕時間、為願望儲蓄；家長輕鬆建立溫和且一致的家庭規則。',
+    images: [{ url: '/hero_warm.png', width: 1024, height: 1024, alt: 'Points Bank 親子點數銀行' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Points Bank 親子點數銀行',
+    description: '讓螢幕時間變成孩子的成就感。',
+    images: ['/hero_warm.png'],
+  },
   icons: {
     icon: '/logo_24px.svg',
     shortcut: '/logo_24px.svg',
-    apple: '/logo_24px.svg',
+    apple: '/logo_webicon.png',
   },
   manifest: '/manifest.json',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#fdfbf7',
 };
 
 export default function RootLayout({ children }) {
